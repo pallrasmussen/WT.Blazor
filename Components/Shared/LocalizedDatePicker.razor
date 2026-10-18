@@ -1,0 +1,155 @@
+@using System.Globalization
+@inject TimeProvider TimeProvider
+
+<div class="localized-date-picker">
+    <button id="@Id" type="button" class="localized-date-picker-input" @ref="triggerRef" @onclick="ToggleAsync" aria-label="@AriaLabel" aria-haspopup="dialog" aria-expanded="@isOpen">
+        <span>@(Value?.ToString(DateFormat, Culture) ?? DatePlaceholder)</span>
+        <span class="localized-date-picker-icon" aria-hidden="true">&#128197;</span>
+    </button>
+
+    @if (isOpen)
+    {
+        <div class="localized-calendar" role="dialog" aria-labelledby="@MonthHeadingId" @ref="calendarRef" @onkeydown="HandleKeyDownAsync" tabindex="-1">
+            <div class="localized-calendar-header">
+                <button type="button" class="localized-calendar-navigation" @onclick="ShowPreviousMonth" aria-label="@PreviousMonthLabel">&#8249;</button>
+            <strong id="@MonthHeadingId">@visibleMonth.ToString("MMMM yyyy", Culture)</strong>
+                <button type="button" class="localized-calendar-navigation" @onclick="ShowNextMonth" aria-label="@NextMonthLabel">&#8250;</button>
+            </div>
+            <div class="localized-calendar-weekdays">
+                @foreach (var dayName in WeekdayNames)
+                {
+                    <span>@dayName</span>
+                }
+            </div>
+            <div class="localized-calendar-days">
+                @foreach (var day in CalendarDays)
+                {
+                    @if (day is null)
+                    {
+                        <span></span>
+                    }
+                    else
+                    {
+                        <button type="button" class="@(day.Value.Date == Value?.Date ? "selected" : "")" aria-label="@day.Value.ToString("D", Culture)" aria-pressed="@(day.Value.Date == Value?.Date)" @onclick="() => SelectDate(day.Value)">@day.Value.Day</button>
+                    }
+                }
+            </div>
+            <button type="button" class="localized-calendar-clear" @onclick="Clear">@ClearLabel</button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public DateTime? Value { get; set; }
+    [Parameter] public EventCallback<DateTime?> ValueChanged { get; set; }
+    [Parameter] public string? Id { get; set; }
+    [Parameter] public string? AriaLabel { get; set; }
+
+    private DateTime visibleMonth;
+    private bool isOpen;
+    private ElementReference triggerRef;
+    private ElementReference calendarRef;
+    private bool shouldFocusCalendar;
+    private bool shouldFocusTrigger;
+
+    private CultureInfo Culture => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en"
+        ? CultureInfo.GetCultureInfo("en-US")
+        : CultureInfo.GetCultureInfo("fo");
+    private bool IsEnglish => Culture.TwoLetterISOLanguageName == "en";
+    private string DateFormat => IsEnglish ? "MM/dd/yyyy" : "dd.MM.yyyy";
+    private string DatePlaceholder => IsEnglish ? "Select date" : "Vel dagfesting";
+    private string CalendarLabel => IsEnglish ? "Date picker" : "Dagfestingarveljari";
+    private string PreviousMonthLabel => IsEnglish ? "Previous month" : "Undanfarni mánaður";
+    private string NextMonthLabel => IsEnglish ? "Next month" : "Næsti mánaður";
+    private string ClearLabel => IsEnglish ? "Clear" : "Rudda";
+    private string MonthHeadingId => $"{Id ?? "date-picker"}-month";
+    private DateTime LocalToday => TimeProvider.GetLocalNow().Date;
+
+    private IEnumerable<string> WeekdayNames => Enumerable.Range(0, 7)
+        .Select(index => Culture.DateTimeFormat.AbbreviatedDayNames[((int)Culture.DateTimeFormat.FirstDayOfWeek + index) % 7]);
+
+    private IEnumerable<DateTime?> CalendarDays
+    {
+        get
+        {
+            var firstDay = new DateTime(visibleMonth.Year, visibleMonth.Month, 1);
+            var leadingDays = ((int)firstDay.DayOfWeek - (int)Culture.DateTimeFormat.FirstDayOfWeek + 7) % 7;
+            var daysInMonth = DateTime.DaysInMonth(visibleMonth.Year, visibleMonth.Month);
+
+            for (var index = 0; index < 42; index++)
+            {
+                var day = index - leadingDays + 1;
+                yield return day < 1 || day > daysInMonth ? null : firstDay.AddDays(day - 1);
+            }
+        }
+    }
+
+    protected override void OnInitialized() => visibleMonth = StartOfMonth(LocalToday);
+
+    protected override void OnParametersSet()
+    {
+        if (!isOpen)
+        {
+            visibleMonth = StartOfMonth(Value ?? LocalToday);
+        }
+    }
+
+    private Task ToggleAsync()
+    {
+        isOpen = !isOpen;
+        if (isOpen)
+        {
+            visibleMonth = StartOfMonth(Value ?? LocalToday);
+            shouldFocusCalendar = true;
+        }
+        else
+        {
+            shouldFocusTrigger = true;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private void ShowPreviousMonth() => visibleMonth = visibleMonth.AddMonths(-1);
+    private void ShowNextMonth() => visibleMonth = visibleMonth.AddMonths(1);
+    private static DateTime StartOfMonth(DateTime date) => new(date.Year, date.Month, 1);
+
+    private async Task SelectDate(DateTime date)
+    {
+        isOpen = false;
+        shouldFocusTrigger = true;
+        await ValueChanged.InvokeAsync(date);
+    }
+
+    private async Task Clear()
+    {
+        isOpen = false;
+        shouldFocusTrigger = true;
+        await ValueChanged.InvokeAsync(null);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (shouldFocusCalendar)
+        {
+            shouldFocusCalendar = false;
+            await calendarRef.FocusAsync();
+        }
+        else if (shouldFocusTrigger)
+        {
+            shouldFocusTrigger = false;
+            await triggerRef.FocusAsync();
+        }
+    }
+
+    private Task HandleKeyDownAsync(KeyboardEventArgs args)
+    {
+        if (args.Key == "Escape")
+        {
+            isOpen = false;
+            shouldFocusTrigger = true;
+        }
+
+        return Task.CompletedTask;
+    }
+}

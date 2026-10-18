@@ -1,0 +1,9 @@
+@inject DeploymentManifest DeploymentManifest
+
+<footer class="site-footer">
+    <span>@AppText.Get("FooterProduct")</span>
+    @if (!string.Equals(DeploymentManifest.BuildVersion, "unknown", StringComparison.OrdinalIgnoreCase))
+    {
+        <span>@string.Format(AppText.Get("Version"), DeploymentManifest.BuildVersion)</span>
+    }
+</footer>

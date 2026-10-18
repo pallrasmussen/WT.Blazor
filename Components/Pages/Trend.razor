@@ -1,0 +1,81 @@
+@page "/gongd/{Id:int}"
+@layout Layout.PublicLayout
+@rendermode InteractiveServer
+@using WT.Blazor.Components.Shared
+@inject ITrendReportService TrendReportService
+
+<PageTitle>@(report is null ? $"{AppText.Get("TrendHeading")} | Sjúkrahúsverkið" : $"{report.Name} | Sjúkrahúsverkið")</PageTitle>
+
+<section class="public-hero">
+    <nav class="trend-navigation" aria-label="Navigation">
+        <a class="trend-back" href="@BackUrl">@AppText.Get("Back")</a>
+    </nav>
+    <p class="eyebrow">Sjúkrahúsverkið</p>
+    <h1>@AppText.Get("TrendHeading")</h1>
+</section>
+
+<section class="public-panel" aria-labelledby="trend-title">
+    @if (isLoading)
+    {
+        <div class="empty-state">
+            <strong>@AppText.Get("Loading")</strong>
+        </div>
+    }
+    else if (report is null)
+    {
+        <div class="empty-state">
+            <strong>@AppText.Get("NotFound")</strong>
+            <a class="btn-secondary" href="@BackUrl">@AppText.Get("Back")</a>
+        </div>
+    }
+    else
+    {
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">@report.Hospital</p>
+                <h2 id="trend-title">@report.Name</h2>
+            </div>
+            <span class="result-count">@AppText.Get("Current"): @report.CurrentWait</span>
+        </div>
+        <p class="result-count">@AppText.Get("TrendDescription")</p>
+        <div class="trend-period-control">
+            <label for="trend-period">@AppText.Get("TrendPeriod")</label>
+            <select id="trend-period" @bind="selectedPeriodDays">
+                <option value="">@AppText.Get("TrendPeriodAll")</option>
+                <option value="90">@AppText.Get("TrendPeriodThreeMonths")</option>
+                <option value="365">@AppText.Get("TrendPeriodYear")</option>
+            </select>
+        </div>
+        <WaitTrendChart Points="VisiblePoints" UnitLabel="@report.UnitLabel" />
+        <div class="trend-actions">
+            <a class="btn-teal button-link" href="@($"/api/trend/{Id}/export/pdf")">@AppText.Get("ExportPdf")</a>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnUrl { get; set; }
+
+    private TrendReport? report;
+    private bool isLoading = true;
+    private int? selectedPeriodDays;
+    private string BackUrl => !string.IsNullOrWhiteSpace(ReturnUrl)
+        && ReturnUrl.StartsWith('/')
+        && !ReturnUrl.StartsWith("//")
+        ? ReturnUrl
+        : "/";
+    private List<TrendPoint> VisiblePoints => report is null || selectedPeriodDays is null
+        ? report?.Points ?? []
+        : report.Points.Where(point => point.Timestamp >= report.Points.Max(point => point.Timestamp).AddDays(-selectedPeriodDays.Value)).ToList();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        isLoading = true;
+        report = await TrendReportService.GetAsync(Id);
+        isLoading = false;
+    }
+}

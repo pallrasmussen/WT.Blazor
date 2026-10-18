@@ -1,0 +1,33 @@
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@using System.Globalization
+
+<div class="public-shell">
+    <a class="skip-link" href="#public-content">@AppText.Get("SkipToContent")</a>
+    <header class="public-header">
+        <a class="brand" href="/" aria-label="Sjúkrahúsverkið">
+            <img src="/images/Sj%C3%BAkrah%C3%BAsverki%20logo.png" alt="" />
+        </a>
+        <div class="public-header-actions">
+            <div class="language-switcher" aria-label="@AppText.Get("Language")">
+                <form method="get" action="/culture/fo" data-enhance="false">
+                    <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+                    <button type="submit" aria-label="@AppText.Get("Faroese")" class="@(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "fo" ? "active" : "")">FO</button>
+                </form>
+                <form method="get" action="/culture/en" data-enhance="false">
+                    <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+                    <button type="submit" aria-label="@AppText.Get("English")" class="@(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en" ? "active" : "")">EN</button>
+                </form>
+            </div>
+            <a class="internal-link" href="/internal">@AppText.Get("Administration")</a>
+        </div>
+    </header>
+    <main id="public-content" class="public-content" tabindex="-1">
+        @Body
+    </main>
+    <SiteFooter />
+</div>
+
+@code {
+    private string ReturnUrl => new Uri(NavigationManager.Uri).PathAndQuery;
+}

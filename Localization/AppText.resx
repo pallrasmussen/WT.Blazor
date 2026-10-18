@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="WaitingTime" xml:space="preserve"><value>Væntað bíðitíð</value></data>
+  <data name="Intro" xml:space="preserve"><value>Her sært tú væntaðu bíðitíðina til útvaldar viðtalur, kanningar og viðgerðir í Sjúkrahúsverkinum.</value></data>
+  <data name="Hospital" xml:space="preserve"><value>Sjúkrahús / felags bíðilisti</value></data>
+  <data name="ChooseHospital" xml:space="preserve"><value>Vel sjúkrahús</value></data>
+  <data name="Department" xml:space="preserve"><value>Depil</value></data>
+  <data name="AllDepartments" xml:space="preserve"><value>Allir deplar</value></data>
+  <data name="AdvancedFilters" xml:space="preserve"><value>Víðka leiting</value></data>
+  <data name="MoreActions" xml:space="preserve"><value>Fleiri gerðir</value></data>
+  <data name="ChooseWaitingTimeScope" xml:space="preserve"><value>Vel sjúkrahús omanfyri.</value></data>
+  <data name="ChooseWaitingTimeScopeHint" xml:space="preserve"><value>Ella vel allar bíðitíðir fyri at síggja alt.</value></data>
+  <data name="TrendNotEnoughData" xml:space="preserve"><value>Ikki nóg nógv søgulig dáta enn til at vísa gongdina.</value></data>
+  <data name="TrendChartLabel" xml:space="preserve"><value>Gongdin í bíðitíð</value></data>
+  <data name="TrendDataTable" xml:space="preserve"><value>Vís dáta í talvu</value></data>
+  <data name="SkipToContent" xml:space="preserve"><value>Leyp til innihald</value></data>
+  <data name="Faroese" xml:space="preserve"><value>Føroyskt</value></data>
+  <data name="English" xml:space="preserve"><value>Enskt</value></data>
+  <data name="Language" xml:space="preserve"><value>Mál</value></data>
+  <data name="Search" xml:space="preserve"><value>Leita eftir sergrein / viðgerð</value></data>
+  <data name="SearchPlaceholder" xml:space="preserve"><value>Leita</value></data>
+  <data name="Results" xml:space="preserve"><value>bíðitíðir</value></data>
+  <data name="Growing" xml:space="preserve"><value>Veksur</value></data>
+  <data name="Declining" xml:space="preserve"><value>Minkar</value></data>
+  <data name="Unchanged" xml:space="preserve"><value>Óbroytt</value></data>
+  <data name="Loading" xml:space="preserve"><value>Leitar...</value></data>
+  <data name="NoResults" xml:space="preserve"><value>Ongar bíðitíðir funnar.</value></data>
+  <data name="ChangeFilters" xml:space="preserve"><value>Royn at broyta filtreringina ella leitiorðið.</value></data>
+  <data name="Trend" xml:space="preserve"><value>Sí gongdina</value></data>
+  <data name="TrendHeading" xml:space="preserve"><value>Gongd í bíðitíð</value></data>
+  <data name="TrendDescription" xml:space="preserve"><value>Grafurin vísir, hvussu væntaða bíðitíðin er broytt í einum tíðarskeiði.</value></data>
+  <data name="Current" xml:space="preserve"><value>Nú</value></data>
+  <data name="NotFound" xml:space="preserve"><value>Bíðitíðin varð ikki funnin.</value></data>
+  <data name="Back" xml:space="preserve"><value>Aftur til bíðitíðir</value></data>
+  <data name="Administration" xml:space="preserve"><value>Umsiting</value></data>
+  <data name="AdministrationAccessRequired" xml:space="preserve"><value>Atgongd til umsiting krevur innriting</value></data>
+  <data name="AdministrationAccessRequiredText" xml:space="preserve"><value>Rita inn við einum Heilsunet-brúkara, sum er limur í einum góðkendum bólki. Um tú avbrýtur innritingina ella upplýsingarnar ikki verða góðtiknar, kanst tú ikki opna umsitingina.</value></data>
+  <data name="PageNotFound" xml:space="preserve"><value>Síðan finst ikki</value></data>
+  <data name="PageNotFoundText" xml:space="preserve"><value>Innihaldið, tú leitar eftir, finst ikki ella er flutt.</value></data>
+  <data name="LastUpdated" xml:space="preserve"><value>Seinast dagført</value></data>
+  <data name="TrendLegend" xml:space="preserve"><value>Tekn til gongd í bíðitíð</value></data>
+  <data name="ExportPdf" xml:space="preserve"><value>Tak niður sum PDF</value></data>
+  <data name="AdminHeading" xml:space="preserve"><value>Dagfør bíðitíðir, eindir og viðmerkingar.</value></data>
+  <data name="AdminHeadingCreate" xml:space="preserve"><value>Stovna bíðitíð</value></data>
+  <data name="AllWaitingLists" xml:space="preserve"><value>Allir bíðilistar</value></data>
+  <data name="AllHospitals" xml:space="preserve"><value>Øll sjúkrahús</value></data>
+  <data name="SearchByName" xml:space="preserve"><value>Leita eftir navni</value></data>
+  <data name="NeedsReview" xml:space="preserve"><value>Vís bíðitíðir, ið krevja eftirlit ({0})</value></data>
+  <data name="ChooseDepartment" xml:space="preserve"><value>Vel depil</value></data>
+  <data name="SpecialtyTreatment" xml:space="preserve"><value>Sergrein / viðgerð</value></data>
+  <data name="Wait" xml:space="preserve"><value>Bíðitíð</value></data>
+  <data name="Unit" xml:space="preserve"><value>Eind</value></data>
+  <data name="Note" xml:space="preserve"><value>Viðmerking</value></data>
+  <data name="Optional" xml:space="preserve"><value>Valfrítt</value></data>
+  <data name="SaveNew" xml:space="preserve"><value>Goym nýggja bíðitíð</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Angra</value></data>
+  <data name="NoWaitingTimes" xml:space="preserve"><value>Ongin bíðitíð funnin.</value></data>
+  <data name="Edit" xml:space="preserve"><value>Rætta</value></data>
+  <data name="Delete" xml:space="preserve"><value>Strika</value></data>
+  <data name="EditWaitingTime" xml:space="preserve"><value>Rætta bíðitíð</value></data>
+  <data name="SaveChanges" xml:space="preserve"><value>Goym broytingar</value></data>
+  <data name="RemoveWaitingTime" xml:space="preserve"><value>Tak bíðitíð av almennu síðuni</value></data>
+  <data name="Reason" xml:space="preserve"><value>Orsøk</value></data>
+  <data name="RemoveFromPublic" xml:space="preserve"><value>Tak av almennu síðuni</value></data>
+  <data name="SelectHospitalValidation" xml:space="preserve"><value>Vel sjúkrahús.</value></data>
+  <data name="SelectDepartmentValidation" xml:space="preserve"><value>Vel depil.</value></data>
+  <data name="EnterNameValidation" xml:space="preserve"><value>Skriva navn á sergrein ella viðgerð.</value></data>
+  <data name="NegativeWaitValidation" xml:space="preserve"><value>Bíðitíðin kann ikki vera negativ.</value></data>
+  <data name="CreatedMessage" xml:space="preserve"><value>{0} er stovnað og sæst nú á almennu síðuni.</value></data>
+  <data name="UpdatedMessage" xml:space="preserve"><value>{0} er rættað.</value></data>
+  <data name="DeactivatedMessage" xml:space="preserve"><value>{0} er tikið av almennu síðuni.</value></data>
+  <data name="WaitingTimeConflict" xml:space="preserve"><value>Bíðitíðin er broytt av øðrum brúkara. Les síðuna umaftur og royn aftur.</value></data>
+  <data name="WaitingTimeNotFound" xml:space="preserve"><value>Bíðitíðin finst ikki longur. Les síðuna umaftur.</value></data>
+  <data name="Date" xml:space="preserve"><value>Dagfesting</value></data>
+  <data name="ExportedAt" xml:space="preserve"><value>Útskrivað</value></data>
+  <data name="TrendExportFileName" xml:space="preserve"><value>Biditid_gongd</value></data>
+  <data name="TrendHistory" xml:space="preserve"><value>Loggur</value></data>
+  <data name="ExportRecords" xml:space="preserve"><value>{0} loggpostar</value></data>
+  <data name="HistoryExportFileName" xml:space="preserve"><value>Biditidir_loggur</value></data>
+  <data name="HistoryExportPdfFileName" xml:space="preserve"><value>Biditidir_loggur</value></data>
+  <data name="Of" xml:space="preserve"><value>av</value></data>
+  <data name="Page" xml:space="preserve"><value>Síða</value></data>
+  <data name="AllWaitingTimes" xml:space="preserve"><value>Allar bíðitíðir</value></data>
+  <data name="ClearFilters" xml:space="preserve"><value>Rudda</value></data>
+  <data name="QuickUpdate" xml:space="preserve"><value>Skjótt dagfør</value></data>
+  <data name="ActiveFilters" xml:space="preserve"><value>Virknar sílur</value></data>
+  <data name="SortResults" xml:space="preserve"><value>Raða úrslit</value></data>
+  <data name="SortName" xml:space="preserve"><value>Navn A-Z</value></data>
+  <data name="SortShortestWait" xml:space="preserve"><value>Styttsta bíðitíð fyrst</value></data>
+  <data name="SortLongestWait" xml:space="preserve"><value>Longsta bíðitíð fyrst</value></data>
+  <data name="SortRecentlyUpdated" xml:space="preserve"><value>Seinast dagført fyrst</value></data>
+  <data name="FreshnessLegend" xml:space="preserve"><value>Hvussu nýlig dagføringin er</value></data>
+  <data name="FreshnessCurrent" xml:space="preserve"><value>Dagført seinastu 3 mánaðirnar</value></data>
+  <data name="FreshnessReview" xml:space="preserve"><value>3-6 mánaðir síðani</value></data>
+  <data name="FreshnessOverdue" xml:space="preserve"><value>Longri enn 6 mánaðir síðani</value></data>
+  <data name="TrendChangeDays" xml:space="preserve"><value>{0} dagar síðan fyrsta skrásetta dagføring</value></data>
+  <data name="Export" xml:space="preserve"><value>Tak niður</value></data>
+  <data name="ReviewQueue" xml:space="preserve"><value>{0} bíðitíðir bíða eftir eftirliti</value></data>
+  <data name="ReviewAll" xml:space="preserve"><value>Eftirkanna allar</value></data>
+  <data name="ConfirmReviewAll" xml:space="preserve"><value>Vátta eftirlit av øllum</value></data>
+  <data name="MarkReviewed" xml:space="preserve"><value>Merk sum eftirkannað</value></data>
+  <data name="ReviewedMessage" xml:space="preserve"><value>{0} er eftirkannað.</value></data>
+  <data name="ReviewedCountMessage" xml:space="preserve"><value>{0} bíðitíðir eru eftirkannaðar.</value></data>
+  <data name="ReviewQueueKeyboardHint" xml:space="preserve"><value>Nýt upp- og niðurpílar á listanum til at fara ígjøgnum.</value></data>
+  <data name="HospitalService" xml:space="preserve"><value>Sjúkrahúsverkið</value></data>
+  <data name="Internal" xml:space="preserve"><value>Innanhýsis</value></data>
+  <data name="EditWaitingTimes" xml:space="preserve"><value>Broyt bíðitíð</value></data>
+  <data name="AddWaitingTime" xml:space="preserve"><value>Stovna bíðitíð</value></data>
+  <data name="History" xml:space="preserve"><value>Loggur</value></data>
+  <data name="Operations" xml:space="preserve"><value>Rakstur</value></data>
+  <data name="DatabaseHealthy" xml:space="preserve"><value>Samband við dátugrunn er í lagi</value></data>
+  <data name="DatabaseUnverified" xml:space="preserve"><value>Samband við dátugrunn kann ikki váttast</value></data>
+  <data name="SystemHealthyAt" xml:space="preserve"><value>Rakstur í lagi · {0:HH:mm}</value></data>
+  <data name="CheckSystem" xml:space="preserve"><value>Kanna rakstur</value></data>
+  <data name="Administrator" xml:space="preserve"><value>Umsitari</value></data>
+  <data name="SuperAdministrator" xml:space="preserve"><value>Høvuðsumsitari</value></data>
+  <data name="OperationsIntro" xml:space="preserve"><value>Støðan á trygdaravritum og varðveiting av loggi.</value></data>
+  <data name="PrintReport" xml:space="preserve"><value>Printa frágreiðing</value></data>
+  <data name="LatestBackup" xml:space="preserve"><value>Seinasta trygdaravrit</value></data>
+  <data name="NoBackup" xml:space="preserve"><value>Einki trygdaravrit er funnið á serverinum.</value></data>
+  <data name="AuditRetention" xml:space="preserve"><value>Varðveiting av loggi</value></data>
+  <data name="AuditRetentionIntro" xml:space="preserve"><value>Loggpostar eldri enn {0} dagar skulu verða mettir sambært galdandi varðveitingarkrøvum.</value></data>
+  <data name="AuditRetentionCount" xml:space="preserve"><value>{0} loggpostar eru eldri enn markið. Eingir loggpostar verða strikaðir automatisk.</value></data>
+  <data name="RecentChanges" xml:space="preserve"><value>Nýligar broytingar</value></data>
+  <data name="RecentChangesCount" xml:space="preserve"><value>{0} broytingar seinastu 7 dagarnar.</value></data>
+  <data name="NeedsReviewCount" xml:space="preserve"><value>{0} bíðitíðir krevja eftirlit.</value></data>
+  <data name="DataQuality" xml:space="preserve"><value>Dátugóðska</value></data>
+  <data name="LongWaitsCount" xml:space="preserve"><value>{0} bíðitíðir eru longri enn {1} dagar.</value></data>
+  <data name="MissingDepartmentsCount" xml:space="preserve"><value>{0} bíðitíðir á Landssjúkrahúsinum mangla depil.</value></data>
+  <data name="UnsavedChanges" xml:space="preserve"><value>Tú hevur ógoymdar broytingar.</value></data>
+  <data name="KeepEditing" xml:space="preserve"><value>Halt fram at rætta</value></data>
+  <data name="DiscardChanges" xml:space="preserve"><value>Koyr broytingar burtur</value></data>
+  <data name="ReviewedByAt" xml:space="preserve"><value>Eftirkannað av {0} · {1:dd.MM.yyyy HH:mm}</value></data>
+  <data name="TrendPeriod" xml:space="preserve"><value>Tíðarskeið</value></data>
+  <data name="TrendPeriodAll" xml:space="preserve"><value>Alt tíðarskeiðið</value></data>
+  <data name="TrendPeriodThreeMonths" xml:space="preserve"><value>Seinastu 3 mánaðir</value></data>
+  <data name="TrendPeriodYear" xml:space="preserve"><value>Seinasta árið</value></data>
+  <data name="ExportPreparing" xml:space="preserve"><value>Ger skjalið klárt til niðurtøku...</value></data>
+  <data name="ExportLimitMessage" xml:space="preserve"><value>{0} loggpostar passa ikki í eina útskriving. Avmarka úrslitini til í mesta lagi {1}.</value></data>
+  <data name="PrintResults" xml:space="preserve"><value>Printa úrslit</value></data>
+  <data name="Print" xml:space="preserve"><value>Printa</value></data>
+  <data name="SharedWaitingList" xml:space="preserve"><value>Felags bíðilisti</value></data>
+  <data name="SharedWaitingLists" xml:space="preserve"><value>Felags bíðilistar</value></data>
+  <data name="ResultsSummary" xml:space="preserve"><value>Vísir {0} bíðitíðir úr {1}.</value></data>
+  <data name="UpdatedToday" xml:space="preserve"><value>{0} dagførdar í dag</value></data>
+  <data name="ExplainIndicators" xml:space="preserve"><value>Hvat merkja teknini?</value></data>
+  <data name="PrintContext" xml:space="preserve"><value>{0} · {1} bíðitíðir · Printað {2:dd.MM.yyyy HH:mm}</value></data>
+  <data name="UpdatedFilter" xml:space="preserve"><value>Seinast dagført</value></data>
+  <data name="UpdatedFilterAll" xml:space="preserve"><value>Altíð</value></data>
+  <data name="UpdatedFilterToday" xml:space="preserve"><value>Í dag</value></data>
+  <data name="UpdatedFilterWeek" xml:space="preserve"><value>Seinastu 7 dagarnar</value></data>
+  <data name="UpdatedFilterStale" xml:space="preserve"><value>Krevur eftirlit</value></data>
+  <data name="LargerText" xml:space="preserve"><value>Størri tekstur</value></data>
+  <data name="FilterPresets" xml:space="preserve"><value>Snarvegir</value></data>
+  <data name="PresetAll" xml:space="preserve"><value>Allar</value></data>
+  <data name="PresetNeedsReview" xml:space="preserve"><value>Krevur eftirlit</value></data>
+  <data name="ChangePreview" xml:space="preserve"><value>Kanna broytingar</value></data>
+  <data name="ConfirmSave" xml:space="preserve"><value>Vátta og goym</value></data>
+  <data name="NoChanges" xml:space="preserve"><value>Ongar broytingar eru at goyma.</value></data>
+  <data name="Undo" xml:space="preserve"><value>Angra broyting</value></data>
+  <data name="UndoCompleted" xml:space="preserve"><value>Broytingin er angrað og skrásett í logginum.</value></data>
+  <data name="CompactMode" xml:space="preserve"><value>Stutt víst</value></data>
+  <data name="VisibleColumns" xml:space="preserve"><value>Vís teigar</value></data>
+  <data name="HistoryColumnHospital" xml:space="preserve"><value>Sjúkrahús</value></data>
+  <data name="HistoryColumnDepartment" xml:space="preserve"><value>Depil</value></data>
+  <data name="HistoryColumnDetail" xml:space="preserve"><value>Broyting</value></data>
+  <data name="HistoryColumnWaits" xml:space="preserve"><value>Bíðitíðir</value></data>
+  <data name="HistoryColumnUsername" xml:space="preserve"><value>HN-brúkari</value></data>
+  <data name="Settings" xml:space="preserve"><value>Stillingar</value></data>
+  <data name="SettingsIntro" xml:space="preserve"><value>Stýr markvirðum, ið verða brúkt til at vísa dagføringar og fylgja upp uppá langar bíðitíðir.</value></data>
+  <data name="FreshnessSettings" xml:space="preserve"><value>Dagføringarstøða</value></data>
+  <data name="FreshnessSettingsIntro" xml:space="preserve"><value>Litirnir vísa, hvussu leingi síðani ein bíðitíð seinast varð dagførd.</value></data>
+  <data name="GreenThreshold" xml:space="preserve"><value>Grønt: upp til mánaðir</value></data>
+  <data name="GreenThresholdHint" xml:space="preserve"><value>Dagført seinastu mánaðirnar.</value></data>
+  <data name="YellowThreshold" xml:space="preserve"><value>Gult: upp til mánaðir</value></data>
+  <data name="YellowThresholdHint" xml:space="preserve"><value>Eldri enn grøna markið, men innan hesa tíð.</value></data>
+  <data name="RedThreshold" xml:space="preserve"><value>Reytt</value></data>
+  <data name="RedThresholdHint" xml:space="preserve"><value>Eldri enn {0} mánaðir.</value></data>
+  <data name="OperationsSettingsIntro" xml:space="preserve"><value>Hesi markvirði verða brúkt í rakstraryvirlitinum.</value></data>
+  <data name="LongWaitThreshold" xml:space="preserve"><value>Long bíðitíð: mánaðir</value></data>
+  <data name="LongWaitThresholdHint" xml:space="preserve"><value>Bíðitíðir longri enn hetta verða taldar við í dátugóðskuni.</value></data>
+  <data name="SaveSettings" xml:space="preserve"><value>Goym stillingar</value></data>
+  <data name="SettingsSaved" xml:space="preserve"><value>Stillingarnar eru goymdar.</value></data>
+  <data name="SettingsSaveFailed" xml:space="preserve"><value>Stillingarnar kundu ikki goymast. Royn aftur.</value></data>
+  <data name="GreenThresholdValidation" xml:space="preserve"><value>Grøna markið skal vera millum 1 og 24 mánaðir.</value></data>
+  <data name="YellowThresholdValidation" xml:space="preserve"><value>Gula markið skal vera størri enn grøna markið og í mesta lagi 36 mánaðir.</value></data>
+  <data name="LongWaitThresholdValidation" xml:space="preserve"><value>Markið fyri langa bíðitíð skal vera millum 1 og 60 mánaðir.</value></data>
+  <data name="LongWaitsCountMonths" xml:space="preserve"><value>{0} bíðitíðir eru longri enn {1} mánaðir.</value></data>
+  <data name="FooterProduct" xml:space="preserve"><value>Sjúkrahúsverkið · Bíðitíðir</value></data>
+  <data name="Version" xml:space="preserve"><value>Útgáva {0}</value></data>
+  <data name="SettingsAudit" xml:space="preserve"><value>Seinastu broytingar</value></data>
+  <data name="SettingsAuditEmpty" xml:space="preserve"><value>Ongar stillingar eru broyttar enn.</value></data>
+  <data name="SettingsAuditEntry" xml:space="preserve"><value>{0:dd.MM.yyyy HH:mm} · {1}: grønt {2}→{3}, gult {4}→{5}, long bíðitíð {6}→{7} mánaðir</value></data>
+  <data name="HistoryIntro" xml:space="preserve"><value>Her sæst, hvør hevur gjørt broytingar í bíðitíðunum og nær broytingin varð gjørd.</value></data>
+  <data name="HistoryAction" xml:space="preserve"><value>Gerð</value></data>
+  <data name="AllHistoryActions" xml:space="preserve"><value>Allar gerðir</value></data>
+  <data name="AllHistoryUsers" xml:space="preserve"><value>Allir brúkarar</value></data>
+  <data name="SearchHistory" xml:space="preserve"><value>Leita í loggi</value></data>
+  <data name="SearchHistoryPlaceholder" xml:space="preserve"><value>Navn, broyting ella brúkari</value></data>
+  <data name="From" xml:space="preserve"><value>Frá</value></data>
+  <data name="To" xml:space="preserve"><value>Til</value></data>
+  <data name="FromDate" xml:space="preserve"><value>Frá dagfesting</value></data>
+  <data name="ToDate" xml:space="preserve"><value>Til dagfesting</value></data>
+  <data name="HistorySort" xml:space="preserve"><value>Raða eftir</value></data>
+  <data name="HistorySortNewest" xml:space="preserve"><value>Nýggjasta fyrst</value></data>
+  <data name="HistorySortOldest" xml:space="preserve"><value>Elsta fyrst</value></data>
+  <data name="HistoryPageSize" xml:space="preserve"><value>Vís í senn</value></data>
+  <data name="HistoryDays" xml:space="preserve"><value>{0} dagar</value></data>
+  <data name="HistoryYearToDate" xml:space="preserve"><value>Í ár</value></data>
+  <data name="HistoryDateTime" xml:space="preserve"><value>Dagfesting og tíð</value></data>
+  <data name="HistoryOldWait" xml:space="preserve"><value>Gamla bíðitíð</value></data>
+  <data name="HistoryNewWait" xml:space="preserve"><value>Nýggja bíðitíð</value></data>
+  <data name="HistoryRequestId" xml:space="preserve"><value>Request ID</value></data>
+  <data name="HistoryPages" xml:space="preserve"><value>Síður í loggi</value></data>
+  <data name="PreviousPage" xml:space="preserve"><value>Undanfarna síða</value></data>
+  <data name="NextPage" xml:space="preserve"><value>Næsta síða</value></data>
+  <data name="HistoryPageSummary" xml:space="preserve"><value>Síða {0} av {1}</value></data>
+  <data name="HistoryRecordCountSingle" xml:space="preserve"><value>{0} loggpostur</value></data>
+  <data name="HistoryRecordCountPlural" xml:space="preserve"><value>{0} loggpostar</value></data>
+  <data name="UnitDays" xml:space="preserve"><value>dagar</value></data>
+  <data name="UnitWeeks" xml:space="preserve"><value>vikur</value></data>
+  <data name="UnitMonths" xml:space="preserve"><value>mánaðir</value></data>
+  <data name="ChangeHospital" xml:space="preserve"><value>Sjúkrahús: {0} → {1}</value></data>
+  <data name="WaitingTimeGuidanceHeading" xml:space="preserve"><value>Væntað bíðitíð</value></data>
+  <data name="WaitingTimeMeaningHeading" xml:space="preserve"><value>Hvat er væntað bíðitíð?</value></data>
+  <data name="WaitingTimeMeaningText" xml:space="preserve"><value>Bíðitíð er eitt vegleiðandi mát fyri, hvussu leingi ein nýggjur sjúklingur kann vænta at bíða. Tín bíðitíð kann vera øðrvísi.</value></data>
+  <data name="WaitingTimeUpdateHeading" xml:space="preserve"><value>Nær verður hon dagførd?</value></data>
+  <data name="WaitingTimeUpdateText" xml:space="preserve"><value>Hvør deild hevur ábyrgd av at dagføra sína væntaðu bíðitíð. Dagfestingin verður víst saman við bíðitíðini.</value></data>
+  <data name="Activate" xml:space="preserve"><value>Virkja</value></data>
+  <data name="Deactivate" xml:space="preserve"><value>Óvirkja</value></data>
+  <data name="DeactivateWaitingTime" xml:space="preserve"><value>Óvirkja bíðitíð á almennu síðuni</value></data>
+  <data name="Inactive" xml:space="preserve"><value>Óvirk</value></data>
+  <data name="ReactivatedMessage" xml:space="preserve"><value>{0} er virkjað á almennu síðuni.</value></data>
+  <data name="ShowInactive" xml:space="preserve"><value>Vís óvirknar ({0})</value></data>
+</root>

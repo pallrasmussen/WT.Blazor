@@ -1,0 +1,20 @@
+# .NET build output
+[Bb]in/
+[Oo]bj/
+
+# Test output
+[Tt]est[Rr]esults/
+*.trx
+
+# Visual Studio and VS Code user-specific files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# JetBrains Rider
+.idea/
+
+# Local environment files
+*.local.json

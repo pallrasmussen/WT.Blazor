@@ -1,0 +1,410 @@
+2026-10-15 13:53:26.290 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 13:53:26.314 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 13:54:45.623 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 272.0136 ms {"RequestId":"0HNPANDUDNCJ8:00000001","ConnectionId":"0HNPANDUDNCJ8"}
+2026-10-15 13:54:45.680 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 200 in 25.4117 ms {"RequestId":"0HNPANDUDNCJ8:0000000B","ConnectionId":"0HNPANDUDNCJ8"}
+2026-10-15 13:54:45.683 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 30.8425 ms {"RequestId":"0HNPANDUDNCJ8:00000005","ConnectionId":"0HNPANDUDNCJ8"}
+2026-10-15 13:54:45.684 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 32.7254 ms {"RequestId":"0HNPANDUDNCJ8:00000009","ConnectionId":"0HNPANDUDNCJ8"}
+2026-10-15 13:54:45.685 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 40.4693 ms {"RequestId":"0HNPANDUDNCJ8:00000003","ConnectionId":"0HNPANDUDNCJ8"}
+2026-10-15 13:54:45.686 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 34.3021 ms {"RequestId":"0HNPANDUDNCJ8:00000007","ConnectionId":"0HNPANDUDNCJ8"}
+2026-10-15 13:54:45.686 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 200 in 25.1785 ms {"RequestId":"0HNPANDUDNCJ8:0000000D","ConnectionId":"0HNPANDUDNCJ8"}
+2026-10-15 13:54:45.839 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /favicon.png responded 200 in 0.8332 ms {"RequestId":"0HNPANDUDNCJ8:00000011","ConnectionId":"0HNPANDUDNCJ8"}
+2026-10-15 13:54:45.841 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 3.5881 ms {"RequestId":"0HNPANDUDNCJ8:0000000F","ConnectionId":"0HNPANDUDNCJ8"}
+2026-10-15 13:54:45.865 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 11.9522 ms {"RequestId":"0HNPANDUDNCJ8:00000013","ConnectionId":"0HNPANDUDNCJ8"}
+2026-10-15 13:55:00.081 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP CONNECT /_blazor responded 200 in 14208.3223 ms {"RequestId":"0HNPANDUDNCJ8:00000015","ConnectionId":"0HNPANDUDNCJ8"}
+2026-10-15 13:55:02.322 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 22.5166 ms {"RequestId":"0HNPANDUDNCJ9:00000001","ConnectionId":"0HNPANDUDNCJ9"}
+2026-10-15 13:55:02.552 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 1.1785 ms {"RequestId":"0HNPANDUDNCJ9:00000002","ConnectionId":"0HNPANDUDNCJ9"}
+2026-10-15 13:55:02.557 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 200 in 2.1314 ms {"RequestId":"0HNPANDUDNCJA:00000001","ConnectionId":"0HNPANDUDNCJA"}
+2026-10-15 13:55:02.558 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 200 in 0.9591 ms {"RequestId":"0HNPANDUDNCJB:00000001","ConnectionId":"0HNPANDUDNCJB"}
+2026-10-15 13:55:02.560 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 1.5564 ms {"RequestId":"0HNPANDUDNCJC:00000001","ConnectionId":"0HNPANDUDNCJC"}
+2026-10-15 13:55:02.569 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 1.4869 ms {"RequestId":"0HNPANDUDNCJD:00000001","ConnectionId":"0HNPANDUDNCJD"}
+2026-10-15 13:55:02.572 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 0.5643 ms {"RequestId":"0HNPANDUDNCJE:00000001","ConnectionId":"0HNPANDUDNCJE"}
+2026-10-15 13:55:02.694 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 1.4265 ms {"RequestId":"0HNPANDUDNCJE:00000002","ConnectionId":"0HNPANDUDNCJE"}
+2026-10-15 13:55:02.699 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 0.3174 ms {"RequestId":"0HNPANDUDNCJE:00000003","ConnectionId":"0HNPANDUDNCJE"}
+2026-10-15 13:55:12.312 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 9608.2226 ms {"RequestId":"0HNPANDUDNCJF:00000001","ConnectionId":"0HNPANDUDNCJF"}
+2026-10-15 13:55:30.109 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 10.6466 ms {"RequestId":"0HNPANDUDNCJG:00000001","ConnectionId":"0HNPANDUDNCJG"}
+2026-10-15 13:55:30.147 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 1.3660 ms {"RequestId":"0HNPANDUDNCJG:00000002","ConnectionId":"0HNPANDUDNCJG"}
+2026-10-15 13:55:30.151 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 200 in 3.3996 ms {"RequestId":"0HNPANDUDNCJH:00000001","ConnectionId":"0HNPANDUDNCJH"}
+2026-10-15 13:55:30.151 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 0.8026 ms {"RequestId":"0HNPANDUDNCJK:00000001","ConnectionId":"0HNPANDUDNCJK"}
+2026-10-15 13:55:30.152 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 200 in 5.3795 ms {"RequestId":"0HNPANDUDNCJI:00000001","ConnectionId":"0HNPANDUDNCJI"}
+2026-10-15 13:55:30.152 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 0.9110 ms {"RequestId":"0HNPANDUDNCJL:00000001","ConnectionId":"0HNPANDUDNCJL"}
+2026-10-15 13:55:30.152 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 2.9817 ms {"RequestId":"0HNPANDUDNCJJ:00000001","ConnectionId":"0HNPANDUDNCJJ"}
+2026-10-15 13:55:30.363 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 11.9118 ms {"RequestId":"0HNPANDUDNCJJ:00000002","ConnectionId":"0HNPANDUDNCJJ"}
+2026-10-15 13:55:30.381 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /favicon.png responded 304 in 0.3147 ms {"RequestId":"0HNPANDUDNCJJ:00000003","ConnectionId":"0HNPANDUDNCJJ"}
+2026-10-15 13:55:30.386 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 0.3164 ms {"RequestId":"0HNPANDUDNCJJ:00000004","ConnectionId":"0HNPANDUDNCJJ"}
+2026-10-15 13:55:38.811 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 401 in 36.9087 ms {"RequestId":"0HNPANDUDNCJN:00000001","ConnectionId":"0HNPANDUDNCJN"}
+2026-10-15 13:55:38.865 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 400 in 14.2627 ms {"RequestId":"0HNPANDUDNCJN:00000002","ConnectionId":"0HNPANDUDNCJN"}
+2026-10-15 13:55:40.663 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /favicon.ico responded 404 in 1.0667 ms {"RequestId":"0HNPANDUDNCJO:00000001","ConnectionId":"0HNPANDUDNCJO"}
+2026-10-15 13:55:40.664 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 6.8315 ms {"RequestId":"0HNPANDUDNCJN:00000003","ConnectionId":"0HNPANDUDNCJN"}
+2026-10-15 13:55:40.676 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 0.9401 ms {"RequestId":"0HNPANDUDNCJP:00000001","ConnectionId":"0HNPANDUDNCJP"}
+2026-10-15 13:55:40.676 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 1.1307 ms {"RequestId":"0HNPANDUDNCJO:00000002","ConnectionId":"0HNPANDUDNCJO"}
+2026-10-15 13:55:40.678 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 3.7201 ms {"RequestId":"0HNPANDUDNCJN:00000004","ConnectionId":"0HNPANDUDNCJN"}
+2026-10-15 13:55:59.269 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 28873.2605 ms {"RequestId":"0HNPANDUDNCJM:00000001","ConnectionId":"0HNPANDUDNCJM"}
+2026-10-15 13:55:59.290 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/disconnect responded 200 in 29.2779 ms {"RequestId":"0HNPANDUDNCJN:00000005","ConnectionId":"0HNPANDUDNCJN"}
+2026-10-15 13:56:01.330 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 3.9084 ms {"RequestId":"0HNPANDUDNCJN:00000006","ConnectionId":"0HNPANDUDNCJN"}
+2026-10-15 13:56:01.457 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 1.1273 ms {"RequestId":"0HNPANDUDNCJN:00000007","ConnectionId":"0HNPANDUDNCJN"}
+2026-10-15 13:56:01.462 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 0.2291 ms {"RequestId":"0HNPANDUDNCJN:00000008","ConnectionId":"0HNPANDUDNCJN"}
+2026-10-15 13:56:14.271 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 12807.1955 ms {"RequestId":"0HNPANDUDNCJQ:00000001","ConnectionId":"0HNPANDUDNCJQ"}
+2026-10-15 13:56:14.273 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/disconnect responded 200 in 0.8352 ms {"RequestId":"0HNPANDUDNCJN:00000009","ConnectionId":"0HNPANDUDNCJN"}
+2026-10-15 14:14:33.629 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 14:14:33.661 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 14:16:25.114 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 358.3900 ms {"RequestId":"0HNPANQ1M9P0N:00000001","ConnectionId":"0HNPANQ1M9P0N"}
+2026-10-15 14:16:25.757 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 304 in 4.5797 ms {"RequestId":"0HNPANQ1M9P0R:00000001","ConnectionId":"0HNPANQ1M9P0R"}
+2026-10-15 14:16:25.757 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 304 in 4.4075 ms {"RequestId":"0HNPANQ1M9P0S:00000001","ConnectionId":"0HNPANQ1M9P0S"}
+2026-10-15 14:16:25.786 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 37.8790 ms {"RequestId":"0HNPANQ1M9P0P:00000001","ConnectionId":"0HNPANQ1M9P0P"}
+2026-10-15 14:16:25.787 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 37.8432 ms {"RequestId":"0HNPANQ1M9P0O:00000001","ConnectionId":"0HNPANQ1M9P0O"}
+2026-10-15 14:16:25.788 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 40.0101 ms {"RequestId":"0HNPANQ1M9P0N:00000002","ConnectionId":"0HNPANQ1M9P0N"}
+2026-10-15 14:16:25.801 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 48.9291 ms {"RequestId":"0HNPANQ1M9P0Q:00000001","ConnectionId":"0HNPANQ1M9P0Q"}
+2026-10-15 14:16:25.912 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 4.2723 ms {"RequestId":"0HNPANQ1M9P0Q:00000002","ConnectionId":"0HNPANQ1M9P0Q"}
+2026-10-15 14:16:25.936 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 17.9609 ms {"RequestId":"0HNPANQ1M9P0Q:00000003","ConnectionId":"0HNPANQ1M9P0Q"}
+2026-10-15 14:19:12.349 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 401 in 52.2929 ms {"RequestId":"0HNPANQ1M9P0U:00000001","ConnectionId":"0HNPANQ1M9P0U"}
+2026-10-15 14:19:12.378 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 400 in 12.7431 ms {"RequestId":"0HNPANQ1M9P0U:00000002","ConnectionId":"0HNPANQ1M9P0U"}
+2026-10-15 14:19:14.410 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 168471.8402 ms {"RequestId":"0HNPANQ1M9P0T:00000001","ConnectionId":"0HNPANQ1M9P0T"}
+2026-10-15 14:19:14.417 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/disconnect responded 200 in 16.4988 ms {"RequestId":"0HNPANQ1M9P0U:00000003","ConnectionId":"0HNPANQ1M9P0U"}
+2026-10-15 14:19:14.961 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /favicon.ico responded 404 in 5.0803 ms {"RequestId":"0HNPANQ1M9P0U:00000004","ConnectionId":"0HNPANQ1M9P0U"}
+2026-10-15 14:19:14.969 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 12.4935 ms {"RequestId":"0HNPANQ1M9P0V:00000001","ConnectionId":"0HNPANQ1M9P0V"}
+2026-10-15 14:19:14.981 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 0.6798 ms {"RequestId":"0HNPANQ1M9P10:00000001","ConnectionId":"0HNPANQ1M9P10"}
+2026-10-15 14:19:14.982 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 1.8126 ms {"RequestId":"0HNPANQ1M9P0U:00000005","ConnectionId":"0HNPANQ1M9P0U"}
+2026-10-15 14:19:14.989 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 9.3891 ms {"RequestId":"0HNPANQ1M9P0V:00000002","ConnectionId":"0HNPANQ1M9P0V"}
+2026-10-15 14:19:15.031 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 0.8338 ms {"RequestId":"0HNPANQ1M9P0V:00000003","ConnectionId":"0HNPANQ1M9P0V"}
+2026-10-15 14:22:29.197 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 0.3017 ms {"RequestId":"0HNPANQ1M9P12:00000001","ConnectionId":"0HNPANQ1M9P12"}
+2026-10-15 14:22:29.205 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 194158.4128 ms {"RequestId":"0HNPANQ1M9P11:00000001","ConnectionId":"0HNPANQ1M9P11"}
+2026-10-15 14:22:59.206 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 30003.9635 ms {"RequestId":"0HNPANQ1M9P13:00000001","ConnectionId":"0HNPANQ1M9P13"}
+2026-10-15 14:23:41.175 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 14:23:41.199 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 14:24:04.343 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 278.7391 ms {"RequestId":"0HNPANUAH5JKI:00000001","ConnectionId":"0HNPANUAH5JKI"}
+2026-10-15 14:24:04.814 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 304 in 2.1174 ms {"RequestId":"0HNPANUAH5JKL:00000001","ConnectionId":"0HNPANUAH5JKL"}
+2026-10-15 14:24:04.821 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 14.9178 ms {"RequestId":"0HNPANUAH5JKJ:00000001","ConnectionId":"0HNPANUAH5JKJ"}
+2026-10-15 14:24:04.821 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 9.3243 ms {"RequestId":"0HNPANUAH5JKK:00000001","ConnectionId":"0HNPANUAH5JKK"}
+2026-10-15 14:24:04.823 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 1.6543 ms {"RequestId":"0HNPANUAH5JKM:00000001","ConnectionId":"0HNPANUAH5JKM"}
+2026-10-15 14:24:04.830 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 304 in 0.3192 ms {"RequestId":"0HNPANUAH5JKN:00000001","ConnectionId":"0HNPANUAH5JKN"}
+2026-10-15 14:24:04.831 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 23.9308 ms {"RequestId":"0HNPANUAH5JKI:00000002","ConnectionId":"0HNPANUAH5JKI"}
+2026-10-15 14:24:04.889 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 4.3036 ms {"RequestId":"0HNPANUAH5JKI:00000003","ConnectionId":"0HNPANUAH5JKI"}
+2026-10-15 14:24:04.907 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 7.4594 ms {"RequestId":"0HNPANUAH5JKI:00000004","ConnectionId":"0HNPANUAH5JKI"}
+2026-10-15 14:24:07.776 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 401 in 43.5303 ms {"RequestId":"0HNPANUAH5JKI:00000005","ConnectionId":"0HNPANUAH5JKI"}
+2026-10-15 14:24:07.790 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 400 in 11.8870 ms {"RequestId":"0HNPANUAH5JKI:00000006","ConnectionId":"0HNPANUAH5JKI"}
+2026-10-15 14:24:09.454 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 20.9607 ms {"RequestId":"0HNPANUAH5JKI:00000007","ConnectionId":"0HNPANUAH5JKI"}
+2026-10-15 14:24:09.462 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 0.8757 ms {"RequestId":"0HNPANUAH5JKK:00000002","ConnectionId":"0HNPANUAH5JKK"}
+2026-10-15 14:24:09.463 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 0.4435 ms {"RequestId":"0HNPANUAH5JKN:00000002","ConnectionId":"0HNPANUAH5JKN"}
+2026-10-15 14:24:09.464 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 2.6959 ms {"RequestId":"0HNPANUAH5JKI:00000008","ConnectionId":"0HNPANUAH5JKI"}
+2026-10-15 14:24:29.206 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 0.6102 ms {"RequestId":"0HNPANUAH5JKI:00000009","ConnectionId":"0HNPANUAH5JKI"}
+2026-10-15 14:24:29.217 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 24298.4740 ms {"RequestId":"0HNPANUAH5JKO:00000001","ConnectionId":"0HNPANUAH5JKO"}
+2026-10-15 14:24:41.872 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 12662.3605 ms {"RequestId":"0HNPANUAH5JKP:00000001","ConnectionId":"0HNPANUAH5JKP"}
+2026-10-15 14:35:34.233 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 14:35:34.280 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 14:35:58.652 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 269.7366 ms {"RequestId":"0HNPAO4VERHAN:00000001","ConnectionId":"0HNPAO4VERHAN"}
+2026-10-15 14:36:00.314 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 304 in 3.8941 ms {"RequestId":"0HNPAO4VERHAP:00000001","ConnectionId":"0HNPAO4VERHAP"}
+2026-10-15 14:36:00.315 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 304 in 2.0487 ms {"RequestId":"0HNPAO4VERHAO:00000001","ConnectionId":"0HNPAO4VERHAO"}
+2026-10-15 14:36:00.335 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 22.8912 ms {"RequestId":"0HNPAO4VERHAR:00000001","ConnectionId":"0HNPAO4VERHAR"}
+2026-10-15 14:36:00.348 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 36.8270 ms {"RequestId":"0HNPAO4VERHAQ:00000001","ConnectionId":"0HNPAO4VERHAQ"}
+2026-10-15 14:36:00.350 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 41.6957 ms {"RequestId":"0HNPAO4VERHAN:00000002","ConnectionId":"0HNPAO4VERHAN"}
+2026-10-15 14:36:00.353 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 40.4368 ms {"RequestId":"0HNPAO4VERHAS:00000001","ConnectionId":"0HNPAO4VERHAS"}
+2026-10-15 14:36:00.480 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 3.7042 ms {"RequestId":"0HNPAO4VERHAN:00000003","ConnectionId":"0HNPAO4VERHAN"}
+2026-10-15 14:36:00.490 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 6.2239 ms {"RequestId":"0HNPAO4VERHAN:00000004","ConnectionId":"0HNPAO4VERHAN"}
+2026-10-15 14:36:17.441 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 27.5882 ms {"RequestId":"0HNPAO4VERHAV:00000001","ConnectionId":"0HNPAO4VERHAV"}
+2026-10-15 14:36:17.464 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 2.2506 ms {"RequestId":"0HNPAO4VERHAV:0000000B","ConnectionId":"0HNPAO4VERHAV"}
+2026-10-15 14:36:17.465 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 8.9213 ms {"RequestId":"0HNPAO4VERHAV:00000005","ConnectionId":"0HNPAO4VERHAV"}
+2026-10-15 14:36:17.465 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 9.5225 ms {"RequestId":"0HNPAO4VERHAV:00000007","ConnectionId":"0HNPAO4VERHAV"}
+2026-10-15 14:36:17.474 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 17.7962 ms {"RequestId":"0HNPAO4VERHAV:00000003","ConnectionId":"0HNPAO4VERHAV"}
+2026-10-15 14:36:17.477 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 200 in 20.6578 ms {"RequestId":"0HNPAO4VERHAV:00000009","ConnectionId":"0HNPAO4VERHAV"}
+2026-10-15 14:36:17.494 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 200 in 33.8224 ms {"RequestId":"0HNPAO4VERHAV:0000000D","ConnectionId":"0HNPAO4VERHAV"}
+2026-10-15 14:36:17.549 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 0.3832 ms {"RequestId":"0HNPAO4VERHAV:0000000F","ConnectionId":"0HNPAO4VERHAV"}
+2026-10-15 14:36:17.552 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /favicon.png responded 200 in 2.4645 ms {"RequestId":"0HNPAO4VERHAV:00000011","ConnectionId":"0HNPAO4VERHAV"}
+2026-10-15 14:36:17.556 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 0.2664 ms {"RequestId":"0HNPAO4VERHAV:00000013","ConnectionId":"0HNPAO4VERHAV"}
+2026-10-15 14:36:21.098 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 401 in 33.6409 ms {"RequestId":"0HNPAO4VERHB0:00000001","ConnectionId":"0HNPAO4VERHB0"}
+2026-10-15 14:36:21.128 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 400 in 9.2880 ms {"RequestId":"0HNPAO4VERHB1:00000001","ConnectionId":"0HNPAO4VERHB1"}
+2026-10-15 14:36:23.156 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP CONNECT /_blazor responded 200 in 5594.9856 ms {"RequestId":"0HNPAO4VERHAV:00000015","ConnectionId":"0HNPAO4VERHAV"}
+2026-10-15 14:36:23.161 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/disconnect responded 200 in 11.4562 ms {"RequestId":"0HNPAO4VERHB1:00000002","ConnectionId":"0HNPAO4VERHB1"}
+2026-10-15 14:36:23.242 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 4.4619 ms {"RequestId":"0HNPAO4VERHB1:00000003","ConnectionId":"0HNPAO4VERHB1"}
+2026-10-15 14:36:23.244 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /favicon.ico responded 404 in 1.3335 ms {"RequestId":"0HNPAO4VERHB2:00000001","ConnectionId":"0HNPAO4VERHB2"}
+2026-10-15 14:36:23.251 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 0.6757 ms {"RequestId":"0HNPAO4VERHB1:00000004","ConnectionId":"0HNPAO4VERHB1"}
+2026-10-15 14:36:23.254 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 0.6427 ms {"RequestId":"0HNPAO4VERHB3:00000001","ConnectionId":"0HNPAO4VERHB3"}
+2026-10-15 14:36:23.256 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 5.8336 ms {"RequestId":"0HNPAO4VERHB2:00000002","ConnectionId":"0HNPAO4VERHB2"}
+2026-10-15 14:36:23.289 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 0.2632 ms {"RequestId":"0HNPAO4VERHB2:00000003","ConnectionId":"0HNPAO4VERHB2"}
+2026-10-15 14:36:24.964 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 401 in 9.4623 ms {"RequestId":"0HNPAO4VERHB2:00000004","ConnectionId":"0HNPAO4VERHB2"}
+2026-10-15 14:36:24.967 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 400 in 0.7203 ms {"RequestId":"0HNPAO4VERHB2:00000005","ConnectionId":"0HNPAO4VERHB2"}
+2026-10-15 14:36:26.975 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/disconnect responded 200 in 0.7402 ms {"RequestId":"0HNPAO4VERHB2:00000006","ConnectionId":"0HNPAO4VERHB2"}
+2026-10-15 14:36:26.975 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 3674.1804 ms {"RequestId":"0HNPAO4VERHB4:00000001","ConnectionId":"0HNPAO4VERHB4"}
+2026-10-15 14:36:27.994 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 5.1272 ms {"RequestId":"0HNPAO4VERHB2:00000007","ConnectionId":"0HNPAO4VERHB2"}
+2026-10-15 14:36:27.998 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /favicon.ico responded 404 in 1.9701 ms {"RequestId":"0HNPAO4VERHB2:00000008","ConnectionId":"0HNPAO4VERHB2"}
+2026-10-15 14:36:28.000 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 0.6444 ms {"RequestId":"0HNPAO4VERHB1:00000005","ConnectionId":"0HNPAO4VERHB1"}
+2026-10-15 14:36:28.004 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 0.2517 ms {"RequestId":"0HNPAO4VERHB6:00000001","ConnectionId":"0HNPAO4VERHB6"}
+2026-10-15 14:36:28.004 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 1.1486 ms {"RequestId":"0HNPAO4VERHB5:00000001","ConnectionId":"0HNPAO4VERHB5"}
+2026-10-15 14:36:28.004 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 5.8900 ms {"RequestId":"0HNPAO4VERHB3:00000002","ConnectionId":"0HNPAO4VERHB3"}
+2026-10-15 14:36:33.303 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/disconnect responded 200 in 0.7739 ms {"RequestId":"0HNPAO4VERHB3:00000003","ConnectionId":"0HNPAO4VERHB3"}
+2026-10-15 14:36:33.322 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 5312.6820 ms {"RequestId":"0HNPAO4VERHB7:00000001","ConnectionId":"0HNPAO4VERHB7"}
+2026-10-15 14:36:57.093 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 401 in 2.0584 ms {"RequestId":"0HNPAO4VERHAN:00000005","ConnectionId":"0HNPAO4VERHAN"}
+2026-10-15 14:36:57.094 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 400 in 0.5884 ms {"RequestId":"0HNPAO4VERHAN:00000006","ConnectionId":"0HNPAO4VERHAN"}
+2026-10-15 14:36:59.119 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/disconnect responded 200 in 0.8853 ms {"RequestId":"0HNPAO4VERHAN:00000007","ConnectionId":"0HNPAO4VERHAN"}
+2026-10-15 14:36:59.120 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 58627.3625 ms {"RequestId":"0HNPAO4VERHAT:00000001","ConnectionId":"0HNPAO4VERHAT"}
+2026-10-15 14:37:56.804 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 401 in 2.5982 ms {"RequestId":"0HNPAO4VERHB8:00000001","ConnectionId":"0HNPAO4VERHB8"}
+2026-10-15 14:39:09.084 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 14:39:09.107 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 14:39:12.889 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 401 in 104.9306 ms {"RequestId":"0HNPAO6PD42GD:00000001","ConnectionId":"0HNPAO6PD42GD"}
+2026-10-15 14:39:13.170 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 400 in 13.7537 ms {"RequestId":"0HNPAO6PD42GE:00000001","ConnectionId":"0HNPAO6PD42GE"}
+2026-10-15 14:41:58.483 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 14:41:58.505 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 14:42:05.036 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 400 in 39.6201 ms {"RequestId":"0HNPAO8CNBVUJ:00000001","ConnectionId":"0HNPAO8CNBVUJ"}
+2026-10-15 15:07:29.377 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 15:07:29.407 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 15:07:39.200 +01:00 [INF] Microsoft.AspNetCore.Authentication.Negotiate.NegotiateHandler Incomplete Negotiate handshake, sending an additional 401 Negotiate challenge. {"EventId":{"Id":1,"Name":"IncompleteNegotiateChallenge"},"RequestId":"0HNPAOMLUNJN6:00000001","RequestPath":"/internal","ConnectionId":"0HNPAOMLUNJN6"}
+2026-10-15 15:07:39.235 +01:00 [DBG] Microsoft.AspNetCore.Authentication.Negotiate.NegotiateHandler Negotiate error code: ClientError. {"EventId":{"Id":11,"Name":"NegotiateError"},"RequestId":"0HNPAOMLUNJN6:00000001","RequestPath":"/internal","ConnectionId":"0HNPAOMLUNJN6"}
+2026-10-15 15:07:39.235 +01:00 [DBG] Microsoft.AspNetCore.Authentication.Negotiate.NegotiateHandler The users authentication request was invalid. {"EventId":{"Id":10,"Name":"ClientError"},"RequestId":"0HNPAOMLUNJN6:00000001","RequestPath":"/internal","ConnectionId":"0HNPAOMLUNJN6"}
+Microsoft.AspNetCore.Authentication.AuthenticationFailureException: InvalidToken
+2026-10-15 15:07:39.238 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 400 in 54.4487 ms {"RequestId":"0HNPAOMLUNJN6:00000001","ConnectionId":"0HNPAOMLUNJN6"}
+2026-10-15 18:17:02.119 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 18:17:02.142 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 18:17:04.291 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 401 in 132.0505 ms {"RequestId":"0HNPAS0GTVK3U:00000001","ConnectionId":"0HNPAS0GTVK3U"}
+2026-10-15 18:17:04.306 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 400 in 8.5211 ms {"RequestId":"0HNPAS0GTVK3V:00000001","ConnectionId":"0HNPAS0GTVK3V"}
+2026-10-15 18:17:04.967 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /favicon.ico responded 404 in 9.5063 ms {"RequestId":"0HNPAS0GTVK3V:00000002","ConnectionId":"0HNPAS0GTVK3V"}
+2026-10-15 18:17:35.239 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 401 in 12.5437 ms {"RequestId":"0HNPAS0GTVK3V:00000003","ConnectionId":"0HNPAS0GTVK3V"}
+2026-10-15 18:17:35.241 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 400 in 0.8357 ms {"RequestId":"0HNPAS0GTVK3V:00000004","ConnectionId":"0HNPAS0GTVK3V"}
+2026-10-15 18:18:04.494 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 401 in 2.2116 ms {"RequestId":"0HNPAS0GTVK40:00000001","ConnectionId":"0HNPAS0GTVK40"}
+2026-10-15 18:18:04.505 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 400 in 10.0379 ms {"RequestId":"0HNPAS0GTVK40:00000002","ConnectionId":"0HNPAS0GTVK40"}
+2026-10-15 18:20:33.554 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 18:20:33.576 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 18:20:41.059 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 350.9126 ms {"RequestId":"0HNPAS2HG9DE2:00000001","ConnectionId":"0HNPAS2HG9DE2"}
+2026-10-15 18:20:41.091 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 304 in 4.9268 ms {"RequestId":"0HNPAS2HG9DE2:00000002","ConnectionId":"0HNPAS2HG9DE2"}
+2026-10-15 18:20:41.091 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 304 in 2.6165 ms {"RequestId":"0HNPAS2HG9DE4:00000001","ConnectionId":"0HNPAS2HG9DE4"}
+2026-10-15 18:20:41.110 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 23.6766 ms {"RequestId":"0HNPAS2HG9DE6:00000001","ConnectionId":"0HNPAS2HG9DE6"}
+2026-10-15 18:20:41.129 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 41.6836 ms {"RequestId":"0HNPAS2HG9DE7:00000001","ConnectionId":"0HNPAS2HG9DE7"}
+2026-10-15 18:20:41.132 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 21.1851 ms {"RequestId":"0HNPAS2HG9DE3:00000001","ConnectionId":"0HNPAS2HG9DE3"}
+2026-10-15 18:20:41.134 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 45.4197 ms {"RequestId":"0HNPAS2HG9DE5:00000001","ConnectionId":"0HNPAS2HG9DE5"}
+2026-10-15 18:20:41.341 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 4.7885 ms {"RequestId":"0HNPAS2HG9DE3:00000002","ConnectionId":"0HNPAS2HG9DE3"}
+2026-10-15 18:20:41.359 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 5.3703 ms {"RequestId":"0HNPAS2HG9DE3:00000003","ConnectionId":"0HNPAS2HG9DE3"}
+2026-10-15 18:20:45.163 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 401 in 63.5760 ms {"RequestId":"0HNPAS2HG9DE3:00000004","ConnectionId":"0HNPAS2HG9DE3"}
+2026-10-15 18:20:45.172 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 400 in 7.2810 ms {"RequestId":"0HNPAS2HG9DE3:00000005","ConnectionId":"0HNPAS2HG9DE3"}
+2026-10-15 18:20:47.209 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 5845.7292 ms {"RequestId":"0HNPAS2HG9DE8:00000001","ConnectionId":"0HNPAS2HG9DE8"}
+2026-10-15 18:20:47.212 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/disconnect responded 200 in 13.3200 ms {"RequestId":"0HNPAS2HG9DE3:00000006","ConnectionId":"0HNPAS2HG9DE3"}
+2026-10-15 18:21:55.590 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 18:21:55.613 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 18:21:56.812 +01:00 [ERR] Microsoft.Extensions.Hosting.Internal.Host Hosting failed to start {"EventId":{"Id":11,"Name":"HostedServiceStartupFaulted"}}
+System.IO.IOException: Failed to bind to address http://127.0.0.1:5224: address already in use.
+ ---> Microsoft.AspNetCore.Connections.AddressInUseException: Only one usage of each socket address (protocol/network address/port) is normally permitted.
+ ---> System.Net.Sockets.SocketException (10048): Only one usage of each socket address (protocol/network address/port) is normally permitted.
+   at System.Net.Sockets.Socket.UpdateStatusAfterSocketErrorAndThrowException(SocketError error, Boolean disconnectOnFailure, String callerName)
+   at System.Net.Sockets.Socket.DoBind(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Bind(EndPoint localEP)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportOptions.CreateDefaultBoundListenSocket(EndPoint endpoint)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportFactory.BindAsync(EndPoint endpoint, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure.TransportManager.BindAsync(EndPoint endPoint, ConnectionDelegate connectionDelegate, EndpointConfig endpointConfig, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.<>c__DisplayClass28_0`1.<<StartAsync>g__OnBind|0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.LocalhostListenOptions.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.AddressesStrategy.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.BindAsync(CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.StartAsync[TContext](IHttpApplication`1 application, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync(CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.Internal.Host.<StartAsync>b__14_1(IHostedService service, CancellationToken token)
+   at Microsoft.Extensions.Hosting.Internal.Host.ForeachService[T](IEnumerable`1 services, CancellationToken token, Boolean concurrent, Boolean abortOnFirstException, List`1 exceptions, Func`3 operation)
+2026-10-15 18:21:56.840 +01:00 [ERR] Microsoft.Extensions.Hosting.Internal.Host BackgroundService failed {"EventId":{"Id":9,"Name":"BackgroundServiceFaulted"}}
+System.OperationCanceledException: The operation was canceled.
+   at System.Threading.PeriodicTimer.State.Signal(Boolean stopping, CancellationToken cancellationToken)
+   at System.Threading.CancellationTokenSource.ExecuteCallbackHandlers(Boolean throwOnFirstException)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.ServiceProviderEngineScope.DisposeAsync()
+   at Microsoft.Extensions.Hosting.Internal.Host.DisposeAsync()
+   at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine& stateMachine)
+   at Microsoft.Extensions.Hosting.Internal.Host.DisposeAsync()
+   at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.RunAsync(IHost host, CancellationToken token)
+   at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine& stateMachine)
+   at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.RunAsync(IHost host, CancellationToken token)
+   at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.Run(IHost host)
+   at Program.<Main>$(String[] args) in C:\Users\admin-hn10901\source\repos\pallrasmussen\WT.Blazor\Program.cs:line 169
+   at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine& stateMachine)
+   at Program.<Main>$(String[] args)
+   at Program.<Main>(String[] args)
+--- End of stack trace from previous location ---
+   at System.Threading.PeriodicTimer.State.System.Threading.Tasks.Sources.IValueTaskSource<System.Boolean>.GetResult(Int16 token)
+   at WT.Blazor.Services.ExportTemporaryFileCleanupService.ExecuteAsync(CancellationToken stoppingToken) in C:\Users\admin-hn10901\source\repos\pallrasmussen\WT.Blazor\Services\ExportTemporaryFileCleanupService.cs:line 17
+   at Microsoft.Extensions.Hosting.Internal.Host.TryExecuteBackgroundServiceAsync(BackgroundService backgroundService)
+2026-10-15 18:21:56.841 +01:00 [FTL] Microsoft.Extensions.Hosting.Internal.Host The HostOptions.BackgroundServiceExceptionBehavior is configured to StopHost. A BackgroundService has thrown an unhandled exception, and the IHost instance is stopping. To avoid this behavior, configure this to Ignore; however the BackgroundService will not be restarted. {"EventId":{"Id":10,"Name":"BackgroundServiceStoppingHost"}}
+System.OperationCanceledException: The operation was canceled.
+   at System.Threading.PeriodicTimer.State.Signal(Boolean stopping, CancellationToken cancellationToken)
+   at System.Threading.CancellationTokenSource.ExecuteCallbackHandlers(Boolean throwOnFirstException)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.ServiceProviderEngineScope.DisposeAsync()
+   at Microsoft.Extensions.Hosting.Internal.Host.DisposeAsync()
+   at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine& stateMachine)
+   at Microsoft.Extensions.Hosting.Internal.Host.DisposeAsync()
+   at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.RunAsync(IHost host, CancellationToken token)
+   at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine& stateMachine)
+   at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.RunAsync(IHost host, CancellationToken token)
+   at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.Run(IHost host)
+   at Program.<Main>$(String[] args) in C:\Users\admin-hn10901\source\repos\pallrasmussen\WT.Blazor\Program.cs:line 169
+   at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine& stateMachine)
+   at Program.<Main>$(String[] args)
+   at Program.<Main>(String[] args)
+--- End of stack trace from previous location ---
+   at System.Threading.PeriodicTimer.State.System.Threading.Tasks.Sources.IValueTaskSource<System.Boolean>.GetResult(Int16 token)
+   at WT.Blazor.Services.ExportTemporaryFileCleanupService.ExecuteAsync(CancellationToken stoppingToken) in C:\Users\admin-hn10901\source\repos\pallrasmussen\WT.Blazor\Services\ExportTemporaryFileCleanupService.cs:line 17
+   at Microsoft.Extensions.Hosting.Internal.Host.TryExecuteBackgroundServiceAsync(BackgroundService backgroundService)
+2026-10-15 18:22:13.471 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP HEAD / responded 404 in 0.5062 ms {"RequestId":"0HNPAS2HG9DE9:00000001","ConnectionId":"0HNPAS2HG9DE9"}
+2026-10-15 18:22:13.518 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP HEAD / responded 404 in 0.3129 ms {"RequestId":"0HNPAS2HG9DEA:00000001","ConnectionId":"0HNPAS2HG9DEA"}
+2026-10-15 18:22:23.281 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 17.2878 ms {"RequestId":"0HNPAS2HG9DEB:00000001","ConnectionId":"0HNPAS2HG9DEB"}
+2026-10-15 18:22:23.550 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 0.9736 ms {"RequestId":"0HNPAS2HG9DEE:00000001","ConnectionId":"0HNPAS2HG9DEE"}
+2026-10-15 18:22:23.551 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 0.5196 ms {"RequestId":"0HNPAS2HG9DEF:00000001","ConnectionId":"0HNPAS2HG9DEF"}
+2026-10-15 18:22:23.552 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 0.5429 ms {"RequestId":"0HNPAS2HG9DEG:00000001","ConnectionId":"0HNPAS2HG9DEG"}
+2026-10-15 18:22:23.553 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 19.4644 ms {"RequestId":"0HNPAS2HG9DEB:00000002","ConnectionId":"0HNPAS2HG9DEB"}
+2026-10-15 18:22:23.564 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 200 in 13.7273 ms {"RequestId":"0HNPAS2HG9DED:00000001","ConnectionId":"0HNPAS2HG9DED"}
+2026-10-15 18:22:23.565 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 200 in 31.1703 ms {"RequestId":"0HNPAS2HG9DEC:00000001","ConnectionId":"0HNPAS2HG9DEC"}
+2026-10-15 18:22:23.619 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 0.4275 ms {"RequestId":"0HNPAS2HG9DEC:00000002","ConnectionId":"0HNPAS2HG9DEC"}
+2026-10-15 18:22:23.632 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /favicon.png responded 200 in 1.7991 ms {"RequestId":"0HNPAS2HG9DEC:00000003","ConnectionId":"0HNPAS2HG9DEC"}
+2026-10-15 18:22:23.633 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 0.7071 ms {"RequestId":"0HNPAS2HG9DED:00000002","ConnectionId":"0HNPAS2HG9DED"}
+2026-10-15 18:22:27.975 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 401 in 5.8830 ms {"RequestId":"0HNPAS2HG9DED:00000003","ConnectionId":"0HNPAS2HG9DED"}
+2026-10-15 18:22:27.977 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 400 in 0.9189 ms {"RequestId":"0HNPAS2HG9DED:00000004","ConnectionId":"0HNPAS2HG9DED"}
+2026-10-15 18:22:28.253 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /favicon.ico responded 404 in 1.6586 ms {"RequestId":"0HNPAS2HG9DED:00000005","ConnectionId":"0HNPAS2HG9DED"}
+2026-10-15 18:23:34.761 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 18:23:34.783 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 18:24:36.582 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 401 in 107.9788 ms {"RequestId":"0HNPAS4NP3A56:00000001","ConnectionId":"0HNPAS4NP3A56"}
+2026-10-15 18:24:36.740 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 400 in 59.6147 ms {"RequestId":"0HNPAS4NP3A56:00000002","ConnectionId":"0HNPAS4NP3A56"}
+2026-10-15 18:24:36.855 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /favicon.ico responded 404 in 31.8129 ms {"RequestId":"0HNPAS4NP3A56:00000003","ConnectionId":"0HNPAS4NP3A56"}
+2026-10-15 18:25:58.626 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 18:25:58.649 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 18:27:02.771 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP HEAD / responded 404 in 42.6093 ms {"RequestId":"0HNPAS63C00VI:00000001","ConnectionId":"0HNPAS63C00VI"}
+2026-10-15 18:27:07.334 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 309.2226 ms {"RequestId":"0HNPAS63C00VK:00000001","ConnectionId":"0HNPAS63C00VK"}
+2026-10-15 18:27:08.042 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 15.3923 ms {"RequestId":"0HNPAS63C00VL:00000001","ConnectionId":"0HNPAS63C00VL"}
+2026-10-15 18:27:08.042 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 6.4115 ms {"RequestId":"0HNPAS63C00VN:00000001","ConnectionId":"0HNPAS63C00VN"}
+2026-10-15 18:27:08.042 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 14.0154 ms {"RequestId":"0HNPAS63C00VM:00000001","ConnectionId":"0HNPAS63C00VM"}
+2026-10-15 18:27:08.056 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 200 in 18.2704 ms {"RequestId":"0HNPAS63C00VO:00000001","ConnectionId":"0HNPAS63C00VO"}
+2026-10-15 18:27:08.057 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 200 in 18.5097 ms {"RequestId":"0HNPAS63C00VP:00000001","ConnectionId":"0HNPAS63C00VP"}
+2026-10-15 18:27:08.057 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 31.1647 ms {"RequestId":"0HNPAS63C00VK:00000002","ConnectionId":"0HNPAS63C00VK"}
+2026-10-15 18:27:08.114 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /favicon.png responded 200 in 1.4540 ms {"RequestId":"0HNPAS63C00VP:00000002","ConnectionId":"0HNPAS63C00VP"}
+2026-10-15 18:27:08.129 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 18.1648 ms {"RequestId":"0HNPAS63C00VO:00000002","ConnectionId":"0HNPAS63C00VO"}
+2026-10-15 18:27:08.156 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 6.3018 ms {"RequestId":"0HNPAS63C00VO:00000003","ConnectionId":"0HNPAS63C00VO"}
+2026-10-15 18:28:05.070 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 18:28:05.096 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 18:28:09.059 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 44.4355 ms {"RequestId":"0HNPAS63C00VR:00000001","ConnectionId":"0HNPAS63C00VR"}
+2026-10-15 18:28:09.223 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 200 in 0.7451 ms {"RequestId":"0HNPAS63C00VS:00000001","ConnectionId":"0HNPAS63C00VS"}
+2026-10-15 18:28:09.224 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 0.8504 ms {"RequestId":"0HNPAS63C00VU:00000001","ConnectionId":"0HNPAS63C00VU"}
+2026-10-15 18:28:09.225 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 0.9258 ms {"RequestId":"0HNPAS63C00VV:00000001","ConnectionId":"0HNPAS63C00VV"}
+2026-10-15 18:28:09.226 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 0.9626 ms {"RequestId":"0HNPAS63C00VT:00000001","ConnectionId":"0HNPAS63C00VT"}
+2026-10-15 18:28:09.227 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 5.2994 ms {"RequestId":"0HNPAS63C00VR:00000002","ConnectionId":"0HNPAS63C00VR"}
+2026-10-15 18:28:09.229 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 200 in 0.9277 ms {"RequestId":"0HNPAS63C0100:00000001","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:28:09.499 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /favicon.png responded 200 in 11.9810 ms {"RequestId":"0HNPAS63C00VR:00000003","ConnectionId":"0HNPAS63C00VR"}
+2026-10-15 18:28:09.631 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 0.8954 ms {"RequestId":"0HNPAS63C0100:00000002","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:28:09.632 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 1.0293 ms {"RequestId":"0HNPAS63C00VU:00000002","ConnectionId":"0HNPAS63C00VU"}
+2026-10-15 18:28:09.633 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 0.5793 ms {"RequestId":"0HNPAS63C00VT:00000002","ConnectionId":"0HNPAS63C00VT"}
+2026-10-15 18:28:09.633 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 2.9600 ms {"RequestId":"0HNPAS63C00VV:00000002","ConnectionId":"0HNPAS63C00VV"}
+2026-10-15 18:28:09.658 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 0.8475 ms {"RequestId":"0HNPAS63C0100:00000003","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:28:11.217 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 34.1443 ms {"RequestId":"0HNPAS63C0100:00000004","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:28:13.357 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 6.3105 ms {"RequestId":"0HNPAS63C0100:00000005","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:28:18.259 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 8591.1900 ms {"RequestId":"0HNPAS63C0101:00000001","ConnectionId":"0HNPAS63C0101"}
+2026-10-15 18:28:19.394 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 71222.9557 ms {"RequestId":"0HNPAS63C00VQ:00000001","ConnectionId":"0HNPAS63C00VQ"}
+2026-10-15 18:28:26.367 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 21.6675 ms {"RequestId":"0HNPAS63C0100:00000006","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:28:26.611 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 1.6294 ms {"RequestId":"0HNPAS63C00VV:00000003","ConnectionId":"0HNPAS63C00VV"}
+2026-10-15 18:28:26.612 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 304 in 0.4184 ms {"RequestId":"0HNPAS63C00VS:00000002","ConnectionId":"0HNPAS63C00VS"}
+2026-10-15 18:28:26.612 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 4.9060 ms {"RequestId":"0HNPAS63C0100:00000007","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:28:26.613 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 1.4440 ms {"RequestId":"0HNPAS63C00VR:00000004","ConnectionId":"0HNPAS63C00VR"}
+2026-10-15 18:28:26.614 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 0.5924 ms {"RequestId":"0HNPAS63C00VU:00000003","ConnectionId":"0HNPAS63C00VU"}
+2026-10-15 18:28:26.617 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 304 in 1.7109 ms {"RequestId":"0HNPAS63C00VT:00000003","ConnectionId":"0HNPAS63C00VT"}
+2026-10-15 18:28:26.682 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 0.8329 ms {"RequestId":"0HNPAS63C0100:00000008","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:28:26.695 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 1.4477 ms {"RequestId":"0HNPAS63C0100:00000009","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:28:29.334 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 5.1729 ms {"RequestId":"0HNPAS63C0100:0000000A","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:28:36.144 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 5.4839 ms {"RequestId":"0HNPAS63C0100:0000000B","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:28:39.872 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 5.9881 ms {"RequestId":"0HNPAS63C0100:0000000C","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:28:47.698 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 2.5824 ms {"RequestId":"0HNPAS63C0100:0000000D","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:28:51.991 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 3.8538 ms {"RequestId":"0HNPAS63C0100:0000000E","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:29:00.950 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 2.9670 ms {"RequestId":"0HNPAS63C0100:0000000F","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:29:03.623 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 5.4138 ms {"RequestId":"0HNPAS63C0100:00000010","ConnectionId":"0HNPAS63C0100"}
+2026-10-15 18:30:09.044 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 102344.4017 ms {"RequestId":"0HNPAS63C0102:00000001","ConnectionId":"0HNPAS63C0102"}
+2026-10-15 18:31:16.848 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 18:31:16.876 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 18:31:19.032 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 4.2044 ms {"RequestId":"0HNPAS63C0103:00000001","ConnectionId":"0HNPAS63C0103"}
+2026-10-15 18:31:19.354 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 14.3111 ms {"RequestId":"0HNPAS63C0105:00000001","ConnectionId":"0HNPAS63C0105"}
+2026-10-15 18:31:19.355 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 304 in 0.4946 ms {"RequestId":"0HNPAS63C0106:00000001","ConnectionId":"0HNPAS63C0106"}
+2026-10-15 18:31:19.364 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 304 in 0.2771 ms {"RequestId":"0HNPAS63C0108:00000001","ConnectionId":"0HNPAS63C0108"}
+2026-10-15 18:31:19.369 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 42.0082 ms {"RequestId":"0HNPAS63C0104:00000001","ConnectionId":"0HNPAS63C0104"}
+2026-10-15 18:31:19.380 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 24.9303 ms {"RequestId":"0HNPAS63C0107:00000001","ConnectionId":"0HNPAS63C0107"}
+2026-10-15 18:31:19.380 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 63.4380 ms {"RequestId":"0HNPAS63C0103:00000002","ConnectionId":"0HNPAS63C0103"}
+2026-10-15 18:31:19.487 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 0.3837 ms {"RequestId":"0HNPAS63C0103:00000003","ConnectionId":"0HNPAS63C0103"}
+2026-10-15 18:31:19.505 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 2.8149 ms {"RequestId":"0HNPAS63C0103:00000004","ConnectionId":"0HNPAS63C0103"}
+2026-10-15 18:31:20.755 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 3.1213 ms {"RequestId":"0HNPAS63C0103:00000005","ConnectionId":"0HNPAS63C0103"}
+2026-10-15 18:31:22.376 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 5.3367 ms {"RequestId":"0HNPAS63C0103:00000006","ConnectionId":"0HNPAS63C0103"}
+2026-10-15 18:31:27.138 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 4.2451 ms {"RequestId":"0HNPAS63C0103:00000007","ConnectionId":"0HNPAS63C0103"}
+2026-10-15 18:31:29.430 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 15.3903 ms {"RequestId":"0HNPAS63C0103:00000008","ConnectionId":"0HNPAS63C0103"}
+2026-10-15 18:31:53.511 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 34002.7311 ms {"RequestId":"0HNPAS63C0109:00000001","ConnectionId":"0HNPAS63C0109"}
+2026-10-15 18:34:52.686 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 18:34:52.710 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 18:37:22.914 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP HEAD / responded 404 in 36.2142 ms {"RequestId":"0HNPASBS5U0F0:00000001","ConnectionId":"0HNPASBS5U0F0"}
+2026-10-15 18:37:23.014 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP HEAD /health responded 200 in 41.8361 ms {"RequestId":"0HNPASBS5U0F1:00000001","ConnectionId":"0HNPASBS5U0F1"}
+2026-10-15 18:37:29.569 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 241.5828 ms {"RequestId":"0HNPASBS5U0F2:00000001","ConnectionId":"0HNPASBS5U0F2"}
+2026-10-15 18:37:29.627 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 17.4733 ms {"RequestId":"0HNPASBS5U0F3:00000001","ConnectionId":"0HNPASBS5U0F3"}
+2026-10-15 18:37:48.040 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 34.9768 ms {"RequestId":"0HNPASBS5U0F4:00000001","ConnectionId":"0HNPASBS5U0F4"}
+2026-10-15 18:37:48.490 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 304 in 0.4585 ms {"RequestId":"0HNPASBS5U0F9:00000001","ConnectionId":"0HNPASBS5U0F9"}
+2026-10-15 18:37:48.491 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 304 in 0.3606 ms {"RequestId":"0HNPASBS5U0F8:00000001","ConnectionId":"0HNPASBS5U0F8"}
+2026-10-15 18:37:48.500 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 6.7137 ms {"RequestId":"0HNPASBS5U0F7:00000001","ConnectionId":"0HNPASBS5U0F7"}
+2026-10-15 18:37:48.500 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 11.9224 ms {"RequestId":"0HNPASBS5U0F5:00000001","ConnectionId":"0HNPASBS5U0F5"}
+2026-10-15 18:37:48.501 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 7.3548 ms {"RequestId":"0HNPASBS5U0F6:00000001","ConnectionId":"0HNPASBS5U0F6"}
+2026-10-15 18:37:48.514 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 32.8233 ms {"RequestId":"0HNPASBS5U0F4:00000002","ConnectionId":"0HNPASBS5U0F4"}
+2026-10-15 18:37:48.601 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 0.8224 ms {"RequestId":"0HNPASBS5U0F7:00000002","ConnectionId":"0HNPASBS5U0F7"}
+2026-10-15 18:37:48.601 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 5.0284 ms {"RequestId":"0HNPASBS5U0F4:00000003","ConnectionId":"0HNPASBS5U0F4"}
+2026-10-15 18:37:48.602 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 0.7468 ms {"RequestId":"0HNPASBS5U0F5:00000002","ConnectionId":"0HNPASBS5U0F5"}
+2026-10-15 18:37:48.606 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 6.7156 ms {"RequestId":"0HNPASBS5U0F6:00000002","ConnectionId":"0HNPASBS5U0F6"}
+2026-10-15 18:37:48.618 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 10.3116 ms {"RequestId":"0HNPASBS5U0F7:00000003","ConnectionId":"0HNPASBS5U0F7"}
+2026-10-15 18:37:50.381 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 67.7455 ms {"RequestId":"0HNPASBS5U0F7:00000004","ConnectionId":"0HNPASBS5U0F7"}
+2026-10-15 18:37:59.193 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 10566.6001 ms {"RequestId":"0HNPASBS5U0FA:00000001","ConnectionId":"0HNPASBS5U0FA"}
+2026-10-15 18:38:13.300 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 18:38:13.324 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 18:38:28.396 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 260.0892 ms {"RequestId":"0HNPASCFJV8B9:00000001","ConnectionId":"0HNPASCFJV8B9"}
+2026-10-15 18:38:28.538 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 304 in 3.5999 ms {"RequestId":"0HNPASCFJV8BC:00000001","ConnectionId":"0HNPASCFJV8BC"}
+2026-10-15 18:38:28.542 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 304 in 0.5187 ms {"RequestId":"0HNPASCFJV8BD:00000001","ConnectionId":"0HNPASCFJV8BD"}
+2026-10-15 18:38:28.555 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 11.5927 ms {"RequestId":"0HNPASCFJV8BB:00000001","ConnectionId":"0HNPASCFJV8BB"}
+2026-10-15 18:38:28.555 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 33.3332 ms {"RequestId":"0HNPASCFJV8BA:00000001","ConnectionId":"0HNPASCFJV8BA"}
+2026-10-15 18:38:28.557 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 13.8463 ms {"RequestId":"0HNPASCFJV8BE:00000001","ConnectionId":"0HNPASCFJV8BE"}
+2026-10-15 18:38:28.568 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 26.2165 ms {"RequestId":"0HNPASCFJV8B9:00000002","ConnectionId":"0HNPASCFJV8B9"}
+2026-10-15 18:38:28.638 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 3.7327 ms {"RequestId":"0HNPASCFJV8B9:00000003","ConnectionId":"0HNPASCFJV8B9"}
+2026-10-15 18:38:28.654 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 8.6831 ms {"RequestId":"0HNPASCFJV8B9:00000004","ConnectionId":"0HNPASCFJV8B9"}
+2026-10-15 18:38:32.831 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 4172.3046 ms {"RequestId":"0HNPASCFJV8BF:00000001","ConnectionId":"0HNPASCFJV8BF"}
+2026-10-15 18:38:34.602 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 26.2101 ms {"RequestId":"0HNPASCFJV8BG:00000001","ConnectionId":"0HNPASCFJV8BG"}
+2026-10-15 18:38:34.822 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 1.4544 ms {"RequestId":"0HNPASCFJV8BH:00000001","ConnectionId":"0HNPASCFJV8BH"}
+2026-10-15 18:38:34.824 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 0.6876 ms {"RequestId":"0HNPASCFJV8BJ:00000001","ConnectionId":"0HNPASCFJV8BJ"}
+2026-10-15 18:38:34.825 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 304 in 0.5588 ms {"RequestId":"0HNPASCFJV8BK:00000001","ConnectionId":"0HNPASCFJV8BK"}
+2026-10-15 18:38:34.826 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 5.0046 ms {"RequestId":"0HNPASCFJV8BG:00000002","ConnectionId":"0HNPASCFJV8BG"}
+2026-10-15 18:38:34.826 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 304 in 0.3368 ms {"RequestId":"0HNPASCFJV8BL:00000001","ConnectionId":"0HNPASCFJV8BL"}
+2026-10-15 18:38:34.826 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 0.9857 ms {"RequestId":"0HNPASCFJV8BI:00000001","ConnectionId":"0HNPASCFJV8BI"}
+2026-10-15 18:38:34.960 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 0.7948 ms {"RequestId":"0HNPASCFJV8BG:00000003","ConnectionId":"0HNPASCFJV8BG"}
+2026-10-15 18:38:34.965 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 2.7244 ms {"RequestId":"0HNPASCFJV8BI:00000002","ConnectionId":"0HNPASCFJV8BI"}
+2026-10-15 18:38:34.966 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 0.5819 ms {"RequestId":"0HNPASCFJV8BJ:00000002","ConnectionId":"0HNPASCFJV8BJ"}
+2026-10-15 18:38:34.966 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 5.5031 ms {"RequestId":"0HNPASCFJV8BH:00000002","ConnectionId":"0HNPASCFJV8BH"}
+2026-10-15 18:38:34.983 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 1.5308 ms {"RequestId":"0HNPASCFJV8BI:00000003","ConnectionId":"0HNPASCFJV8BI"}
+2026-10-15 18:38:36.231 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 1239.4617 ms {"RequestId":"0HNPASCFJV8BM:00000001","ConnectionId":"0HNPASCFJV8BM"}
+2026-10-15 18:39:16.448 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 18:39:16.471 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 18:39:18.489 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 234.7697 ms {"RequestId":"0HNPASCUIH6M6:00000001","ConnectionId":"0HNPASCUIH6M6"}
+2026-10-15 18:39:18.524 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 304 in 0.5243 ms {"RequestId":"0HNPASCUIH6MA:00000001","ConnectionId":"0HNPASCUIH6MA"}
+2026-10-15 18:39:18.531 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 7.7331 ms {"RequestId":"0HNPASCUIH6M9:00000001","ConnectionId":"0HNPASCUIH6M9"}
+2026-10-15 18:39:18.531 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 14.6858 ms {"RequestId":"0HNPASCUIH6M7:00000001","ConnectionId":"0HNPASCUIH6M7"}
+2026-10-15 18:39:18.531 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 14.7983 ms {"RequestId":"0HNPASCUIH6M8:00000001","ConnectionId":"0HNPASCUIH6M8"}
+2026-10-15 18:39:18.531 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 304 in 0.4344 ms {"RequestId":"0HNPASCUIH6MB:00000001","ConnectionId":"0HNPASCUIH6MB"}
+2026-10-15 18:39:18.541 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 22.7573 ms {"RequestId":"0HNPASCUIH6M6:00000002","ConnectionId":"0HNPASCUIH6M6"}
+2026-10-15 18:39:18.636 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 3.7328 ms {"RequestId":"0HNPASCUIH6M6:00000003","ConnectionId":"0HNPASCUIH6M6"}
+2026-10-15 18:39:18.651 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 11.1015 ms {"RequestId":"0HNPASCUIH6M6:00000004","ConnectionId":"0HNPASCUIH6M6"}
+2026-10-15 18:39:26.800 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 101.6992 ms {"RequestId":"0HNPASCUIH6M6:00000005","ConnectionId":"0HNPASCUIH6M6"}
+2026-10-15 18:39:41.830 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 38.1600 ms {"RequestId":"0HNPASCUIH6M6:00000006","ConnectionId":"0HNPASCUIH6M6"}
+2026-10-15 18:39:48.504 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 12.5936 ms {"RequestId":"0HNPASCUIH6M6:00000007","ConnectionId":"0HNPASCUIH6M6"}
+2026-10-15 18:39:49.601 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 6.2322 ms {"RequestId":"0HNPASCUIH6M6:00000008","ConnectionId":"0HNPASCUIH6M6"}
+2026-10-15 18:39:51.824 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 3.9109 ms {"RequestId":"0HNPASCUIH6M6:00000009","ConnectionId":"0HNPASCUIH6M6"}
+2026-10-15 18:39:55.945 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 5.2996 ms {"RequestId":"0HNPASCUIH6M6:0000000A","ConnectionId":"0HNPASCUIH6M6"}
+2026-10-15 18:41:49.992 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 0.6016 ms {"RequestId":"0HNPASCUIH6M6:0000000B","ConnectionId":"0HNPASCUIH6M6"}
+2026-10-15 18:41:50.001 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 151344.6423 ms {"RequestId":"0HNPASCUIH6MC:00000001","ConnectionId":"0HNPASCUIH6MC"}
+2026-10-15 18:42:20.039 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 30043.7646 ms {"RequestId":"0HNPASCUIH6MD:00000001","ConnectionId":"0HNPASCUIH6MD"}
+2026-10-15 18:44:13.398 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-15 18:44:13.421 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}
+2026-10-15 18:44:20.096 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 405.8599 ms {"RequestId":"0HNPASFOCS3B8:00000001","ConnectionId":"0HNPASFOCS3B8"}
+2026-10-15 18:44:21.113 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /images/Sjúkrahúsverki logo.png responded 304 in 10.0589 ms {"RequestId":"0HNPASFOCS3BC:00000001","ConnectionId":"0HNPASFOCS3BC"}
+2026-10-15 18:44:21.132 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /WT.Blazor.2khm9loj3b.styles.css responded 200 in 18.7190 ms {"RequestId":"0HNPASFOCS3BA:00000001","ConnectionId":"0HNPASFOCS3BA"}
+2026-10-15 18:44:21.133 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_framework/blazor.web.cd06xom9c5.js responded 304 in 0.8041 ms {"RequestId":"0HNPASFOCS3BD:00000001","ConnectionId":"0HNPASFOCS3BD"}
+2026-10-15 18:44:21.133 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /app.7dsumu1g0c.css responded 200 in 29.4553 ms {"RequestId":"0HNPASFOCS3B9:00000001","ConnectionId":"0HNPASFOCS3B9"}
+2026-10-15 18:44:21.136 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Components/Layout/ReconnectModal.abdmv1u4y3.razor.js responded 200 in 29.3671 ms {"RequestId":"0HNPASFOCS3BB:00000001","ConnectionId":"0HNPASFOCS3BB"}
+2026-10-15 18:44:21.149 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /lib/bootstrap/dist/css/bootstrap.min.46ein0sx1k.css responded 200 in 41.8011 ms {"RequestId":"0HNPASFOCS3B8:00000002","ConnectionId":"0HNPASFOCS3B8"}
+2026-10-15 18:44:21.338 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor/initializers responded 200 in 111.2716 ms {"RequestId":"0HNPASFOCS3B8:00000003","ConnectionId":"0HNPASFOCS3B8"}
+2026-10-15 18:44:21.356 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /_blazor/negotiate responded 200 in 13.1937 ms {"RequestId":"0HNPASFOCS3B8:00000004","ConnectionId":"0HNPASFOCS3B8"}
+2026-10-15 18:44:23.931 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 79.4496 ms {"RequestId":"0HNPASFOCS3B8:00000005","ConnectionId":"0HNPASFOCS3B8"}
+2026-10-15 18:44:27.708 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 21.9724 ms {"RequestId":"0HNPASFOCS3B8:00000006","ConnectionId":"0HNPASFOCS3B8"}
+2026-10-15 18:44:38.777 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 4.8865 ms {"RequestId":"0HNPASFOCS3B8:00000007","ConnectionId":"0HNPASFOCS3B8"}
+2026-10-15 18:44:50.450 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /internal responded 200 in 8.6156 ms {"RequestId":"0HNPASFOCS3B8:00000008","ConnectionId":"0HNPASFOCS3B8"}
+2026-10-15 18:45:05.862 +01:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /_blazor responded 101 in 44503.7090 ms {"RequestId":"0HNPASFOCS3BE:00000001","ConnectionId":"0HNPASFOCS3BE"}

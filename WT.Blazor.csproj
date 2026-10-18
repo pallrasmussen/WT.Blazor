@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Version>0.1.0-alpha</Version>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+    <!-- Keep dotnet publish output out of build item globs if it's ever placed under the project folder. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);publish/**;deploy/publish/**;WT.Blazor.Tests/**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="10.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="10.0.12" />
+    <PackageReference Include="QuestPDF" Version="2026.9.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+  </ItemGroup>
+
+  <Target Name="WriteDeploymentManifest" AfterTargets="Publish">
+    <Exec Command="git rev-parse HEAD" WorkingDirectory="$(MSBuildProjectDirectory)" ConsoleToMSBuild="true" IgnoreExitCode="true" Condition="Exists('$(MSBuildProjectDirectory)\.git')">
+      <Output TaskParameter="ConsoleOutput" PropertyName="DeploymentCommitSha" />
+    </Exec>
+    <PropertyGroup>
+      <DeploymentCommitSha>$([System.String]::Copy('$(DeploymentCommitSha)').Trim())</DeploymentCommitSha>
+      <DeploymentCommitSha Condition="'$(DeploymentCommitSha)' == ''">unknown</DeploymentCommitSha>
+      <DeploymentManifestPath>$(PublishDir)deployment-manifest.json</DeploymentManifestPath>
+      <DeploymentPublishedAtUtc>$([System.DateTime]::UtcNow.ToString('O'))</DeploymentPublishedAtUtc>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(DeploymentManifestPath)" Overwrite="true" Lines="{&quot;buildVersion&quot;:&quot;$(Version)&quot;,&quot;commitSha&quot;:&quot;$(DeploymentCommitSha)&quot;,&quot;publishedAtUtc&quot;:&quot;$(DeploymentPublishedAtUtc)&quot;}" />
+  </Target>
+
+</Project>

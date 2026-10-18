@@ -1,0 +1,90 @@
+@using WT.Blazor.Services
+
+@if (Points.Count < 2)
+{
+    <div class="empty-state">@AppText.Get("TrendNotEnoughData")</div>
+}
+else
+{
+    <div class="chart-wrap">
+        <svg class="chart-svg" viewBox="0 0 820 320" role="img" aria-label="@AppText.Get("TrendChartLabel")">
+            @((MarkupString)BuildSvgMarkup())
+        </svg>
+    </div>
+    <details class="trend-data-table">
+        <summary>@AppText.Get("TrendDataTable")</summary>
+        <table>
+            <thead><tr><th>@AppText.Get("Date")</th><th>@AppText.Get("Wait")</th></tr></thead>
+            <tbody>
+                @foreach (var point in Points)
+                {
+                    <tr><td>@point.Timestamp.ToString("dd.MM.yyyy")</td><td>@point.Value @UnitLabel</td></tr>
+                }
+            </tbody>
+        </table>
+    </details>
+}
+
+@code {
+    [Parameter, EditorRequired] public List<TrendPoint> Points { get; set; } = [];
+    [Parameter] public string UnitLabel { get; set; } = "";
+
+    private const int Width = 820;
+    private const int Height = 320;
+    private static readonly (int L, int R, int T, int B) Pad = (62, 28, 20, 60);
+
+    private double MinTicks => Points.Min(p => p.Timestamp.Ticks);
+    private double MaxTicks => Points.Max(p => p.Timestamp.Ticks) is var max && max == MinTicks ? max + TimeSpan.FromDays(1).Ticks : max;
+    private double MinValue => Math.Max(0, Points.Min(p => p.Value) - Spread * 0.25);
+    private double MaxValue => Points.Max(p => p.Value) + Spread * 0.25;
+    private double Spread => Math.Max(1, Points.Max(p => p.Value) - Points.Min(p => p.Value));
+
+    private double X(DateTime t)
+    {
+        var pw = Width - Pad.L - Pad.R;
+        return Pad.L + (t.Ticks - MinTicks) / (MaxTicks - MinTicks) * pw;
+    }
+
+    private double Y(double value)
+    {
+        var ph = Height - Pad.T - Pad.B;
+        return Pad.T + ph - (value - MinValue) / (MaxValue - MinValue) * ph;
+    }
+
+    private static string F(double v) => v.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    private string BuildSvgMarkup()
+    {
+        var sb = new System.Text.StringBuilder();
+
+        const int ticks = 4;
+        for (var i = 0; i <= ticks; i++)
+        {
+            var value = MinValue + (MaxValue - MinValue) * i / ticks;
+            var y = Y(value);
+            sb.Append($"""<line x1="{Pad.L}" y1="{F(y)}" x2="{Width - Pad.R}" y2="{F(y)}" stroke="#e3e8eb" stroke-width="1"/>""");
+            sb.Append($"""<text x="{Pad.L - 10}" y="{F(y + 4)}" text-anchor="end" font-size="11" fill="#667085">{Math.Round(value)}</text>""");
+        }
+
+        var d = new System.Text.StringBuilder($"M {F(X(Points[0].Timestamp))} {F(Y(Points[0].Value))}");
+        for (var i = 1; i < Points.Count; i++)
+        {
+            d.Append($" L {F(X(Points[i].Timestamp))} {F(Y(Points[i].Value))}");
+        }
+        sb.Append($"""<path d="{d}" fill="none" stroke="#006b73" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>""");
+
+        var labelInterval = Math.Max(1, (int)Math.Ceiling(Points.Count / 8d));
+        for (var index = 0; index < Points.Count; index++)
+        {
+            var p = Points[index];
+            var x = X(p.Timestamp);
+            var y = Y(p.Value);
+            var pointLabel = System.Net.WebUtility.HtmlEncode($"{p.Timestamp:dd.MM.yyyy}: {p.Value} {UnitLabel}");
+            sb.Append($"""<circle class="chart-point" cx="{F(x)}" cy="{F(y)}" r="5" fill="#fff" stroke="#006b73" stroke-width="3"><title>{pointLabel}</title></circle>""");
+            if (index % labelInterval == 0 || index == Points.Count - 1)
+                sb.Append($"""<text x="{F(x)}" y="{Height - Pad.B + 24}" text-anchor="middle" font-size="10.5" fill="#667085">{p.Timestamp:dd.MM.yy}</text>""");
+        }
+
+        return sb.ToString();
+    }
+}

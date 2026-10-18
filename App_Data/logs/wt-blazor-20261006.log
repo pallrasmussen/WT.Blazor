@@ -1,0 +1,2 @@
+2026-10-06 20:17:42.515 +01:00 [INF] WT.Blazor Configured Windows security groups: Viewer=HNPV-WAC05\WT-Viewers, Contributor=HNPV-WAC05\WT-Contributors, Admin=HNPV-WAC05\WT-Admins {}
+2026-10-06 20:17:42.542 +01:00 [INF] WT.Blazor Deployment manifest: BuildVersion=unknown, CommitSha=unknown, PublishedAtUtc="0001-01-01T00:00:00.0000000+00:00" {}

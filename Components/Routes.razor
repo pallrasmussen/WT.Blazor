@@ -1,0 +1,13 @@
+﻿<Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+            <NotAuthorized>
+                <div class="empty-state" style="margin:3rem auto;max-width:640px">
+                    <strong>Atgongd noktað.</strong>
+                    <span>Tín AD-brúkari er ikki limur í teirri Heilsunet-bólkinum, ið hevur atgongd til hesa síðuna.</span>
+                </div>
+            </NotAuthorized>
+        </AuthorizeRouteView>
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+</Router>

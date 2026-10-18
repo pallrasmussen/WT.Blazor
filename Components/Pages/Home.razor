@@ -1,0 +1,233 @@
+﻿@page "/"
+@layout Layout.PublicLayout
+@rendermode InteractiveServer
+@implements IDisposable
+@using WT.Blazor.Components.Shared
+@inject IWaitingTimeCatalogService WaitingTimeCatalog
+@inject ITrendReadService TrendReader
+@inject IPortalSettingsService PortalSettingsReader
+@inject PortalSettingsChangeNotifier PortalSettingsNotifier
+@inject TimeProvider TimeProvider
+@inject NavigationManager NavigationManager
+
+<PageTitle>Bíðitíðir | Sjúkrahúsverkið</PageTitle>
+
+<section class="public-hero">
+	<h1>@AppText.Get("WaitingTime")</h1>
+	<p>@AppText.Get("Intro")</p>
+</section>
+
+<section class="public-panel public-large-text" aria-label="Bíðitíðir" aria-busy="@isLoading">
+	<div class="results-toolbar public-utilities">
+		<div class="browse-actions">
+			@if (hasSearched)
+			{
+				<div class="browse-search">
+					<label class="visually-hidden" for="search">@AppText.Get("Search")</label>
+					<input id="search" type="search" @bind="searchText" @bind:event="oninput" @bind:after="UpdateUrl" placeholder="@AppText.Get("SearchPlaceholder")" />
+				</div>
+			}
+			@if (HasActiveFilters)
+			{
+				<button type="button" class="filter-reset" @onclick="ClearFilters">@AppText.Get("ClearFilters")</button>
+			}
+		</div>
+		<div class="utility-actions">
+			@if (!isLoading && visibleItems.Count > 0)
+			{
+				<button type="button" class="print-results" onclick="window.print()" title="@AppText.Get("PrintResults")"><span class="print-icon" aria-hidden="true">&#128424;</span><span>@AppText.Get("Print")</span></button>
+				<details class="public-legend">
+					<summary>@AppText.Get("ExplainIndicators")</summary>
+					<div class="trend-legend" aria-label="@AppText.Get("TrendLegend")">
+						<span><i class="trend-arrow trend-up" aria-hidden="true"></i> @AppText.Get("Growing")</span>
+						<span><i class="trend-arrow trend-down" aria-hidden="true"></i> @AppText.Get("Declining")</span>
+						<span><i class="trend-arrow trend-flat" aria-hidden="true"></i> @AppText.Get("Unchanged")</span>
+					</div>
+					<div class="freshness-legend" aria-label="@AppText.Get("FreshnessLegend")">
+						<span><i class="status-dot status-fresh" aria-hidden="true"></i>@AppText.Get("FreshnessCurrent")</span>
+						<span><i class="status-dot status-warning" aria-hidden="true"></i>@AppText.Get("FreshnessReview")</span>
+						<span><i class="status-dot status-old" aria-hidden="true"></i>@AppText.Get("FreshnessOverdue")</span>
+					</div>
+				</details>
+			}
+		</div>
+	</div>
+	<p class="print-summary">@string.Format(AppText.Get("PrintContext"), ScopeText, visibleItems.Count, TimeProvider.GetLocalNow())</p>
+
+	@if (isLoading && items.Count == 0)
+	{
+		<div class="waiting-grid" aria-label="@AppText.Get("Loading")">
+			@for (var index = 0; index < 3; index++)
+			{
+				<div class="waiting-card waiting-card-skeleton" aria-hidden="true">
+					<span></span><strong></strong><i></i><em></em>
+				</div>
+			}
+		</div>
+	}
+	else if (!hasSearched)
+	{
+		<div class="empty-state">
+			<strong>@AppText.Get("ChooseWaitingTimeScope")</strong>
+			<span>@AppText.Get("ChooseWaitingTimeScopeHint")</span>
+		</div>
+	}
+	else if (visibleItems.Count == 0)
+	{
+		<div class="empty-state">
+			<strong>@AppText.Get("NoResults")</strong>
+			<span>@AppText.Get("ChangeFilters")</span>
+		</div>
+	}
+	else
+	{
+		<div class="waiting-grid">
+			@foreach (var item in visibleItems)
+			{
+				<article id="waiting-time-@item.Id" class="waiting-card">
+					<div class="card-main">
+						<span class="chip">@(item.Department is not null ? DisplayNames.For(item.Department.Value) : DisplayNames.For(item.Hospital))</span>
+						<span class="card-hospital">@DisplayNames.For(item.Hospital)</span>
+						<h3>@item.Name</h3>
+						<div class="wait-value">
+							@item.WaitValue <span>@DisplayNames.For(item.Unit, item.WaitValue)</span>
+							@if (trendChanges.TryGetValue(item.Id, out var change))
+							{
+								<span class="trend-arrow @TrendCssClass(change)" role="img" aria-label="@TrendLabel(change)" title="@TrendLabel(change)"></span>
+							}
+						</div>
+					</div>
+					@if (string.IsNullOrWhiteSpace(item.Note))
+					{
+						<p class="note note-empty" aria-hidden="true"></p>
+					}
+					else
+					{
+						<p class="note">@item.Note</p>
+					}
+					<a class="graph-link" href="@TrendUri(item.Id)">@AppText.Get("Trend")</a>
+					<div class="updated-note @UpdatedStatus.CssClass(item.UpdatedAt, portalSettings.GreenMaximumAgeMonths, portalSettings.YellowMaximumAgeMonths, CurrentUtc)">@AppText.Get("LastUpdated"): @item.UpdatedAt.ToLocalTime().ToString("dd. MMMM yyyy")</div>
+				</article>
+			}
+		</div>
+	}
+	@if (isLoading && items.Count > 0)
+	{
+		<div class="results-loading" role="status" aria-live="polite">@AppText.Get("Loading")</div>
+	}
+</section>
+
+<section class="waiting-time-guidance" aria-labelledby="waiting-time-guidance-heading">
+	<h2 id="waiting-time-guidance-heading">@AppText.Get("WaitingTimeGuidanceHeading")</h2>
+	<div class="guidance-grid">
+		<article class="guidance-card">
+			<h3>@AppText.Get("WaitingTimeMeaningHeading")</h3>
+			<p>@AppText.Get("WaitingTimeMeaningText")</p>
+		</article>
+		<article class="guidance-card">
+			<h3>@AppText.Get("WaitingTimeUpdateHeading")</h3>
+			<p>@AppText.Get("WaitingTimeUpdateText")</p>
+		</article>
+	</div>
+</section>
+
+@code {
+	private string selectedHospitalName = "";
+	private string selectedDepartmentName = "";
+	private string searchText = "";
+	[SupplyParameterFromQuery(Name = "hospital")] public string? QueryHospital { get; set; }
+	[SupplyParameterFromQuery(Name = "department")] public string? QueryDepartment { get; set; }
+	[SupplyParameterFromQuery(Name = "q")] public string? QuerySearch { get; set; }
+	private bool hasSearched;
+	private bool isLoading;
+	private List<WaitingTime> items = [];
+	private Dictionary<int, int> trendChanges = [];
+	private PortalSettings portalSettings = new();
+	private DateTime CurrentUtc => TimeProvider.GetUtcNow().UtcDateTime;
+	private bool HasActiveFilters => !string.IsNullOrEmpty(selectedHospitalName)
+		|| !string.IsNullOrWhiteSpace(searchText);
+	private string ScopeText => string.IsNullOrEmpty(selectedHospitalName)
+		? AppText.Get("AllWaitingTimes")
+		: selectedDepartmentName == ""
+				? selectedHospitalName
+				: $"{selectedHospitalName}, {selectedDepartmentName}";
+
+	private List<WaitingTime> visibleItems
+	{
+		get
+		{
+			var filtered = string.IsNullOrWhiteSpace(searchText)
+				? items
+				: items.Where(i => i.Name.Contains(searchText.Trim(), StringComparison.CurrentCultureIgnoreCase));
+			return filtered.OrderBy(item => item.Name).ToList();
+		}
+	}
+
+	private static string CountText(int n) => n == 1 ? $"1 {AppText.Get("WaitingTime").ToLowerInvariant()}" : $"{n} {AppText.Get("Results")}";
+	private static string TrendCssClass(int change) => change switch { > 0 => "trend-up", < 0 => "trend-down", _ => "trend-flat" };
+	private static string TrendLabel(int change) => change switch { > 0 => AppText.Get("Growing"), < 0 => AppText.Get("Declining"), _ => AppText.Get("Unchanged") };
+
+	protected override async Task OnInitializedAsync()
+	{
+		portalSettings = await PortalSettingsReader.GetAsync();
+		Hospital? hospital = Enum.TryParse<Hospital>(QueryHospital, out var parsedHospital) && parsedHospital != Hospital.Sjukrahusverkid
+			? parsedHospital
+			: null;
+		Department? department = hospital == Hospital.Landssjukrahusid
+			&& Enum.TryParse<Department>(QueryDepartment, out var parsedDepartment)
+			? parsedDepartment
+			: null;
+		if (hospital is not null) selectedHospitalName = DisplayNames.For(hospital.Value);
+		if (department is not null) selectedDepartmentName = DisplayNames.For(department.Value);
+		searchText = QuerySearch ?? "";
+		hasSearched = true;
+		isLoading = true;
+		await LoadItemsAsync(hospital, department);
+		isLoading = false;
+	}
+
+	protected override void OnInitialized() => PortalSettingsNotifier.Changed += HandleSettingsChanged;
+
+	private void HandleSettingsChanged(object? sender, EventArgs args) => _ = InvokeAsync(async () =>
+	{
+		portalSettings = await PortalSettingsReader.GetAsync();
+		StateHasChanged();
+	});
+
+	public void Dispose() => PortalSettingsNotifier.Changed -= HandleSettingsChanged;
+
+	private async Task ClearFilters()
+	{
+		selectedHospitalName = "";
+		selectedDepartmentName = "";
+		searchText = "";
+		UpdateUrl();
+		hasSearched = true;
+		isLoading = true;
+		StateHasChanged();
+
+		await LoadItemsAsync(null, null);
+		isLoading = false;
+	}
+
+	private async Task LoadItemsAsync(Hospital? hospital, Department? department)
+	{
+		items = await WaitingTimeCatalog.GetActiveAsync(hospital, department);
+		trendChanges = await TrendReader.GetTrendChangesAsync(items.Select(item => item.Id));
+	}
+
+	private void UpdateUrl()
+	{
+		var hospital = DisplayNames.TryHospitalFrom(selectedHospitalName);
+		var department = DisplayNames.TryDepartmentFrom(selectedDepartmentName);
+		NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+		{
+			["hospital"] = hospital is null or Hospital.Sjukrahusverkid ? null : hospital.ToString(),
+			["department"] = department?.ToString(),
+			["q"] = string.IsNullOrWhiteSpace(searchText) ? null : searchText.Trim()
+		}), replace: true);
+	}
+
+	private string TrendUri(int id) => $"/gongd/{id}?returnUrl={Uri.EscapeDataString($"{NavigationManager.ToBaseRelativePath(NavigationManager.Uri)}#waiting-time-{id}")}";
+
+}

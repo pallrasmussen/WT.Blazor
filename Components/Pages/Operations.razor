@@ -1,0 +1,86 @@
+@page "/internal/operations"
+@layout Layout.InternalLayout
+@rendermode InteractiveServer
+@attribute [Authorize(Policy = Policies.AdminAccess)]
+@implements IDisposable
+@inject Microsoft.Extensions.Options.IOptions<BackupOptions> BackupOptions
+@inject Microsoft.Extensions.Options.IOptions<AuditRetentionOptions> AuditRetentionOptions
+@inject IPortalSettingsService PortalSettingsReader
+@inject PortalSettingsChangeNotifier PortalSettingsNotifier
+@inject TimeProvider TimeProvider
+
+<PageTitle>@AppText.Get("Operations") | @AppText.Get("HospitalService")</PageTitle>
+
+<div class="internal-heading">
+    <div>
+        <h1>@AppText.Get("Operations")</h1>
+        <p>@AppText.Get("OperationsIntro")</p>
+        <button class="btn-secondary" onclick="window.print()">@AppText.Get("PrintReport")</button>
+    </div>
+</div>
+
+<section class="internal-grid">
+    <article class="internal-card">
+        <h2>@AppText.Get("LatestBackup")</h2>
+        @if (latestBackup is null)
+        {
+            <p>@AppText.Get("NoBackup")</p>
+        }
+        else
+        {
+            <p>@latestBackup.Name</p>
+            <p>@latestBackup.LastWriteTime:dd.MM.yyyy HH:mm · @BackupAgeText</p>
+        }
+    </article>
+    <article class="internal-card">
+        <h2>@AppText.Get("AuditRetention")</h2>
+        <p>@string.Format(AppText.Get("AuditRetentionIntro"), retentionDays)</p>
+        <p>@string.Format(AppText.Get("AuditRetentionCount"), summary.EntriesForReview)</p>
+    </article>
+</section>
+
+<section class="internal-grid">
+    <article class="internal-card">
+        <h2>@AppText.Get("RecentChanges")</h2>
+        <p>@string.Format(AppText.Get("RecentChangesCount"), summary.RecentChanges)</p>
+        <p>@string.Format(AppText.Get("NeedsReviewCount"), summary.NeedsReview)</p>
+    </article>
+    <article class="internal-card">
+        <h2>@AppText.Get("DataQuality")</h2>
+        <p>@string.Format(AppText.Get("LongWaitsCountMonths"), summary.LongWaits, portalSettings.LongWaitMonths)</p>
+        <p>@string.Format(AppText.Get("MissingDepartmentsCount"), summary.MissingDepartments)</p>
+    </article>
+</section>
+
+@code {
+    [Inject] private IOperationsReadService OperationsReader { get; set; } = default!;
+
+    private FileInfo? latestBackup;
+    private int retentionDays;
+    private PortalSettings portalSettings = new();
+    private OperationsSummary summary = new(0, 0, 0, 0, 0);
+    private string BackupAgeText => latestBackup is null ? "" : $"{Math.Floor((TimeProvider.GetLocalNow().DateTime - latestBackup.LastWriteTime).TotalDays)} dagar síðani";
+
+    protected override async Task OnInitializedAsync()
+    {
+		PortalSettingsNotifier.Changed += HandleSettingsChanged;
+		portalSettings = await PortalSettingsReader.GetAsync();
+        var backupPath = BackupOptions.Value.Path;
+        retentionDays = AuditRetentionOptions.Value.ReviewAfterDays;
+        if (Directory.Exists(backupPath))
+        {
+            latestBackup = new DirectoryInfo(backupPath).GetFiles("wt-blazor-*.db").OrderByDescending(file => file.LastWriteTime).FirstOrDefault();
+        }
+
+        summary = await OperationsReader.GetOperationsSummaryAsync(retentionDays, portalSettings.GreenMaximumAgeMonths, portalSettings.LongWaitMonths);
+    }
+
+    private void HandleSettingsChanged(object? sender, EventArgs args) => _ = InvokeAsync(async () =>
+    {
+        portalSettings = await PortalSettingsReader.GetAsync();
+        summary = await OperationsReader.GetOperationsSummaryAsync(retentionDays, portalSettings.GreenMaximumAgeMonths, portalSettings.LongWaitMonths);
+        StateHasChanged();
+    });
+
+    public void Dispose() => PortalSettingsNotifier.Changed -= HandleSettingsChanged;
+}

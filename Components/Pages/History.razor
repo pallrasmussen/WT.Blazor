@@ -1,0 +1,535 @@
+@page "/internal/history"
+@layout Layout.InternalLayout
+@rendermode InteractiveServer
+@attribute [Authorize(Policy = Policies.AdminAccess)]
+@inject IHistoryReadService HistoryReader
+@inject NavigationManager NavigationManager
+@inject TimeProvider TimeProvider
+@inject Microsoft.Extensions.Options.IOptions<ExportOptions> ExportOptions
+@using WT.Blazor.Components.Shared
+
+<PageTitle>@AppText.Get("History") | @AppText.Get("HospitalService")</PageTitle>
+
+<div class="internal-heading">
+    <div>
+        <h1>@AppText.Get("History")</h1>
+        <p>@AppText.Get("HistoryIntro")</p>
+    </div>
+</div>
+
+<section class="public-panel">
+    <div class="history-toolbar">
+        <div class="history-filters @(filterHospital == Hospital.Landssjukrahusid ? "with-department" : "")">
+            <div>
+                <label for="history-hospital">@AppText.Get("HistoryColumnHospital")</label>
+                <select id="history-hospital" @bind="filterHospital" @bind:after="ResetAndLoadAsync">
+                    <option value="">@AppText.Get("AllHospitals")</option>
+                    @foreach (var h in AllHospitals)
+                    {
+                        <option value="@h">@DisplayNames.For(h)</option>
+                    }
+                </select>
+            </div>
+            @if (filterHospital == Hospital.Landssjukrahusid)
+            {
+                <div>
+                    <label for="history-department">@AppText.Get("Department")</label>
+                    <select id="history-department" @bind="filterDepartment" @bind:after="ResetAndLoadAsync">
+                        <option value="">@AppText.Get("AllDepartments")</option>
+                        @foreach (var d in AllDepartments)
+                        {
+                            <option value="@d">@DisplayNames.For(d)</option>
+                        }
+                    </select>
+                </div>
+            }
+            <div>
+                <label for="history-search">@AppText.Get("SearchHistory")</label>
+                <input id="history-search" @bind="filterSearch" @bind:event="oninput" @bind:after="ResetAndLoadAsync" placeholder="@AppText.Get("SearchHistoryPlaceholder")" />
+            </div>
+            <div>
+                <label for="history-from">@AppText.Get("From")</label>
+                <LocalizedDatePicker Id="history-from" AriaLabel="@AppText.Get("FromDate")" Value="fromDate" ValueChanged="SetFromDate" />
+            </div>
+            <div>
+                <label for="history-to">@AppText.Get("To")</label>
+                <LocalizedDatePicker Id="history-to" AriaLabel="@AppText.Get("ToDate")" Value="toDate" ValueChanged="SetToDate" />
+            </div>
+        </div>
+        <details class="history-advanced-filters">
+            <summary>@AppText.Get("AdvancedFilters")</summary>
+            <div>
+                <div>
+                    <label for="history-name">@AppText.Get("SpecialtyTreatment")</label>
+                    <select id="history-name" @bind="filterName" @bind:after="ResetAndLoadAsync">
+                        <option value="">@AppText.Get("AllWaitingTimes")</option>
+                        @foreach (var n in names) { <option value="@n">@n</option> }
+                    </select>
+                </div>
+                <div>
+                    <label for="history-action">@AppText.Get("HistoryAction")</label>
+                    <select id="history-action" @bind="filterAction" @bind:after="ResetAndLoadAsync">
+                        <option value="">@AppText.Get("AllHistoryActions")</option>
+                        @foreach (var action in Enum.GetValues<HistoryAction>()) { <option value="@action">@DisplayNames.For(action)</option> }
+                    </select>
+                </div>
+                <div>
+                    <label for="history-username">@AppText.Get("HistoryColumnUsername")</label>
+                    <select id="history-username" @bind="filterUsername" @bind:after="ResetAndLoadAsync">
+                        <option value="">@AppText.Get("AllHistoryUsers")</option>
+                        @foreach (var username in usernames) { <option value="@username">@username</option> }
+                    </select>
+                </div>
+                <div>
+                    <label for="history-sort">@AppText.Get("HistorySort")</label>
+                    <select id="history-sort" @bind="sortOrder" @bind:after="ResetAndLoadAsync">
+                        <option value="timestamp-desc">@AppText.Get("HistorySortNewest")</option>
+                        <option value="timestamp-asc">@AppText.Get("HistorySortOldest")</option>
+                        <option value="name-asc">@AppText.Get("SpecialtyTreatment")</option>
+                        <option value="action-asc">@AppText.Get("HistoryAction")</option>
+                        <option value="username-asc">@AppText.Get("HistoryColumnUsername")</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="history-page-size">@AppText.Get("HistoryPageSize")</label>
+                    <select id="history-page-size" @bind="pageSize" @bind:after="ResetAndLoadAsync">
+                        <option value="25">25</option><option value="50">50</option><option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+        </details>
+        <div class="admin-actions">
+            <button class="btn-secondary history-range-button @(IsDateRangeActive(0) ? "active" : "")" @onclick="() => SetDateRange(0)">@AppText.Get("UpdatedFilterToday")</button>
+            <button class="btn-secondary history-range-button @(IsDateRangeActive(7) ? "active" : "")" @onclick="() => SetDateRange(7)">@string.Format(AppText.Get("HistoryDays"), 7)</button>
+            <button class="btn-secondary history-range-button @(IsDateRangeActive(30) ? "active" : "")" @onclick="() => SetDateRange(30)">@string.Format(AppText.Get("HistoryDays"), 30)</button>
+            <button class="btn-secondary history-range-button @(IsYearToDateActive ? "active" : "")" @onclick="SetYearToDate">@AppText.Get("HistoryYearToDate")</button>
+            <button class="icon-button" title="@AppText.Get("ClearFilters")" aria-label="@AppText.Get("ClearFilters")" @onclick="ResetFilters">&#x21BB;</button>
+            <details class="export-menu">
+                <summary>@AppText.Get("Export")</summary>
+                <div>
+                    <button class="btn-secondary" @onclick='() => StartExportAsync("/api/history/export/csv")' disabled="@isExportStarting">CSV</button>
+                    <button class="btn-teal" @onclick='() => StartExportAsync("/api/history/export")' disabled="@isExportStarting">Excel</button>
+                    <button class="btn-secondary" @onclick='() => StartExportAsync("/api/history/export/pdf")' disabled="@isExportStarting">PDF</button>
+                </div>
+            </details>
+        </div>
+        <div class="history-display-controls">
+            <label><input type="checkbox" @bind="compactMode" @bind:after="UpdateDisplaySettings" /> @AppText.Get("CompactMode")</label>
+            <details class="column-menu">
+                <summary>@AppText.Get("VisibleColumns")</summary>
+                <div>
+                    <label><input type="checkbox" @bind="showHospitalColumn" @bind:after="UpdateDisplaySettings" /> @AppText.Get("HistoryColumnHospital")</label>
+                    <label><input type="checkbox" @bind="showDepartmentColumn" @bind:after="UpdateDisplaySettings" /> @AppText.Get("HistoryColumnDepartment")</label>
+                    <label><input type="checkbox" @bind="showDetailColumn" @bind:after="UpdateDisplaySettings" /> @AppText.Get("HistoryColumnDetail")</label>
+                    <label><input type="checkbox" @bind="showWaitColumns" @bind:after="UpdateDisplaySettings" /> @AppText.Get("HistoryColumnWaits")</label>
+                    <label><input type="checkbox" @bind="showUsernameColumn" @bind:after="UpdateDisplaySettings" /> @AppText.Get("HistoryColumnUsername")</label>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    @if (exportMessage is not null)
+    {
+        <p class="export-status" role="status" aria-live="polite">@exportMessage</p>
+    }
+
+    @if (HasActiveFilters)
+    {
+        <div class="history-active-filters" aria-label="@AppText.Get("ActiveFilters")">
+            <span>@AppText.Get("ActiveFilters")</span>
+            @if (filterHospital is not null)
+            {
+                <button type="button" class="filter-chip" @onclick="ClearLocationAsync">@DisplayNames.For(filterHospital.Value) <span aria-hidden="true">x</span></button>
+            }
+            @if (!string.IsNullOrEmpty(filterName))
+            {
+                <button type="button" class="filter-chip" @onclick="ClearNameAsync">@filterName <span aria-hidden="true">x</span></button>
+            }
+            @if (filterAction is not null)
+            {
+                <button type="button" class="filter-chip" @onclick="ClearActionAsync">@DisplayNames.For(filterAction.Value) <span aria-hidden="true">x</span></button>
+            }
+            @if (!string.IsNullOrEmpty(filterUsername))
+            {
+                <button type="button" class="filter-chip" @onclick="ClearUsernameAsync">@filterUsername <span aria-hidden="true">x</span></button>
+            }
+            @if (!string.IsNullOrWhiteSpace(filterSearch))
+            {
+                <button type="button" class="filter-chip" @onclick="ClearSearchAsync">@filterSearch <span aria-hidden="true">x</span></button>
+            }
+            @if (fromDate is not null || toDate is not null)
+            {
+                <button type="button" class="filter-chip" @onclick="ClearDatesAsync">@AppText.Get("Date") <span aria-hidden="true">x</span></button>
+            }
+        </div>
+    }
+
+    <p class="result-count" style="margin-top:.8rem">@CountText(totalEntries)</p>
+
+    <div class="history-table-wrap">
+        <table class="history-table @(compactMode ? "compact" : "")">
+            <thead>
+                <tr>
+                    <th class="history-time-column">@AppText.Get("HistoryDateTime")</th>
+                    @if (showHospitalColumn) { <th class="history-hospital-column">@AppText.Get("HistoryColumnHospital")</th> }
+                    @if (showDepartmentColumn) { <th>@AppText.Get("HistoryColumnDepartment")</th> }
+                    <th>@AppText.Get("SpecialtyTreatment")</th>
+                    <th>@AppText.Get("HistoryAction")</th>
+                    @if (showDetailColumn) { <th>@AppText.Get("HistoryColumnDetail")</th> }
+                    @if (showWaitColumns) { <th>@AppText.Get("HistoryOldWait")</th><th>@AppText.Get("HistoryNewWait")</th> }
+                    @if (showUsernameColumn) { <th>@AppText.Get("HistoryColumnUsername")</th> }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in entries)
+                {
+                    <tr>
+                        <td class="history-time-column" data-label="@AppText.Get("HistoryDateTime")">@e.Timestamp.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                        @if (showHospitalColumn) { <td class="history-hospital-column" data-label="@AppText.Get("HistoryColumnHospital")">@DisplayNames.For(e.Hospital)</td> }
+                        @if (showDepartmentColumn) { <td data-label="@AppText.Get("HistoryColumnDepartment")">@(e.Department is not null ? DisplayNames.For(e.Department.Value) : "–")</td> }
+                        <td data-label="@AppText.Get("SpecialtyTreatment")"><strong>@e.Name</strong></td>
+                        <td data-label="@AppText.Get("HistoryAction")">@DisplayNames.For(e.Action)</td>
+                        @if (showDetailColumn)
+                        {
+                        <td data-label="@AppText.Get("HistoryColumnDetail")">
+                            @if (string.IsNullOrWhiteSpace(e.Detail))
+                            {
+                                <span>–</span>
+                            }
+                            else
+                            {
+                                <details class="log-detail">
+                                    <summary>@DetailPreview(DisplayDetail(e.Detail))</summary>
+                                    <span>@DisplayDetail(e.Detail)</span>
+                                    @if (!string.IsNullOrEmpty(e.RequestId))
+                                    {
+                                        <span class="log-detail-request">@AppText.Get("HistoryRequestId"): @e.RequestId</span>
+                                    }
+                                </details>
+                            }
+                        </td>
+                        }
+                        @if (showWaitColumns) { <td data-label="@AppText.Get("HistoryOldWait")">@WaitText(e.OldWaitValue, e.OldUnit)</td><td data-label="@AppText.Get("HistoryNewWait")">@WaitText(e.NewWaitValue, e.NewUnit)</td> }
+                        @if (showUsernameColumn) { <td data-label="@AppText.Get("HistoryColumnUsername")">@(e.Username ?? "–")</td> }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (totalPages > 1)
+    {
+        <nav class="log-pager" aria-label="@AppText.Get("HistoryPages")">
+            <button class="icon-button" title="@AppText.Get("PreviousPage")" aria-label="@AppText.Get("PreviousPage")" disabled="@(pageNumber == 1)" @onclick="PreviousPage">&#x2190;</button>
+            <span>@string.Format(AppText.Get("HistoryPageSummary"), pageNumber, totalPages)</span>
+            <button class="icon-button" title="@AppText.Get("NextPage")" aria-label="@AppText.Get("NextPage")" disabled="@(pageNumber == totalPages)" @onclick="NextPage">&#x2192;</button>
+        </nav>
+    }
+</section>
+
+@code {
+    private static readonly Hospital[] AllHospitals = Enum.GetValues<Hospital>()
+        .Where(hospital => hospital != Hospital.Sjukrahusverkid)
+        .ToArray();
+    private static readonly Department[] AllDepartments = Enum.GetValues<Department>();
+
+    private Hospital? filterHospital;
+    private Department? filterDepartment;
+    private string filterName = "";
+    private HistoryAction? filterAction;
+    private string filterUsername = "";
+    private string filterSearch = "";
+    private DateTime? fromDate;
+    private DateTime? toDate;
+    private List<string> names = [];
+    private List<string> usernames = [];
+    private List<WaitingTimeHistoryEntry> entries = [];
+    [SupplyParameterFromQuery(Name = "hospital")] public string? QueryHospital { get; set; }
+    [SupplyParameterFromQuery(Name = "department")] public string? QueryDepartment { get; set; }
+    [SupplyParameterFromQuery(Name = "name")] public string? QueryName { get; set; }
+    [SupplyParameterFromQuery(Name = "action")] public string? QueryAction { get; set; }
+    [SupplyParameterFromQuery(Name = "username")] public string? QueryUsername { get; set; }
+    [SupplyParameterFromQuery(Name = "q")] public string? QuerySearch { get; set; }
+    [SupplyParameterFromQuery(Name = "from")] public DateTime? QueryFromDate { get; set; }
+    [SupplyParameterFromQuery(Name = "to")] public DateTime? QueryToDate { get; set; }
+    [SupplyParameterFromQuery(Name = "sort")] public string? QuerySort { get; set; }
+    [SupplyParameterFromQuery(Name = "page")] public int? QueryPage { get; set; }
+    [SupplyParameterFromQuery(Name = "size")] public int? QueryPageSize { get; set; }
+    [SupplyParameterFromQuery(Name = "compact")] public bool? QueryCompact { get; set; }
+    [SupplyParameterFromQuery(Name = "columns")] public string? QueryColumns { get; set; }
+
+    private int pageSize = 50;
+    private string sortOrder = "timestamp-desc";
+    private int pageNumber = 1;
+    private int totalEntries;
+    private bool isExportStarting;
+    private string? exportMessage;
+    private bool compactMode;
+    private bool showHospitalColumn = true;
+    private bool showDepartmentColumn = true;
+    private bool showDetailColumn = true;
+    private bool showWaitColumns = true;
+    private bool showUsernameColumn = true;
+    private int totalPages => Math.Max(1, (int)Math.Ceiling(totalEntries / (double)pageSize));
+    private bool HasActiveFilters => filterHospital is not null
+        || !string.IsNullOrEmpty(filterName)
+        || filterAction is not null
+        || !string.IsNullOrEmpty(filterUsername)
+        || !string.IsNullOrWhiteSpace(filterSearch)
+        || fromDate is not null
+        || toDate is not null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        filterHospital = DisplayNames.TryHospitalFrom(QueryHospital);
+        filterDepartment = DisplayNames.TryDepartmentFrom(QueryDepartment);
+        filterName = QueryName ?? "";
+        filterAction = Enum.TryParse<HistoryAction>(QueryAction, out var action) ? action : null;
+        filterUsername = QueryUsername ?? "";
+        filterSearch = QuerySearch ?? "";
+        fromDate = QueryFromDate;
+        toDate = QueryToDate;
+        sortOrder = IsSortOrder(QuerySort) ? QuerySort! : sortOrder;
+        pageNumber = Math.Max(1, QueryPage ?? 1);
+        pageSize = QueryPageSize is 25 or 50 or 100 ? QueryPageSize.Value : pageSize;
+        compactMode = QueryCompact == true;
+        SetVisibleColumns(QueryColumns);
+        names = await HistoryReader.GetHistoryNamesAsync();
+        usernames = await HistoryReader.GetHistoryUsersAsync();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        if (filterHospital != Hospital.Landssjukrahusid) filterDepartment = null;
+
+        var query = HistoryQueryMapper.FromValues(
+            filterHospital,
+            filterDepartment,
+            filterName,
+            filterAction,
+            filterUsername,
+            filterSearch,
+            sortOrder,
+            fromDate,
+            toDate,
+            pageNumber,
+            pageSize);
+        var page = await HistoryReader.GetHistoryPageAsync(query);
+        totalEntries = page.TotalCount;
+        if (pageNumber > totalPages)
+        {
+            pageNumber = totalPages;
+            page = await HistoryReader.GetHistoryPageAsync(query with { PageNumber = pageNumber });
+        }
+        entries = page.Entries.ToList();
+    }
+
+    private async Task ResetAndLoadAsync()
+    {
+        pageNumber = 1;
+        UpdateUrl();
+        await LoadAsync();
+    }
+
+    private async Task SetFromDate(DateTime? value)
+    {
+        fromDate = value;
+        await ResetAndLoadAsync();
+    }
+
+    private async Task SetToDate(DateTime? value)
+    {
+        toDate = value;
+        await ResetAndLoadAsync();
+    }
+
+    private async Task ClearLocationAsync()
+    {
+        filterHospital = null;
+        filterDepartment = null;
+        await ResetAndLoadAsync();
+    }
+
+    private async Task ClearNameAsync()
+    {
+        filterName = "";
+        await ResetAndLoadAsync();
+    }
+
+    private async Task ClearActionAsync()
+    {
+        filterAction = null;
+        await ResetAndLoadAsync();
+    }
+
+    private async Task ClearUsernameAsync()
+    {
+        filterUsername = "";
+        await ResetAndLoadAsync();
+    }
+
+    private async Task ClearSearchAsync()
+    {
+        filterSearch = "";
+        await ResetAndLoadAsync();
+    }
+
+    private async Task ClearDatesAsync()
+    {
+        fromDate = null;
+        toDate = null;
+        await ResetAndLoadAsync();
+    }
+
+    private async Task StartExportAsync(string route)
+    {
+        if (totalEntries > ExportOptions.Value.MaximumHistoryRows)
+        {
+            exportMessage = string.Format(AppText.Get("ExportLimitMessage"), totalEntries, ExportOptions.Value.MaximumHistoryRows);
+            return;
+        }
+
+        isExportStarting = true;
+        exportMessage = AppText.Get("ExportPreparing");
+        await InvokeAsync(StateHasChanged);
+        await Task.Yield();
+        NavigationManager.NavigateTo($"{route}?{ExportQuery()}", forceLoad: true);
+    }
+
+    private string ExportQuery() => string.Join("&", CreateQueryParameters(includePaging: false)
+        .Where(parameter => parameter.Value is not null)
+        .Select(parameter => $"{parameter.Key}={Uri.EscapeDataString(parameter.Value!.ToString()!)}"));
+
+    private static string WaitText(int? value, WaitUnit? unit) =>
+        value is null ? "–" : $"{value} {(unit is not null ? DisplayNames.For(unit.Value, value.Value) : "")}";
+
+    private static string CountText(int n) => string.Format(AppText.Get(n == 1 ? "HistoryRecordCountSingle" : "HistoryRecordCountPlural"), n);
+
+    private const string LegacyDemoDetail = "Dømisøga til demo";
+
+    private static string DisplayDetail(string detail) => detail == LegacyDemoDetail ? "Demo" : detail;
+
+    private static string DetailPreview(string detail) => detail.Length <= 44 ? detail : $"{detail[..44]}...";
+
+    private async Task ResetFilters()
+    {
+        filterHospital = null;
+        filterDepartment = null;
+        filterName = "";
+        filterAction = null;
+        filterUsername = "";
+        filterSearch = "";
+        fromDate = null;
+        toDate = null;
+        sortOrder = "timestamp-desc";
+        pageSize = 50;
+        await ResetAndLoadAsync();
+    }
+
+    private async Task PreviousPage()
+    {
+        if (pageNumber == 1) return;
+        pageNumber--;
+        UpdateUrl();
+        await LoadAsync();
+    }
+
+    private async Task NextPage()
+    {
+        if (pageNumber >= totalPages) return;
+        pageNumber++;
+        UpdateUrl();
+        await LoadAsync();
+    }
+
+    private async Task SetDateRange(int days)
+    {
+        var today = TimeProvider.GetLocalNow().Date;
+        toDate = today;
+        fromDate = days == 0 ? today : today.AddDays(1 - days);
+        await ResetAndLoadAsync();
+    }
+
+    private bool IsDateRangeActive(int days)
+    {
+        var today = TimeProvider.GetLocalNow().Date;
+        var expectedFromDate = days == 0 ? today : today.AddDays(1 - days);
+        return fromDate?.Date == expectedFromDate && toDate?.Date == today;
+    }
+
+    private bool IsYearToDateActive
+    {
+        get
+        {
+            var today = TimeProvider.GetLocalNow().Date;
+            return fromDate?.Date == new DateTime(today.Year, 1, 1) && toDate?.Date == today;
+        }
+    }
+
+    private async Task SetYearToDate()
+    {
+        var today = TimeProvider.GetLocalNow().Date;
+        fromDate = new DateTime(today.Year, 1, 1);
+        toDate = today;
+        await ResetAndLoadAsync();
+    }
+
+    private void UpdateUrl()
+    {
+        NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(CreateQueryParameters(includePaging: true)), replace: true);
+    }
+
+    private Dictionary<string, object?> CreateQueryParameters(bool includePaging)
+    {
+        var parameters = new Dictionary<string, object?>
+        {
+            ["hospital"] = filterHospital is null ? null : DisplayNames.For(filterHospital.Value),
+            ["department"] = filterDepartment is null ? null : DisplayNames.For(filterDepartment.Value),
+            ["name"] = NullIfEmpty(filterName),
+            ["action"] = filterAction?.ToString(),
+            ["username"] = NullIfEmpty(filterUsername),
+            ["q"] = NullIfEmpty(filterSearch),
+            ["from"] = fromDate?.ToString("yyyy-MM-dd"),
+            ["to"] = toDate?.ToString("yyyy-MM-dd"),
+            ["sort"] = sortOrder == "timestamp-desc" ? null : sortOrder,
+            ["compact"] = compactMode ? true : null,
+            ["columns"] = VisibleColumns == AllVisibleColumns ? null : VisibleColumns
+        };
+        if (includePaging)
+        {
+            parameters["page"] = pageNumber == 1 ? null : pageNumber;
+            parameters["size"] = pageSize == 50 ? null : pageSize;
+        }
+        return parameters;
+    }
+
+    private static bool IsSortOrder(string? value) => value is "timestamp-desc" or "timestamp-asc" or "name-asc" or "action-asc" or "username-asc";
+    private static string? NullIfEmpty(string value) => string.IsNullOrWhiteSpace(value) ? null : value;
+
+    private const string AllVisibleColumns = "hospital,department,detail,waits,username";
+    private string VisibleColumns => string.Join(',', new[]
+    {
+        showHospitalColumn ? "hospital" : null,
+        showDepartmentColumn ? "department" : null,
+        showDetailColumn ? "detail" : null,
+        showWaitColumns ? "waits" : null,
+        showUsernameColumn ? "username" : null
+    }.Where(column => column is not null));
+
+    private Task UpdateDisplaySettings()
+    {
+        UpdateUrl();
+        return Task.CompletedTask;
+    }
+
+    private void SetVisibleColumns(string? columns)
+    {
+        if (string.IsNullOrWhiteSpace(columns)) return;
+        var visible = columns.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        showHospitalColumn = visible.Contains("hospital", StringComparer.OrdinalIgnoreCase);
+        showDepartmentColumn = visible.Contains("department", StringComparer.OrdinalIgnoreCase);
+        showDetailColumn = visible.Contains("detail", StringComparer.OrdinalIgnoreCase);
+        showWaitColumns = visible.Contains("waits", StringComparer.OrdinalIgnoreCase);
+        showUsernameColumn = visible.Contains("username", StringComparer.OrdinalIgnoreCase);
+    }
+}

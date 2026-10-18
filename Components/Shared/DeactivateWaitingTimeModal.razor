@@ -1,0 +1,44 @@
+@using WT.Blazor.Localization
+@using WT.Blazor.Models
+
+<div class="modal-backdrop" @ref="modalRef" @onkeydown="HandleKeyDown" tabindex="-1">
+    <div class="modal" @onclick:stopPropagation="true">
+        <h2>@AppText.Get("DeactivateWaitingTime")</h2>
+        @if (ErrorMessage is not null)
+        {
+            <div class="login-error">@ErrorMessage</div>
+        }
+        <p><strong>@Item.Name</strong></p>
+        <p>@DisplayNames.For(Item.Hospital)@(Item.Department is not null ? " · " + DisplayNames.For(Item.Department.Value) : "")</p>
+        <p>@Item.WaitValue @DisplayNames.For(Item.Unit, Item.WaitValue)</p>
+        <div class="edit-form-field">
+            <label for="deactivation-reason">@AppText.Get(AppTextKey.Reason)</label>
+            <input id="deactivation-reason" value="@Reason" @oninput="UpdateReason" placeholder="@AppText.Get(AppTextKey.Optional)" />
+        </div>
+        <div class="modal-actions">
+            <button class="btn-secondary" @onclick="Cancel">@AppText.Get(AppTextKey.Cancel)</button>
+            <button class="btn-danger" @onclick="Confirm">@AppText.Get("Deactivate")</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public WaitingTime Item { get; set; } = default!;
+    [Parameter] public string? Reason { get; set; }
+    [Parameter] public string? ErrorMessage { get; set; }
+    [Parameter] public EventCallback<string?> ReasonChanged { get; set; }
+    [Parameter] public EventCallback Cancel { get; set; }
+    [Parameter] public EventCallback Confirm { get; set; }
+
+    private ElementReference modalRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) await modalRef.FocusAsync();
+    }
+
+    private Task UpdateReason(ChangeEventArgs args) => ReasonChanged.InvokeAsync(args.Value?.ToString());
+
+    private Task HandleKeyDown(KeyboardEventArgs args) =>
+        args.Key == "Escape" ? Cancel.InvokeAsync() : Task.CompletedTask;
+}

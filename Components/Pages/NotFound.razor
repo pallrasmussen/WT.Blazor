@@ -1,0 +1,32 @@
+﻿@page "/not-found"
+@layout Layout.PublicLayout
+@using Microsoft.AspNetCore.Diagnostics
+@inject IHttpContextAccessor HttpContextAccessor
+
+<PageTitle>@PageTitle</PageTitle>
+
+<section class="public-panel access-message">
+	@if (IsAccessFailure)
+	{
+		<h1>@AppText.Get("AdministrationAccessRequired")</h1>
+		<p>@AppText.Get("AdministrationAccessRequiredText")</p>
+		<a class="btn-secondary" href="/">@AppText.Get("Back")</a>
+	}
+	else
+	{
+		<h1>@AppText.Get("PageNotFound")</h1>
+		<p>@AppText.Get("PageNotFoundText")</p>
+		<a class="btn-secondary" href="/">@AppText.Get("Back")</a>
+	}
+</section>
+
+@code {
+	private int? OriginalStatusCode => HttpContextAccessor.HttpContext?
+		.Features.Get<IStatusCodeReExecuteFeature>()?.OriginalStatusCode;
+
+	private bool IsAccessFailure => OriginalStatusCode is StatusCodes.Status401Unauthorized or StatusCodes.Status403Forbidden;
+
+	private string PageTitle => IsAccessFailure
+		? AppText.Get("AdministrationAccessRequired")
+		: AppText.Get("PageNotFound");
+}

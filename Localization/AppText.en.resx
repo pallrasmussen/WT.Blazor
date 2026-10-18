@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="WaitingTime" xml:space="preserve"><value>Expected waiting time</value></data><data name="Intro" xml:space="preserve"><value>Here you can see expected waiting times for selected consultations, examinations and treatments in the Hospital Service.</value></data><data name="Hospital" xml:space="preserve"><value>Hospital / shared waiting list</value></data><data name="ChooseHospital" xml:space="preserve"><value>Choose hospital</value></data><data name="Department" xml:space="preserve"><value>Department</value></data><data name="AllDepartments" xml:space="preserve"><value>All departments</value></data><data name="Language" xml:space="preserve"><value>Language</value></data><data name="Search" xml:space="preserve"><value>Search specialty / treatment</value></data><data name="SearchPlaceholder" xml:space="preserve"><value>E.g. MRI scan</value></data><data name="Results" xml:space="preserve"><value>waiting times</value></data><data name="Growing" xml:space="preserve"><value>Increasing</value></data><data name="Declining" xml:space="preserve"><value>Decreasing</value></data><data name="Unchanged" xml:space="preserve"><value>Unchanged</value></data><data name="Loading" xml:space="preserve"><value>Loading...</value></data><data name="NoResults" xml:space="preserve"><value>No waiting times found.</value></data><data name="ChangeFilters" xml:space="preserve"><value>Try changing the filters or search term.</value></data><data name="Trend" xml:space="preserve"><value>View trend</value></data><data name="TrendHeading" xml:space="preserve"><value>Waiting time trend</value></data><data name="TrendDescription" xml:space="preserve"><value>The chart shows how the expected waiting time has changed over time.</value></data><data name="Current" xml:space="preserve"><value>Now</value></data><data name="NotFound" xml:space="preserve"><value>The waiting time was not found.</value></data><data name="Back" xml:space="preserve"><value>Back to waiting times</value></data><data name="Administration" xml:space="preserve"><value>Administration</value></data><data name="AdministrationAccessRequired" xml:space="preserve"><value>Administration access requires sign-in</value></data><data name="AdministrationAccessRequiredText" xml:space="preserve"><value>Sign in with a Heilsunet account that belongs to an approved group. You cannot open administration if you cancel the sign-in prompt or your credentials are not accepted.</value></data><data name="PageNotFound" xml:space="preserve"><value>Page not found</value></data><data name="PageNotFoundText" xml:space="preserve"><value>The content you requested does not exist or has moved.</value></data><data name="LastUpdated" xml:space="preserve"><value>Last updated</value></data><data name="TrendLegend" xml:space="preserve"><value>Waiting time trend symbols</value></data>
+  <data name="ExportPdf" xml:space="preserve"><value>Download PDF</value></data>
+  <data name="WaitingTimeConflict" xml:space="preserve"><value>This waiting time was changed by another user. Refresh the page and try again.</value></data><data name="WaitingTimeNotFound" xml:space="preserve"><value>This waiting time no longer exists. Refresh the page.</value></data>
+  <data name="AdminHeading" xml:space="preserve"><value>Update waiting times, units and notes.</value></data><data name="AdminHeadingCreate" xml:space="preserve"><value>Add a waiting time</value></data><data name="AllWaitingLists" xml:space="preserve"><value>All waiting lists</value></data><data name="AllHospitals" xml:space="preserve"><value>All hospitals</value></data><data name="SearchByName" xml:space="preserve"><value>Search by name</value></data><data name="NeedsReview" xml:space="preserve"><value>Show waiting times requiring review ({0})</value></data><data name="ChooseDepartment" xml:space="preserve"><value>Choose department</value></data><data name="SpecialtyTreatment" xml:space="preserve"><value>Specialty / treatment</value></data><data name="Wait" xml:space="preserve"><value>Waiting time</value></data><data name="Unit" xml:space="preserve"><value>Unit</value></data><data name="Note" xml:space="preserve"><value>Note</value></data><data name="Optional" xml:space="preserve"><value>Optional</value></data><data name="SaveNew" xml:space="preserve"><value>Save new waiting time</value></data><data name="Cancel" xml:space="preserve"><value>Cancel</value></data><data name="NoWaitingTimes" xml:space="preserve"><value>No waiting times found.</value></data><data name="Edit" xml:space="preserve"><value>Edit</value></data><data name="Delete" xml:space="preserve"><value>Delete</value></data><data name="EditWaitingTime" xml:space="preserve"><value>Edit waiting time</value></data><data name="SaveChanges" xml:space="preserve"><value>Save changes</value></data><data name="RemoveWaitingTime" xml:space="preserve"><value>Remove waiting time from public view</value></data><data name="Reason" xml:space="preserve"><value>Reason</value></data><data name="RemoveFromPublic" xml:space="preserve"><value>Remove from public view</value></data><data name="SelectHospitalValidation" xml:space="preserve"><value>Choose a hospital.</value></data><data name="SelectDepartmentValidation" xml:space="preserve"><value>Choose a department.</value></data><data name="EnterNameValidation" xml:space="preserve"><value>Enter a specialty or treatment name.</value></data><data name="NegativeWaitValidation" xml:space="preserve"><value>Waiting time cannot be negative.</value></data><data name="CreatedMessage" xml:space="preserve"><value>{0} was created and is now visible publicly.</value></data><data name="UpdatedMessage" xml:space="preserve"><value>{0} was updated.</value></data><data name="DeactivatedMessage" xml:space="preserve"><value>{0} was removed from public view.</value></data>
+  <data name="Date" xml:space="preserve"><value>Date</value></data>
+  <data name="ExportedAt" xml:space="preserve"><value>Exported</value></data>
+  <data name="TrendExportFileName" xml:space="preserve"><value>waiting-time-trend</value></data>
+  <data name="TrendHistory" xml:space="preserve"><value>History</value></data>
+  <data name="ExportRecords" xml:space="preserve"><value>{0} records</value></data>
+  <data name="HistoryExportFileName" xml:space="preserve"><value>waiting-time-history</value></data>
+  <data name="HistoryExportPdfFileName" xml:space="preserve"><value>waiting-time-history</value></data>
+  <data name="Of" xml:space="preserve"><value>of</value></data>
+  <data name="Page" xml:space="preserve"><value>Page</value></data>
+  <data name="AllWaitingTimes" xml:space="preserve"><value>All waiting times</value></data>
+  <data name="ClearFilters" xml:space="preserve"><value>Clear filters</value></data>
+  <data name="QuickUpdate" xml:space="preserve"><value>Quick update</value></data>
+  <data name="ActiveFilters" xml:space="preserve"><value>Active filters</value></data>
+  <data name="SortResults" xml:space="preserve"><value>Sort results</value></data>
+  <data name="SortName" xml:space="preserve"><value>Name A-Z</value></data>
+  <data name="SortShortestWait" xml:space="preserve"><value>Shortest wait first</value></data>
+  <data name="SortLongestWait" xml:space="preserve"><value>Longest wait first</value></data>
+  <data name="SortRecentlyUpdated" xml:space="preserve"><value>Recently updated first</value></data>
+  <data name="FreshnessLegend" xml:space="preserve"><value>Update freshness</value></data>
+  <data name="FreshnessCurrent" xml:space="preserve"><value>Updated within the last 3 months</value></data>
+  <data name="FreshnessReview" xml:space="preserve"><value>Updated 3-6 months ago</value></data>
+  <data name="FreshnessOverdue" xml:space="preserve"><value>Updated over 6 months ago</value></data>
+  <data name="TrendChangeDays" xml:space="preserve"><value>{0} days since the first recorded update</value></data>
+  <data name="Export" xml:space="preserve"><value>Export</value></data>
+  <data name="ReviewQueue" xml:space="preserve"><value>{0} waiting times need review</value></data>
+  <data name="ReviewAll" xml:space="preserve"><value>Review all</value></data>
+  <data name="ConfirmReviewAll" xml:space="preserve"><value>Confirm review of all</value></data>
+  <data name="MarkReviewed" xml:space="preserve"><value>Mark reviewed</value></data>
+  <data name="ReviewedMessage" xml:space="preserve"><value>{0} was reviewed.</value></data>
+  <data name="ReviewedCountMessage" xml:space="preserve"><value>{0} waiting times were reviewed.</value></data>
+  <data name="ReviewQueueKeyboardHint" xml:space="preserve"><value>Use the Up and Down arrows on the list to move through records.</value></data>
+  <data name="HospitalService" xml:space="preserve"><value>Hospital Service</value></data>
+  <data name="Internal" xml:space="preserve"><value>Internal</value></data>
+  <data name="EditWaitingTimes" xml:space="preserve"><value>Edit waiting times</value></data>
+  <data name="AddWaitingTime" xml:space="preserve"><value>Add waiting time</value></data>
+  <data name="History" xml:space="preserve"><value>History</value></data>
+  <data name="Operations" xml:space="preserve"><value>Operations</value></data>
+  <data name="DatabaseHealthy" xml:space="preserve"><value>Database connection is healthy</value></data>
+  <data name="DatabaseUnverified" xml:space="preserve"><value>Database connection could not be verified</value></data>
+  <data name="SystemHealthyAt" xml:space="preserve"><value>System healthy · {0:HH:mm}</value></data>
+  <data name="CheckSystem" xml:space="preserve"><value>Check system</value></data>
+  <data name="Administrator" xml:space="preserve"><value>Administrator</value></data>
+  <data name="SuperAdministrator" xml:space="preserve"><value>Super administrator</value></data>
+  <data name="OperationsIntro" xml:space="preserve"><value>Backup and audit-retention status.</value></data>
+  <data name="PrintReport" xml:space="preserve"><value>Print report</value></data>
+  <data name="LatestBackup" xml:space="preserve"><value>Latest backup</value></data>
+  <data name="NoBackup" xml:space="preserve"><value>No backup was found on the server.</value></data>
+  <data name="AuditRetention" xml:space="preserve"><value>Audit retention</value></data>
+  <data name="AuditRetentionIntro" xml:space="preserve"><value>Audit entries older than {0} days require review under the applicable retention requirements.</value></data>
+  <data name="AuditRetentionCount" xml:space="preserve"><value>{0} audit entries are older than the threshold. No audit entries are deleted automatically.</value></data>
+  <data name="RecentChanges" xml:space="preserve"><value>Recent changes</value></data>
+  <data name="RecentChangesCount" xml:space="preserve"><value>{0} changes in the last 7 days.</value></data>
+  <data name="NeedsReviewCount" xml:space="preserve"><value>{0} waiting times need review.</value></data>
+  <data name="DataQuality" xml:space="preserve"><value>Data quality</value></data>
+  <data name="LongWaitsCount" xml:space="preserve"><value>{0} waiting times exceed {1} days.</value></data>
+  <data name="MissingDepartmentsCount" xml:space="preserve"><value>{0} waiting times at the National Hospital have no department.</value></data>
+  <data name="UnsavedChanges" xml:space="preserve"><value>You have unsaved changes.</value></data>
+  <data name="KeepEditing" xml:space="preserve"><value>Keep editing</value></data>
+  <data name="DiscardChanges" xml:space="preserve"><value>Discard changes</value></data>
+  <data name="ReviewedByAt" xml:space="preserve"><value>Reviewed by {0} · {1:dd.MM.yyyy HH:mm}</value></data>
+  <data name="TrendPeriod" xml:space="preserve"><value>Period</value></data>
+  <data name="TrendPeriodAll" xml:space="preserve"><value>All history</value></data>
+  <data name="TrendPeriodThreeMonths" xml:space="preserve"><value>Last 3 months</value></data>
+  <data name="TrendPeriodYear" xml:space="preserve"><value>Last year</value></data>
+  <data name="ExportPreparing" xml:space="preserve"><value>Preparing download...</value></data>
+  <data name="ExportLimitMessage" xml:space="preserve"><value>{0} audit entries cannot be exported together. Narrow the results to at most {1} entries.</value></data>
+  <data name="PrintResults" xml:space="preserve"><value>Print results</value></data>
+  <data name="SharedWaitingList" xml:space="preserve"><value>Shared waiting list</value></data>
+  <data name="ResultsSummary" xml:space="preserve"><value>Showing {0} waiting times from {1}.</value></data>
+  <data name="UpdatedToday" xml:space="preserve"><value>{0} updated today</value></data>
+  <data name="ExplainIndicators" xml:space="preserve"><value>What do the indicators mean?</value></data>
+  <data name="PrintContext" xml:space="preserve"><value>{0} · {1} waiting times · Printed {2:dd.MM.yyyy HH:mm}</value></data>
+  <data name="UpdatedFilter" xml:space="preserve"><value>Last updated</value></data>
+  <data name="UpdatedFilterAll" xml:space="preserve"><value>Any time</value></data>
+  <data name="UpdatedFilterToday" xml:space="preserve"><value>Today</value></data>
+  <data name="UpdatedFilterWeek" xml:space="preserve"><value>Last 7 days</value></data>
+  <data name="UpdatedFilterStale" xml:space="preserve"><value>Needs review</value></data>
+  <data name="LargerText" xml:space="preserve"><value>Larger text</value></data>
+  <data name="FilterPresets" xml:space="preserve"><value>Quick filters</value></data>
+  <data name="PresetAll" xml:space="preserve"><value>All</value></data>
+  <data name="PresetNeedsReview" xml:space="preserve"><value>Needs review</value></data>
+  <data name="ChangePreview" xml:space="preserve"><value>Review changes</value></data>
+  <data name="ConfirmSave" xml:space="preserve"><value>Confirm and save</value></data>
+  <data name="NoChanges" xml:space="preserve"><value>There are no changes to save.</value></data>
+  <data name="Undo" xml:space="preserve"><value>Undo change</value></data>
+  <data name="UndoCompleted" xml:space="preserve"><value>The change was undone and recorded in the audit log.</value></data>
+  <data name="CompactMode" xml:space="preserve"><value>Compact view</value></data>
+  <data name="VisibleColumns" xml:space="preserve"><value>Visible columns</value></data>
+  <data name="HistoryColumnHospital" xml:space="preserve"><value>Hospital</value></data>
+  <data name="HistoryColumnDepartment" xml:space="preserve"><value>Department</value></data>
+  <data name="HistoryColumnDetail" xml:space="preserve"><value>Change</value></data>
+  <data name="HistoryColumnWaits" xml:space="preserve"><value>Waiting times</value></data>
+  <data name="HistoryColumnUsername" xml:space="preserve"><value>HN user</value></data>
+  <data name="Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="SettingsIntro" xml:space="preserve"><value>Manage thresholds used to show update status and follow up on long waiting times.</value></data>
+  <data name="FreshnessSettings" xml:space="preserve"><value>Update status</value></data>
+  <data name="FreshnessSettingsIntro" xml:space="preserve"><value>The colors show how long it has been since a waiting time was last updated.</value></data>
+  <data name="GreenThreshold" xml:space="preserve"><value>Green: up to months</value></data>
+  <data name="GreenThresholdHint" xml:space="preserve"><value>Updated within this many months.</value></data>
+  <data name="YellowThreshold" xml:space="preserve"><value>Yellow: up to months</value></data>
+  <data name="YellowThresholdHint" xml:space="preserve"><value>Older than the green threshold but within this period.</value></data>
+  <data name="RedThreshold" xml:space="preserve"><value>Red</value></data>
+  <data name="RedThresholdHint" xml:space="preserve"><value>Older than {0} months.</value></data>
+  <data name="OperationsSettingsIntro" xml:space="preserve"><value>These thresholds are used in the operations overview.</value></data>
+  <data name="LongWaitThreshold" xml:space="preserve"><value>Long wait: months</value></data>
+  <data name="LongWaitThresholdHint" xml:space="preserve"><value>Waiting times longer than this are included in the data-quality count.</value></data>
+  <data name="SaveSettings" xml:space="preserve"><value>Save settings</value></data>
+  <data name="SettingsSaved" xml:space="preserve"><value>Settings saved.</value></data>
+  <data name="SettingsSaveFailed" xml:space="preserve"><value>Settings could not be saved. Try again.</value></data>
+  <data name="GreenThresholdValidation" xml:space="preserve"><value>The green threshold must be between 1 and 24 months.</value></data>
+  <data name="YellowThresholdValidation" xml:space="preserve"><value>The yellow threshold must be later than the green threshold and at most 36 months.</value></data>
+  <data name="LongWaitThresholdValidation" xml:space="preserve"><value>The long-wait threshold must be between 1 and 60 months.</value></data>
+  <data name="LongWaitsCountMonths" xml:space="preserve"><value>{0} waiting times exceed {1} months.</value></data>
+  <data name="FooterProduct" xml:space="preserve"><value>Hospital Service · Waiting times</value></data>
+  <data name="Version" xml:space="preserve"><value>Version {0}</value></data>
+  <data name="SettingsAudit" xml:space="preserve"><value>Recent changes</value></data>
+  <data name="SettingsAuditEmpty" xml:space="preserve"><value>No settings have been changed yet.</value></data>
+  <data name="SettingsAuditEntry" xml:space="preserve"><value>{0:dd.MM.yyyy HH:mm} · {1}: green {2}→{3}, yellow {4}→{5}, long wait {6}→{7} months</value></data>
+  <data name="HistoryIntro" xml:space="preserve"><value>See who changed waiting times and when each change was made.</value></data>
+  <data name="HistoryAction" xml:space="preserve"><value>Action</value></data>
+  <data name="AllHistoryActions" xml:space="preserve"><value>All actions</value></data>
+  <data name="AllHistoryUsers" xml:space="preserve"><value>All users</value></data>
+  <data name="SearchHistory" xml:space="preserve"><value>Search history</value></data>
+  <data name="SearchHistoryPlaceholder" xml:space="preserve"><value>Name, change, or user</value></data>
+  <data name="From" xml:space="preserve"><value>From</value></data>
+  <data name="To" xml:space="preserve"><value>To</value></data>
+  <data name="FromDate" xml:space="preserve"><value>From date</value></data>
+  <data name="ToDate" xml:space="preserve"><value>To date</value></data>
+  <data name="HistorySort" xml:space="preserve"><value>Sort by</value></data>
+  <data name="HistorySortNewest" xml:space="preserve"><value>Newest first</value></data>
+  <data name="HistorySortOldest" xml:space="preserve"><value>Oldest first</value></data>
+  <data name="HistoryPageSize" xml:space="preserve"><value>Show at once</value></data>
+  <data name="HistoryDays" xml:space="preserve"><value>{0} days</value></data>
+  <data name="HistoryYearToDate" xml:space="preserve"><value>This year</value></data>
+  <data name="HistoryDateTime" xml:space="preserve"><value>Date and time</value></data>
+  <data name="HistoryOldWait" xml:space="preserve"><value>Previous waiting time</value></data>
+  <data name="HistoryNewWait" xml:space="preserve"><value>New waiting time</value></data>
+  <data name="HistoryRequestId" xml:space="preserve"><value>Request ID</value></data>
+  <data name="HistoryPages" xml:space="preserve"><value>History pages</value></data>
+  <data name="PreviousPage" xml:space="preserve"><value>Previous page</value></data>
+  <data name="NextPage" xml:space="preserve"><value>Next page</value></data>
+  <data name="HistoryPageSummary" xml:space="preserve"><value>Page {0} of {1}</value></data>
+  <data name="HistoryRecordCountSingle" xml:space="preserve"><value>{0} history entry</value></data>
+  <data name="HistoryRecordCountPlural" xml:space="preserve"><value>{0} history entries</value></data>
+  <data name="UnitDays" xml:space="preserve"><value>days</value></data>
+  <data name="UnitWeeks" xml:space="preserve"><value>weeks</value></data>
+  <data name="UnitMonths" xml:space="preserve"><value>months</value></data>
+  <data name="ChangeHospital" xml:space="preserve"><value>Hospital: {0} → {1}</value></data>
+  <data name="AdvancedFilters" xml:space="preserve"><value>Advanced filters</value></data>
+  <data name="MoreActions" xml:space="preserve"><value>More actions</value></data>
+  <data name="ChooseWaitingTimeScope" xml:space="preserve"><value>Choose a hospital above.</value></data>
+  <data name="ChooseWaitingTimeScopeHint" xml:space="preserve"><value>Or choose all waiting times to see everything.</value></data>
+  <data name="TrendNotEnoughData" xml:space="preserve"><value>There is not enough historical data to show a trend yet.</value></data>
+  <data name="TrendChartLabel" xml:space="preserve"><value>Waiting time trend</value></data>
+  <data name="TrendDataTable" xml:space="preserve"><value>Show data as a table</value></data>
+  <data name="SkipToContent" xml:space="preserve"><value>Skip to content</value></data>
+  <data name="Faroese" xml:space="preserve"><value>Faroese</value></data>
+  <data name="English" xml:space="preserve"><value>English</value></data>
+  <data name="Print" xml:space="preserve"><value>Print</value></data>
+  <data name="WaitingTimeGuidanceHeading" xml:space="preserve"><value>Expected waiting times</value></data>
+  <data name="WaitingTimeMeaningHeading" xml:space="preserve"><value>What is an expected waiting time?</value></data>
+  <data name="WaitingTimeMeaningText" xml:space="preserve"><value>A waiting time is a guide to how long a new patient can expect to wait. Your waiting time may differ.</value></data>
+  <data name="WaitingTimeUpdateHeading" xml:space="preserve"><value>When is it updated?</value></data>
+  <data name="WaitingTimeUpdateText" xml:space="preserve"><value>Each department is responsible for updating its expected waiting time. The update date is shown with the waiting time.</value></data>
+  <data name="Activate" xml:space="preserve"><value>Activate</value></data>
+  <data name="Deactivate" xml:space="preserve"><value>Deactivate</value></data>
+  <data name="DeactivateWaitingTime" xml:space="preserve"><value>Deactivate waiting time from public view</value></data>
+  <data name="Inactive" xml:space="preserve"><value>Inactive</value></data>
+  <data name="ReactivatedMessage" xml:space="preserve"><value>{0} was activated and is now visible publicly.</value></data>
+  <data name="ShowInactive" xml:space="preserve"><value>Show inactive ({0})</value></data>
+</root>

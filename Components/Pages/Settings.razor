@@ -1,0 +1,192 @@
+@page "/internal/settings"
+@layout Layout.InternalLayout
+@rendermode InteractiveServer
+@attribute [Authorize(Policy = Policies.SuperAdminAccess)]
+@inject IPortalSettingsService PortalSettingsManager
+@inject NavigationManager NavigationManager
+@inject ILogger<Settings> Logger
+
+<PageTitle>@AppText.Get("Settings") | @AppText.Get("HospitalService")</PageTitle>
+
+<div class="internal-heading">
+    <div>
+        <h1>@AppText.Get("Settings")</h1>
+        <p>@AppText.Get("SettingsIntro")</p>
+    </div>
+</div>
+
+@if (isLoading)
+{
+    <div class="empty-state"><strong>@AppText.Get("Loading")</strong></div>
+}
+else
+{
+    <NavigationLock ConfirmExternalNavigation="hasUnsavedChanges" OnBeforeInternalNavigation="ConfirmNavigationAsync" />
+    <section class="internal-card settings-card">
+        <h2>@AppText.Get("FreshnessSettings")</h2>
+        <p>@AppText.Get("FreshnessSettingsIntro")</p>
+        <div class="settings-grid">
+            <div>
+                <label for="green-months">@AppText.Get("GreenThreshold")</label>
+                <input id="green-months" type="number" min="1" max="24" @bind="settings.GreenMaximumAgeMonths" />
+                <small>@AppText.Get("GreenThresholdHint")</small>
+            </div>
+            <div>
+                <label for="yellow-months">@AppText.Get("YellowThreshold")</label>
+                <input id="yellow-months" type="number" min="2" max="36" @bind="settings.YellowMaximumAgeMonths" />
+                <small>@AppText.Get("YellowThresholdHint")</small>
+            </div>
+            <div>
+                <label>@AppText.Get("RedThreshold")</label>
+                <p class="setting-readonly">@string.Format(AppText.Get("RedThresholdHint"), settings.YellowMaximumAgeMonths)</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="internal-card settings-card">
+        <h2>@AppText.Get("Operations")</h2>
+        <p>@AppText.Get("OperationsSettingsIntro")</p>
+        <div class="settings-grid">
+            <div>
+                <label for="long-wait-months">@AppText.Get("LongWaitThreshold")</label>
+                <input id="long-wait-months" type="number" min="1" max="60" @bind="settings.LongWaitMonths" />
+                <small>@AppText.Get("LongWaitThresholdHint")</small>
+            </div>
+        </div>
+        @if (errorMessage is not null)
+        {
+            <p class="login-error" role="alert">@errorMessage</p>
+        }
+        @if (statusMessage is not null)
+        {
+            <p class="status-banner" role="status">@statusMessage</p>
+        }
+        @if (hasUnsavedChanges)
+        {
+            <p class="dirty-note" role="status">@AppText.Get("UnsavedChanges")</p>
+        }
+        <button type="button" class="btn-teal" @onclick="SaveAsync" disabled="@(isSaving || !hasUnsavedChanges)">@AppText.Get("SaveSettings")</button>
+    </section>
+
+    <section class="internal-card settings-card">
+        <h2>@AppText.Get("SettingsAudit")</h2>
+        @if (recentChanges.Count == 0)
+        {
+            <p>@AppText.Get("SettingsAuditEmpty")</p>
+        }
+        else
+        {
+            <ul class="settings-audit-list">
+                @foreach (var change in recentChanges)
+                {
+                    <li>@string.Format(AppText.Get("SettingsAuditEntry"), change.Timestamp.ToLocalTime(), change.Username, change.OldGreenMaximumAgeMonths, change.NewGreenMaximumAgeMonths, change.OldYellowMaximumAgeMonths, change.NewYellowMaximumAgeMonths, change.OldLongWaitMonths, change.NewLongWaitMonths)</li>
+                }
+            </ul>
+        }
+    </section>
+
+    @if (showNavigationWarning)
+    {
+        <section class="discard-confirmation settings-navigation-warning" role="alert">
+            <span>@AppText.Get("UnsavedChanges")</span>
+            <button type="button" class="btn-secondary" @onclick="KeepEditing">@AppText.Get("KeepEditing")</button>
+            <button type="button" class="btn-danger" @onclick="DiscardAndContinue">@AppText.Get("DiscardChanges")</button>
+        </section>
+    }
+}
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private PortalSettings settings = new();
+    private PortalSettings savedSettings = new();
+    private bool isLoading = true;
+    private bool isSaving;
+    private string? errorMessage;
+    private string? statusMessage;
+    private string username = "";
+    private IReadOnlyList<PortalSettingsAuditEntry> recentChanges = [];
+    private string? pendingNavigation;
+    private bool showNavigationWarning;
+    private bool allowNavigation;
+    private bool hasUnsavedChanges => settings.GreenMaximumAgeMonths != savedSettings.GreenMaximumAgeMonths
+        || settings.YellowMaximumAgeMonths != savedSettings.YellowMaximumAgeMonths
+        || settings.LongWaitMonths != savedSettings.LongWaitMonths;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthState is not null)
+            username = (await AuthState).User.Identity?.Name ?? "";
+        settings = await PortalSettingsManager.GetAsync();
+        savedSettings = Copy(settings);
+        recentChanges = await PortalSettingsManager.GetRecentChangesAsync();
+        isLoading = false;
+    }
+
+    private async Task SaveAsync()
+    {
+        errorMessage = Validate();
+        statusMessage = null;
+        if (errorMessage is not null) return;
+
+        isSaving = true;
+        try
+        {
+            await PortalSettingsManager.SaveAsync(settings, username);
+            savedSettings = Copy(settings);
+            recentChanges = await PortalSettingsManager.GetRecentChangesAsync();
+            statusMessage = AppText.Get("SettingsSaved");
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Could not save portal settings for {Username}.", username);
+            errorMessage = AppText.Get("SettingsSaveFailed");
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private string? Validate()
+    {
+        if (settings.GreenMaximumAgeMonths is < 1 or > 24)
+            return AppText.Get("GreenThresholdValidation");
+        if (settings.YellowMaximumAgeMonths is < 2 or > 36 || settings.YellowMaximumAgeMonths <= settings.GreenMaximumAgeMonths)
+            return AppText.Get("YellowThresholdValidation");
+        if (settings.LongWaitMonths is < 1 or > 60)
+            return AppText.Get("LongWaitThresholdValidation");
+        return null;
+    }
+
+    private Task ConfirmNavigationAsync(LocationChangingContext context)
+    {
+        if (!hasUnsavedChanges || allowNavigation)
+            return Task.CompletedTask;
+
+        context.PreventNavigation();
+        pendingNavigation = context.TargetLocation;
+        showNavigationWarning = true;
+        return InvokeAsync(StateHasChanged);
+    }
+
+    private void KeepEditing() => showNavigationWarning = false;
+
+    private void DiscardAndContinue()
+    {
+        var destination = pendingNavigation;
+        pendingNavigation = null;
+        showNavigationWarning = false;
+        if (string.IsNullOrWhiteSpace(destination))
+            return;
+
+        allowNavigation = true;
+        NavigationManager.NavigateTo(destination);
+    }
+
+    private static PortalSettings Copy(PortalSettings source) => new()
+    {
+        GreenMaximumAgeMonths = source.GreenMaximumAgeMonths,
+        YellowMaximumAgeMonths = source.YellowMaximumAgeMonths,
+        LongWaitMonths = source.LongWaitMonths
+    };
+}
