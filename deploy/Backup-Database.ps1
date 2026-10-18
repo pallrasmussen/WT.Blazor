@@ -2,12 +2,16 @@
 param(
     [string]$AppPoolName = "WT.BlazorPool",
     [string]$DatabasePath = "C:\inetpub\wwwroot\WT.Blazor\App_Data\wt-blazor.db",
+    [string]$KeyRingPath = (Join-Path (Split-Path -Parent $DatabasePath) "keys"),
     [string]$BackupPath = "C:\inetpub\backups\WT.Blazor",
     [int]$Keep = 30
 )
 
 Import-Module WebAdministration
 
+if ($Keep -lt 1) {
+    throw "Keep must be at least 1."
+}
 if (-not (Test-Path $DatabasePath)) {
     throw "Database not found: $DatabasePath"
 }
@@ -56,7 +60,25 @@ if ($currentState -ne "Stopped") {
 try {
     $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
     $destination = Join-Path $BackupPath "wt-blazor-$timestamp.db"
+    $keyDestination = Join-Path $BackupPath "wt-blazor-$timestamp.keys"
     Copy-Item -Path $DatabasePath -Destination $destination -ErrorAction Stop
+    if (Test-Path $KeyRingPath) {
+        Copy-Item -Path $KeyRingPath -Destination $keyDestination -Recurse -ErrorAction Stop
+        Write-Host "Data Protection key ring backed up: $keyDestination"
+    }
+    else {
+        New-Item -ItemType Directory -Path $keyDestination -Force | Out-Null
+        Write-Host "No Data Protection keys existed at backup time; an empty key-ring archive was created."
+    }
+}
+catch {
+    if ($destination -and (Test-Path $destination)) {
+        Remove-Item -LiteralPath $destination -Force -ErrorAction SilentlyContinue
+    }
+    if ($keyDestination -and (Test-Path $keyDestination)) {
+        Remove-Item -LiteralPath $keyDestination -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    throw
 }
 finally {
     Start-AppPool
@@ -65,6 +87,12 @@ finally {
 Get-ChildItem -Path $BackupPath -Filter "wt-blazor-*.db" |
     Sort-Object LastWriteTime -Descending |
     Select-Object -Skip $Keep |
-    Remove-Item -Force
+    ForEach-Object {
+        Remove-Item -LiteralPath $_.FullName -Force
+        $keyBackup = Join-Path $BackupPath "$($_.BaseName).keys"
+        if (Test-Path $keyBackup) {
+            Remove-Item -LiteralPath $keyBackup -Recurse -Force
+        }
+    }
 
 Write-Output $destination

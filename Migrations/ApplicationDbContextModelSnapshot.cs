@@ -29,6 +29,10 @@ namespace WT.Blazor.Migrations
                     b.Property<int>("LongWaitMonths")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("YellowMaximumAgeMonths")
                         .HasColumnType("INTEGER");
 

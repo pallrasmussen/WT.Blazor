@@ -136,7 +136,9 @@ The first application start creates and migrates `App_Data\wt-blazor.db` automat
 
 Before replacing release files, the script backs up the SQLite database. It synchronizes the published files with `robocopy /MIR` while excluding `App_Data`, so the database, logs, data-protection keys, and export working files are retained. EF Core applies any included migrations when the application starts.
 
-The backup script retains the newest 30 database backups by default. To create a manual backup:
+Each backup contains a database file and a matching timestamped `.keys` directory copied from `App_Data\keys`. Keep the two together: restoring only the database can invalidate existing authentication and antiforgery cookies. Data Protection keys are sensitive; restrict access to the backup directory and protect its storage with the organization's approved encryption and retention controls.
+
+The backup script retains the newest 30 database/key-ring pairs by default. To create a manual backup:
 
 ```powershell
 .\deploy\Backup-Database.ps1 `
@@ -144,6 +146,20 @@ The backup script retains the newest 30 database backups by default. To create a
   -DatabasePath 'C:\inetpub\wwwroot\WT.Blazor\App_Data\wt-blazor.db' `
   -BackupPath 'C:\inetpub\backups\WT.Blazor'
 ```
+
+Install the daily backup and freshness-monitor scheduled tasks from an elevated PowerShell session. The monitor checks for a nonempty database backup and matching key archive no older than 30 hours; configure SMTP to receive email when it detects a problem:
+
+```powershell
+.\deploy\Install-BackupTask.ps1 `
+  -BackupPath 'C:\inetpub\backups\WT.Blazor' `
+  -SmtpServer 'smtp.example.org' `
+  -From 'wt-blazor-monitor@example.org' `
+  -To 'operations@example.org','on-call@example.org'
+```
+
+Without SMTP parameters, a stale or missing backup fails the scheduled monitor task and is visible in Task Scheduler's task history/last-run result. Verify both scheduled tasks are enabled and their most recent runs succeeded.
+
+To restore, stop the IIS application pool, preserve the current `App_Data`, copy the selected `.db` file to `App_Data\wt-blazor.db`, and copy the contents of its matching `.keys` directory into `App_Data\keys` (do not leave the timestamped archive directory nested there). Reapply the application-pool Modify permissions on `App_Data`, then start the pool and verify `/health` and sign-in. If the matching key archive is unavailable, users will need to authenticate again; never substitute a different installation's key ring.
 
 ## Verification
 

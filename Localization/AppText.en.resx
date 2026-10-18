@@ -113,6 +113,7 @@
   <data name="SaveSettings" xml:space="preserve"><value>Save settings</value></data>
   <data name="SettingsSaved" xml:space="preserve"><value>Settings saved.</value></data>
   <data name="SettingsSaveFailed" xml:space="preserve"><value>Settings could not be saved. Try again.</value></data>
+  <data name="SettingsConcurrencyConflict" xml:space="preserve"><value>Another administrator changed these settings. Reload the page before saving again.</value></data>
   <data name="GreenThresholdValidation" xml:space="preserve"><value>The green threshold must be between 1 and 24 months.</value></data>
   <data name="YellowThresholdValidation" xml:space="preserve"><value>The yellow threshold must be later than the green threshold and at most 36 months.</value></data>
   <data name="LongWaitThresholdValidation" xml:space="preserve"><value>The long-wait threshold must be between 1 and 60 months.</value></data>

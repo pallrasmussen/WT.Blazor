@@ -32,6 +32,7 @@ public sealed class PortalSettingsService(ApplicationDbContext db, PortalSetting
             || current.YellowMaximumAgeMonths != settings.YellowMaximumAgeMonths
             || current.LongWaitMonths != settings.LongWaitMonths;
         if (!changed) return;
+        if (current.Version != settings.Version) throw new PortalSettingsConcurrencyException();
 
         db.PortalSettingsAuditEntries.Add(new PortalSettingsAuditEntry
         {
@@ -47,8 +48,23 @@ public sealed class PortalSettingsService(ApplicationDbContext db, PortalSetting
         current.GreenMaximumAgeMonths = settings.GreenMaximumAgeMonths;
         current.YellowMaximumAgeMonths = settings.YellowMaximumAgeMonths;
         current.LongWaitMonths = settings.LongWaitMonths;
-        await db.SaveChangesAsync(cancellationToken);
+        current.Version++;
+        try
+        {
+            await db.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException exception)
+        {
+            db.Entry(current).State = EntityState.Detached;
+            foreach (var auditEntry in db.ChangeTracker.Entries<PortalSettingsAuditEntry>()
+                         .Where(entry => entry.State == EntityState.Added).ToList())
+            {
+                auditEntry.State = EntityState.Detached;
+            }
+            throw new PortalSettingsConcurrencyException(exception);
+        }
         changeNotifier.NotifyChanged();
+        settings.Version = current.Version;
     }
 
     public async Task<IReadOnlyList<PortalSettingsAuditEntry>> GetRecentChangesAsync(int maximumEntries = 10, CancellationToken cancellationToken = default) =>
