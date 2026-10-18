@@ -51,7 +51,7 @@ public class HomePageTests : BunitContext
     private sealed class EmptyTrendReadService : ITrendReadService
     {
         public Task<WaitingTime?> GetByIdAsync(int id, CancellationToken cancellationToken = default) => Task.FromResult<WaitingTime?>(null);
-        public Task<List<TrendPoint>> GetTrendPointsAsync(int waitingTimeId, CancellationToken cancellationToken = default) => Task.FromResult(new List<TrendPoint>());
+        public Task<List<TrendPoint>> GetTrendPointsAsync(int waitingTimeId, CancellationToken cancellationToken = default, int? periodDays = null) => Task.FromResult(new List<TrendPoint>());
         public Task<Dictionary<int, int>> GetTrendChangesAsync(IEnumerable<int> waitingTimeIds) => Task.FromResult(new Dictionary<int, int>());
     }
 

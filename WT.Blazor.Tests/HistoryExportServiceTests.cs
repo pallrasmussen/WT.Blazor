@@ -172,7 +172,7 @@ public class HistoryExportServiceTests
         var service = new TrendReportService(reader);
 
         using var source = new CancellationTokenSource();
-        var report = await service.GetAsync(item.Id, source.Token);
+        var report = await service.GetAsync(item.Id, source.Token, periodDays: 90);
 
         Assert.NotNull(report);
         Assert.Equal(item.Name, report.Name);
@@ -181,6 +181,7 @@ public class HistoryExportServiceTests
         Assert.Equal($"3 {DisplayNames.For(item.Unit, 3)}", report.CurrentWait);
         Assert.Same(points, report.Points);
         Assert.Equal(source.Token, reader.LastCancellationToken);
+        Assert.Equal(90, reader.LastPeriodDays);
     }
 
     private sealed class StubHistoryReader(
@@ -203,14 +204,16 @@ public class HistoryExportServiceTests
         List<TrendPoint>? points = null) : ITrendReadService
     {
         public CancellationToken LastCancellationToken { get; private set; }
+        public int? LastPeriodDays { get; private set; }
         public Task<WaitingTime?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             LastCancellationToken = cancellationToken;
             return Task.FromResult(item);
         }
-        public Task<List<TrendPoint>> GetTrendPointsAsync(int waitingTimeId, CancellationToken cancellationToken = default)
+        public Task<List<TrendPoint>> GetTrendPointsAsync(int waitingTimeId, CancellationToken cancellationToken = default, int? periodDays = null)
         {
             LastCancellationToken = cancellationToken;
+            LastPeriodDays = periodDays;
             return Task.FromResult(points ?? []);
         }
         public Task<Dictionary<int, int>> GetTrendChangesAsync(IEnumerable<int> waitingTimeIds) => throw new NotSupportedException();
@@ -219,7 +222,7 @@ public class HistoryExportServiceTests
     private sealed class StubTrendReportService(TrendReport? report) : ITrendReportService
     {
         public CancellationToken LastCancellationToken { get; private set; }
-        public Task<TrendReport?> GetAsync(int waitingTimeId, CancellationToken cancellationToken = default)
+        public Task<TrendReport?> GetAsync(int waitingTimeId, CancellationToken cancellationToken = default, int? periodDays = null)
         {
             LastCancellationToken = cancellationToken;
             return Task.FromResult(report);

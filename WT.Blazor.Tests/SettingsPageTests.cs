@@ -41,24 +41,24 @@ public class SettingsPageTests : BunitContext
         CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("fo");
         try
         {
-        await using var connection = new SqliteConnection("Data Source=:memory:");
-        await connection.OpenAsync();
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connection).Options;
-        await using var db = new ApplicationDbContext(options);
-        await db.Database.EnsureCreatedAsync();
-        var service = new PortalSettingsService(db, new PortalSettingsChangeNotifier(), TimeProvider.System);
-        await service.SaveAsync(new PortalSettings
-        {
-            GreenMaximumAgeMonths = 2,
-            YellowMaximumAgeMonths = 5,
-            LongWaitMonths = 10
-        }, "test-user");
-        Services.AddSingleton<IPortalSettingsService>(service);
+            await using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connection).Options;
+            await using var db = new ApplicationDbContext(options);
+            await db.Database.EnsureCreatedAsync();
+            var service = new PortalSettingsService(db, new PortalSettingsChangeNotifier(), TimeProvider.System);
+            await service.SaveAsync(new PortalSettings
+            {
+                GreenMaximumAgeMonths = 2,
+                YellowMaximumAgeMonths = 5,
+                LongWaitMonths = 10
+            }, "test-user");
+            Services.AddSingleton<IPortalSettingsService>(service);
 
-        var cut = Render<Settings>();
+            var cut = Render<Settings>();
 
-        Assert.Contains("Seinastu broytingar", cut.Markup);
-        Assert.Contains("test-user", cut.Markup);
+            Assert.Contains("Seinastu broytingar", cut.Markup);
+            Assert.Contains("test-user", cut.Markup);
         }
         finally
         {

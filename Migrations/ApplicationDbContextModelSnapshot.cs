@@ -181,13 +181,13 @@ namespace WT.Blazor.Migrations
 
                     b.HasIndex("Timestamp");
 
-                    b.HasIndex("WaitingTimeId");
-
                     b.HasIndex("Action", "Timestamp");
 
                     b.HasIndex("Username", "Timestamp");
 
                     b.HasIndex("Hospital", "Department", "Timestamp");
+
+                    b.HasIndex("WaitingTimeId", "Action", "Timestamp");
 
                     b.ToTable("WaitingTimeHistoryEntries");
                 });

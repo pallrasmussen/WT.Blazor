@@ -58,7 +58,7 @@ public class TrendComponentTests : BunitContext
     [Fact]
     public void TrendPageFiltersPointsToSelectedPeriod()
     {
-        Services.AddSingleton<ITrendReportService>(new StubTrendReportService(new TrendReport(
+        var reportService = new StubTrendReportService(new TrendReport(
             7,
             "MR",
             "Landssjúkrahúsið",
@@ -69,7 +69,8 @@ public class TrendComponentTests : BunitContext
                 new TrendPoint(new DateTime(2025, 1, 1), 2),
                 new TrendPoint(new DateTime(2026, 8, 1), 3),
                 new TrendPoint(new DateTime(2026, 9, 1), 4)
-            ])));
+            ]));
+        Services.AddSingleton<ITrendReportService>(reportService);
         Services.GetRequiredService<NavigationManager>().NavigateTo("/gongd/7?returnUrl=%2F%3Fhospital%3DLandssj%C3%BAkrah%C3%BAsi%C3%B0");
 
         var cut = Render<Trend>(parameters => parameters.Add(component => component.Id, 7));
@@ -79,11 +80,18 @@ public class TrendComponentTests : BunitContext
 
         cut.Find("#trend-period").Change("90");
 
-        cut.WaitForAssertion(() => Assert.Equal(2, cut.FindAll("circle.chart-point").Count));
+        cut.WaitForAssertion(() => Assert.Equal(3, cut.FindAll("circle.chart-point").Count));
+        Assert.Equal([null, 90], reportService.RequestedPeriods);
     }
 
     private sealed class StubTrendReportService(TrendReport? report) : ITrendReportService
     {
-        public Task<TrendReport?> GetAsync(int waitingTimeId, CancellationToken cancellationToken = default) => Task.FromResult(report);
+        public List<int?> RequestedPeriods { get; } = [];
+
+        public Task<TrendReport?> GetAsync(int waitingTimeId, CancellationToken cancellationToken = default, int? periodDays = null)
+        {
+            RequestedPeriods.Add(periodDays);
+            return Task.FromResult(report);
+        }
     }
 }

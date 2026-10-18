@@ -13,17 +13,17 @@ public record TrendReport(
 
 public interface ITrendReportService
 {
-    Task<TrendReport?> GetAsync(int waitingTimeId, CancellationToken cancellationToken = default);
+    Task<TrendReport?> GetAsync(int waitingTimeId, CancellationToken cancellationToken = default, int? periodDays = null);
 }
 
 public sealed class TrendReportService(ITrendReadService trendReader) : ITrendReportService
 {
-    public async Task<TrendReport?> GetAsync(int waitingTimeId, CancellationToken cancellationToken = default)
+    public async Task<TrendReport?> GetAsync(int waitingTimeId, CancellationToken cancellationToken = default, int? periodDays = null)
     {
         var item = await trendReader.GetByIdAsync(waitingTimeId, cancellationToken);
         if (item is null) return null;
 
-        var points = await trendReader.GetTrendPointsAsync(waitingTimeId, cancellationToken);
+        var points = await trendReader.GetTrendPointsAsync(waitingTimeId, cancellationToken, periodDays);
         return new TrendReport(
             item.Id,
             item.Name,

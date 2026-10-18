@@ -52,6 +52,35 @@ public class PublicBrowserSmokeTests : IAsyncLifetime
         Assert.EndsWith(".pdf", download.SuggestedFilename, StringComparison.OrdinalIgnoreCase);
     }
 
+    [BrowserFact]
+    public async Task PublicPageProvidesKeyboardNavigationAndAccessibleLandmarks()
+    {
+        var page = await browser!.NewPageAsync();
+
+        await page.GotoAsync(baseUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+
+        var skipLink = page.Locator("a.skip-link");
+        await Assertions.Expect(skipLink).ToHaveAttributeAsync("href", "#public-content");
+        await page.Keyboard.PressAsync("Tab");
+        Assert.True(await skipLink.EvaluateAsync<bool>("element => element === document.activeElement"));
+        await page.Keyboard.PressAsync("Enter");
+        Assert.True(await page.Locator("#public-content").EvaluateAsync<bool>("element => element === document.activeElement"));
+
+        await Assertions.Expect(page.GetByRole(AriaRole.Main)).ToHaveCountAsync(1);
+        await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Level = 1 })).ToHaveCountAsync(1);
+        await Assertions.Expect(page.Locator("img:not([alt])")).ToHaveCountAsync(0);
+
+        foreach (var input in await page.Locator("input:not([type='hidden'])").AllAsync())
+        {
+            var inputId = await input.GetAttributeAsync("id");
+            var accessibleName = await input.GetAttributeAsync("aria-label");
+            Assert.True(
+                !string.IsNullOrWhiteSpace(accessibleName)
+                || (!string.IsNullOrWhiteSpace(inputId) && await page.Locator($"label[for='{inputId}']").CountAsync() == 1),
+                $"Input '{inputId}' must have an accessible name.");
+        }
+    }
+
     public async Task InitializeAsync()
     {
         playwright = await Playwright.CreateAsync();

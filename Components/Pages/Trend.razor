@@ -40,13 +40,13 @@
         <p class="result-count">@AppText.Get("TrendDescription")</p>
         <div class="trend-period-control">
             <label for="trend-period">@AppText.Get("TrendPeriod")</label>
-            <select id="trend-period" @bind="selectedPeriodDays">
+            <select id="trend-period" @bind="selectedPeriodDays" @bind:after="LoadReportAsync">
                 <option value="">@AppText.Get("TrendPeriodAll")</option>
                 <option value="90">@AppText.Get("TrendPeriodThreeMonths")</option>
                 <option value="365">@AppText.Get("TrendPeriodYear")</option>
             </select>
         </div>
-        <WaitTrendChart Points="VisiblePoints" UnitLabel="@report.UnitLabel" />
+        <WaitTrendChart Points="report.Points" UnitLabel="@report.UnitLabel" />
         <div class="trend-actions">
             <a class="btn-teal button-link" href="@($"/api/trend/{Id}/export/pdf")">@AppText.Get("ExportPdf")</a>
         </div>
@@ -68,14 +68,15 @@
         && !ReturnUrl.StartsWith("//")
         ? ReturnUrl
         : "/";
-    private List<TrendPoint> VisiblePoints => report is null || selectedPeriodDays is null
-        ? report?.Points ?? []
-        : report.Points.Where(point => point.Timestamp >= report.Points.Max(point => point.Timestamp).AddDays(-selectedPeriodDays.Value)).ToList();
-
     protected override async Task OnParametersSetAsync()
     {
+        await LoadReportAsync();
+    }
+
+    private async Task LoadReportAsync()
+    {
         isLoading = true;
-        report = await TrendReportService.GetAsync(Id);
+        report = await TrendReportService.GetAsync(Id, periodDays: selectedPeriodDays);
         isLoading = false;
     }
 }

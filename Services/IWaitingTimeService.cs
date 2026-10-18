@@ -61,7 +61,7 @@ public interface IOperationsReadService
 public interface ITrendReadService
 {
     Task<WaitingTime?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
-    Task<List<TrendPoint>> GetTrendPointsAsync(int waitingTimeId, CancellationToken cancellationToken = default);
+    Task<List<TrendPoint>> GetTrendPointsAsync(int waitingTimeId, CancellationToken cancellationToken = default, int? periodDays = null);
     Task<Dictionary<int, int>> GetTrendChangesAsync(IEnumerable<int> waitingTimeIds);
 }
 
@@ -73,4 +73,3 @@ public interface IWaitingTimeManagementService
     Task DeactivateAsync(int id, int expectedVersion, string username, string? reason = null);
     Task<WaitingTime> ReactivateAsync(int id, int expectedVersion, string username);
 }
-

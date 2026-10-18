@@ -155,7 +155,7 @@ public class AuditLogTests
             DeleteDatabase(databasePath);
         }
     }
-    
+
     [Fact]
     public async Task AllMigrationsApplyToANewDatabase()
     {

@@ -23,7 +23,7 @@ public class LocalizationTests
             CultureInfo.CurrentUICulture = originalCulture;
         }
     }
-    
+
     [Fact]
     public void FaroeseTechnicalAndAdministrationTermsUseApprovedText()
     {

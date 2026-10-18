@@ -17,17 +17,17 @@ public class InternalLayoutTests : BunitContext
         CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("fo");
         try
         {
-        Services.Configure<AdGroupsOptions>(_ => { });
-        Services.AddSingleton<HealthCheckService>(new HealthyHealthChecks());
-        Services.AddSingleton(DeploymentManifest.Unknown);
-        Services.AddSingleton(TimeProvider.System);
+            Services.Configure<AdGroupsOptions>(_ => { });
+            Services.AddSingleton<HealthCheckService>(new HealthyHealthChecks());
+            Services.AddSingleton(DeploymentManifest.Unknown);
+            Services.AddSingleton(TimeProvider.System);
 
-        var cut = Render<InternalLayout>();
-        var backLink = cut.Find("a.internal-nav-back");
+            var cut = Render<InternalLayout>();
+            var backLink = cut.Find("a.internal-nav-back");
 
-        Assert.Equal("/", backLink.GetAttribute("href"));
-        Assert.Contains("Aftur til bíðitíðir", backLink.TextContent);
-        Assert.Contains("←", backLink.TextContent);
+            Assert.Equal("/", backLink.GetAttribute("href"));
+            Assert.Contains("Aftur til bíðitíðir", backLink.TextContent);
+            Assert.Contains("←", backLink.TextContent);
         }
         finally
         {

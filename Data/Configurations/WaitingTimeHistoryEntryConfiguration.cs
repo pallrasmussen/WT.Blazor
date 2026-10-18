@@ -16,6 +16,7 @@ public sealed class WaitingTimeHistoryEntryConfiguration : IEntityTypeConfigurat
         builder.HasIndex(entry => entry.Timestamp);
         builder.HasIndex(entry => new { entry.Hospital, entry.Department, entry.Timestamp });
         builder.HasIndex(entry => new { entry.Action, entry.Timestamp });
+        builder.HasIndex(entry => new { entry.WaitingTimeId, entry.Action, entry.Timestamp });
         builder.HasIndex(entry => new { entry.Username, entry.Timestamp });
     }
 }

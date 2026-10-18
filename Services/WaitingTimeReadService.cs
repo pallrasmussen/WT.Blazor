@@ -89,20 +89,47 @@ public class WaitingTimeReadService(
             waitingTimeCounts?.MissingDepartments ?? 0);
     }
 
-    public async Task<List<TrendPoint>> GetTrendPointsAsync(int waitingTimeId, CancellationToken cancellationToken = default)
+    public async Task<List<TrendPoint>> GetTrendPointsAsync(int waitingTimeId, CancellationToken cancellationToken = default, int? periodDays = null)
     {
+        if (periodDays is <= 0) throw new ArgumentOutOfRangeException(nameof(periodDays), "Trend periods must contain at least one day.");
+
         var displayUnit = await db.WaitingTimes.AsNoTracking()
             .Where(waitingTime => waitingTime.Id == waitingTimeId)
             .Select(waitingTime => (WaitUnit?)waitingTime.Unit)
             .FirstOrDefaultAsync(cancellationToken);
         if (displayUnit is null) return [];
 
-        var raw = await db.WaitingTimeHistoryEntries.AsNoTracking()
-            .Where(entry => entry.WaitingTimeId == waitingTimeId && entry.Action == HistoryAction.Updated && entry.NewWaitValue != null)
+        var historyEntries = db.WaitingTimeHistoryEntries.AsNoTracking()
+            .Where(entry => entry.WaitingTimeId == waitingTimeId && entry.Action == HistoryAction.Updated && entry.NewWaitValue != null);
+
+        if (periodDays is null)
+        {
+            var history = await historyEntries
+                .OrderBy(entry => entry.Timestamp)
+                .Select(entry => new TrendHistoryPoint(entry.Timestamp, entry.NewWaitValue!.Value, entry.NewUnit, entry.NewWaitDays))
+                .ToListAsync(cancellationToken);
+            return TrendPointReducer.Reduce(history, displayUnit.Value);
+        }
+
+        var latestTimestamp = await historyEntries.MaxAsync(entry => (DateTime?)entry.Timestamp, cancellationToken);
+        if (latestTimestamp is null) return [];
+
+        var cutoff = latestTimestamp.Value.AddDays(-periodDays.Value);
+        var latestPointBeforeCutoff = await historyEntries
+            .Where(entry => entry.Timestamp < cutoff)
+            .OrderByDescending(entry => entry.Timestamp)
+            .Take(1)
+            .Select(entry => new TrendHistoryPoint(entry.Timestamp, entry.NewWaitValue!.Value, entry.NewUnit, entry.NewWaitDays))
+            .ToListAsync(cancellationToken);
+        var pointsInPeriod = await historyEntries
+            .Where(entry => entry.Timestamp >= cutoff)
             .OrderBy(entry => entry.Timestamp)
             .Select(entry => new TrendHistoryPoint(entry.Timestamp, entry.NewWaitValue!.Value, entry.NewUnit, entry.NewWaitDays))
             .ToListAsync(cancellationToken);
-        return TrendPointReducer.Reduce(raw, displayUnit.Value);
+
+        return TrendPointReducer.Reduce(latestPointBeforeCutoff.Concat(pointsInPeriod), displayUnit.Value)
+            .Where(point => point.Timestamp >= cutoff)
+            .ToList();
     }
 
     public async Task<Dictionary<int, ReviewInfo>> GetLatestReviewsAsync(IEnumerable<int> waitingTimeIds)

@@ -1,6 +1,7 @@
 using System.Globalization;
 
 namespace WT.Blazor.Localization;
+
 using System.Resources;
 
 public static class AppText
