@@ -247,12 +247,20 @@ catch {
     throw "Could not enable Windows/Anonymous authentication - the IIS-WindowsAuthentication feature likely isn't fully installed. Check with: Get-WindowsOptionalFeature -Online -FeatureName IIS-WindowsAuthentication. Original error: $_"
 }
 
-# 6. Let the app pool identity read/write the SQLite db under App_Data.
-$acl = Get-Acl $PhysicalPath
-$rule = New-Object System.Security.AccessControl.FileSystemAccessRule(
-    "IIS AppPool\$AppPoolName", "Modify", "ContainerInherit,ObjectInherit", "None", "Allow")
-$acl.AddAccessRule($rule)
-Set-Acl $PhysicalPath $acl
+# 6. Restrict app-pool write access to runtime data under App_Data.
+$appPoolIdentity = "IIS AppPool\$AppPoolName"
+$rootAcl = Get-Acl $PhysicalPath
+foreach ($existingRule in @($rootAcl.Access | Where-Object { $_.IdentityReference.Value -ieq $appPoolIdentity })) {
+    $rootAcl.RemoveAccessRuleSpecific($existingRule)
+}
+Set-Acl $PhysicalPath $rootAcl
+
+$appDataPath = Join-Path $PhysicalPath "App_Data"
+$dataAcl = Get-Acl $appDataPath
+$dataRule = New-Object System.Security.AccessControl.FileSystemAccessRule(
+    $appPoolIdentity, "Modify", "ContainerInherit,ObjectInherit", "None", "Allow")
+$dataAcl.SetAccessRule($dataRule)
+Set-Acl $appDataPath $dataAcl
 
 # 7. Start the app pool back up (it was stopped earlier to release file locks for the copy).
 Start-WebAppPool -Name $AppPoolName -ErrorAction SilentlyContinue

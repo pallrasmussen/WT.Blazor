@@ -35,6 +35,45 @@ public class HistoryExportServiceTests
     }
 
     [Fact]
+    public async Task CreateCsvAsyncNeutralizesSpreadsheetFormulasInUntrustedText()
+    {
+        var reader = new StubHistoryReader(new WaitingTimeHistoryEntry
+        {
+            Name = "=1+1",
+            Detail = "+1+1",
+            Username = "-1+1",
+            RequestId = "@SUM(1,1)"
+        });
+        var service = new HistoryExportService(reader, TimeProvider.System, Options.Create(new ExportOptions()));
+
+        var export = await service.CreateCsvAsync(new HistoryQuery());
+        var content = Encoding.UTF8.GetString(await export.ReadContentAsync());
+
+        Assert.Contains("\"'=1+1\"", content);
+        Assert.Contains("\"'+1+1\"", content);
+        Assert.Contains("\"'-1+1\"", content);
+        Assert.Contains("\"'@SUM(1,1)\"", content);
+    }
+
+    [Theory]
+    [InlineData("=1+1")]
+    [InlineData("+1+1")]
+    [InlineData("-1+1")]
+    [InlineData("@SUM(1,1)")]
+    [InlineData(" =1+1")]
+    [InlineData("\t=1+1")]
+    public async Task CreateCsvAsyncNeutralizesFormulasAfterLeadingWhitespace(string value)
+    {
+        var reader = new StubHistoryReader(new WaitingTimeHistoryEntry { Name = value });
+        var service = new HistoryExportService(reader, TimeProvider.System, Options.Create(new ExportOptions()));
+
+        var export = await service.CreateCsvAsync(new HistoryQuery());
+        var content = Encoding.UTF8.GetString(await export.ReadContentAsync());
+
+        Assert.Contains($"\"'{value}\"", content);
+    }
+
+    [Fact]
     public async Task CreateExcelAsyncIncludesAllAuditColumns()
     {
         var reader = new StubHistoryReader(new WaitingTimeHistoryEntry
