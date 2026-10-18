@@ -121,11 +121,34 @@ public class SettingsPageTests : BunitContext
         });
     }
 
+    [Fact]
+    public void ConcurrentSaveShowsReloadGuidanceAndKeepsTheChanges()
+    {
+        var service = new RecordingPortalSettingsService(throwOnConcurrencyConflict: true);
+        Services.AddLogging();
+        Services.AddSingleton<IPortalSettingsService>(service);
+
+        var cut = Render<Settings>();
+        cut.Find("#green-months").Change("4");
+        cut.Find("button.btn-teal").Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains(AppText.Get("SettingsConcurrencyConflict"), cut.Markup);
+            Assert.NotEmpty(cut.FindAll(".dirty-note"));
+        });
+    }
+
     private sealed class RecordingPortalSettingsService : IPortalSettingsService
     {
         private readonly bool throwOnSave;
+        private readonly bool throwOnConcurrencyConflict;
 
-        public RecordingPortalSettingsService(bool throwOnSave = false) => this.throwOnSave = throwOnSave;
+        public RecordingPortalSettingsService(bool throwOnSave = false, bool throwOnConcurrencyConflict = false)
+        {
+            this.throwOnSave = throwOnSave;
+            this.throwOnConcurrencyConflict = throwOnConcurrencyConflict;
+        }
 
         public int SaveCalls { get; private set; }
 
@@ -134,6 +157,7 @@ public class SettingsPageTests : BunitContext
         public Task SaveAsync(PortalSettings settings, string username, CancellationToken cancellationToken = default)
         {
             SaveCalls++;
+            if (throwOnConcurrencyConflict) throw new PortalSettingsConcurrencyException();
             if (throwOnSave) throw new InvalidOperationException("Simulated save failure.");
             return Task.CompletedTask;
         }

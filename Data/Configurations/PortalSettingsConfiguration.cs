@@ -9,5 +9,6 @@ public sealed class PortalSettingsConfiguration : IEntityTypeConfiguration<Porta
     public void Configure(EntityTypeBuilder<PortalSettings> builder)
     {
         builder.HasKey(settings => settings.Id);
+        builder.Property(settings => settings.Version).IsConcurrencyToken();
     }
 }

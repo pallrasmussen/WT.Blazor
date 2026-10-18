@@ -136,6 +136,10 @@ else
             recentChanges = await PortalSettingsManager.GetRecentChangesAsync();
             statusMessage = AppText.Get("SettingsSaved");
         }
+        catch (PortalSettingsConcurrencyException)
+        {
+            errorMessage = AppText.Get("SettingsConcurrencyConflict");
+        }
         catch (Exception exception)
         {
             Logger.LogError(exception, "Could not save portal settings for {Username}.", username);
@@ -187,6 +191,7 @@ else
     {
         GreenMaximumAgeMonths = source.GreenMaximumAgeMonths,
         YellowMaximumAgeMonths = source.YellowMaximumAgeMonths,
-        LongWaitMonths = source.LongWaitMonths
+        LongWaitMonths = source.LongWaitMonths,
+        Version = source.Version
     };
 }

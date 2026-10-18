@@ -32,6 +32,7 @@ public sealed class PortalSettingsService(ApplicationDbContext db, PortalSetting
             || current.YellowMaximumAgeMonths != settings.YellowMaximumAgeMonths
             || current.LongWaitMonths != settings.LongWaitMonths;
         if (!changed) return;
+        if (current.Version != settings.Version) throw new PortalSettingsConcurrencyException();
 
         db.PortalSettingsAuditEntries.Add(new PortalSettingsAuditEntry
         {
@@ -47,7 +48,15 @@ public sealed class PortalSettingsService(ApplicationDbContext db, PortalSetting
         current.GreenMaximumAgeMonths = settings.GreenMaximumAgeMonths;
         current.YellowMaximumAgeMonths = settings.YellowMaximumAgeMonths;
         current.LongWaitMonths = settings.LongWaitMonths;
-        await db.SaveChangesAsync(cancellationToken);
+        current.Version++;
+        try
+        {
+            await db.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException exception)
+        {
+            throw new PortalSettingsConcurrencyException(exception);
+        }
         changeNotifier.NotifyChanged();
     }
 

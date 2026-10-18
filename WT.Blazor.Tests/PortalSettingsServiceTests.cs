@@ -38,6 +38,34 @@ public class PortalSettingsServiceTests
     }
 
     [Fact]
+    public async Task SaveAsyncRejectsSettingsLoadedBeforeAnotherAdministratorSaved()
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connection).Options;
+        await using var seedDb = new ApplicationDbContext(options);
+        await seedDb.Database.EnsureCreatedAsync();
+        seedDb.PortalSettings.Add(new PortalSettings());
+        await seedDb.SaveChangesAsync();
+
+        await using var firstDb = new ApplicationDbContext(options);
+        await using var secondDb = new ApplicationDbContext(options);
+        var firstService = new PortalSettingsService(firstDb, new PortalSettingsChangeNotifier(), TimeProvider.System);
+        var secondService = new PortalSettingsService(secondDb, new PortalSettingsChangeNotifier(), TimeProvider.System);
+        var firstEdit = await firstService.GetAsync();
+        var staleEdit = await secondService.GetAsync();
+        firstEdit.GreenMaximumAgeMonths = 4;
+        staleEdit.YellowMaximumAgeMonths = 8;
+
+        await firstService.SaveAsync(firstEdit, "first-admin");
+
+        await Assert.ThrowsAsync<PortalSettingsConcurrencyException>(() => secondService.SaveAsync(staleEdit, "second-admin"));
+        Assert.Equal(4, (await firstService.GetAsync()).GreenMaximumAgeMonths);
+        Assert.Equal(PortalSettings.DefaultYellowMaximumAgeMonths, (await firstService.GetAsync()).YellowMaximumAgeMonths);
+        Assert.Single(await firstService.GetRecentChangesAsync());
+    }
+
+    [Fact]
     public async Task SaveAsyncRejectsYellowThresholdAtOrBeforeGreenThreshold()
     {
         await using var connection = new SqliteConnection("Data Source=:memory:");
