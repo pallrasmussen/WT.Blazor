@@ -56,6 +56,17 @@ public class TrendComponentTests : BunitContext
     }
 
     [Fact]
+    public void TrendPagePreservesSafeHashOnlyReturnUrls()
+    {
+        Services.AddSingleton<ITrendReportService>(new StubTrendReportService(null));
+        Services.GetRequiredService<NavigationManager>().NavigateTo("/gongd/42?returnUrl=%23waiting-time-42");
+
+        var cut = Render<Trend>(parameters => parameters.Add(component => component.Id, 42));
+
+        cut.WaitForAssertion(() => Assert.Equal("/#waiting-time-42", cut.Find("a.trend-back").GetAttribute("href")));
+    }
+
+    [Fact]
     public void TrendPageFiltersPointsToSelectedPeriod()
     {
         var reportService = new StubTrendReportService(new TrendReport(

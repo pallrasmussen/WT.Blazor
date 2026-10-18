@@ -18,6 +18,10 @@
     <div>
         <h1>@(showCreateForm ? AppText.Get("AdminHeadingCreate") : AppText.Get("AdminHeading"))</h1>
     </div>
+    @if (isSuperAdmin && !showCreateForm)
+    {
+        <a class="btn-teal button-link" href="/internal?new=true">@AppText.Get("AddWaitingTime")</a>
+    }
 </div>
 
 @if (!(isSuperAdmin && showCreateForm))

@@ -43,8 +43,18 @@
   <data name="Operations" xml:space="preserve"><value>Operations</value></data>
   <data name="DatabaseHealthy" xml:space="preserve"><value>Database connection is healthy</value></data>
   <data name="DatabaseUnverified" xml:space="preserve"><value>Database connection could not be verified</value></data>
+  <data name="SystemHealthy" xml:space="preserve"><value>System healthy</value></data>
   <data name="SystemHealthyAt" xml:space="preserve"><value>System healthy · {0:HH:mm}</value></data>
   <data name="CheckSystem" xml:space="preserve"><value>Check system</value></data>
+  <data name="SystemStatus" xml:space="preserve"><value>System status</value></data>
+  <data name="NavigationMenu" xml:space="preserve"><value>Show navigation</value></data>
+  <data name="InternalNavigation" xml:space="preserve"><value>Administration navigation</value></data>
+  <data name="WaitingTimesNavigation" xml:space="preserve"><value>Waiting times</value></data>
+  <data name="AdministrationToolsNavigation" xml:space="preserve"><value>Administration tools</value></data>
+  <data name="Breadcrumb" xml:space="preserve"><value>Breadcrumb</value></data>
+  <data name="ApplicationError" xml:space="preserve"><value>Something went wrong</value></data>
+  <data name="ApplicationErrorText" xml:space="preserve"><value>We could not complete your request. Try again shortly, or return to the waiting times.</value></data>
+  <data name="ErrorRequestId" xml:space="preserve"><value>Reference ID</value></data>
   <data name="Administrator" xml:space="preserve"><value>Administrator</value></data>
   <data name="SuperAdministrator" xml:space="preserve"><value>Super administrator</value></data>
   <data name="OperationsIntro" xml:space="preserve"><value>Backup and audit-retention status.</value></data>

@@ -29,10 +29,45 @@ public class InternalLayoutTests : BunitContext
             Assert.Contains("Aftur til bíðitíðir", backLink.TextContent);
             Assert.Contains("←", backLink.TextContent);
         }
+
         finally
         {
             CultureInfo.CurrentUICulture = originalCulture;
         }
+    }
+
+    [Fact]
+    public void MarksTheCurrentPageWithinALabelledNavigationLandmark()
+    {
+        Services.Configure<AdGroupsOptions>(_ => { });
+        Services.AddSingleton<HealthCheckService>(new HealthyHealthChecks());
+        Services.AddSingleton(DeploymentManifest.Unknown);
+        Services.AddSingleton(TimeProvider.System);
+        Services.GetRequiredService<Microsoft.AspNetCore.Components.NavigationManager>().NavigateTo("/internal");
+
+        var cut = Render<InternalLayout>();
+
+        Assert.Equal("Administration navigation", cut.Find("nav#internal-navigation").GetAttribute("aria-label"));
+        Assert.Equal("page", cut.Find("a[href='/internal']").GetAttribute("aria-current"));
+        Assert.Empty(cut.FindAll("a[href='/internal?new=true']"));
+    }
+
+    [Fact]
+    public void OpensTheMobileNavigationMenuOnDemand()
+    {
+        Services.Configure<AdGroupsOptions>(_ => { });
+        Services.AddSingleton<HealthCheckService>(new HealthyHealthChecks());
+        Services.AddSingleton(DeploymentManifest.Unknown);
+        Services.AddSingleton(TimeProvider.System);
+
+        var cut = Render<InternalLayout>();
+        var toggle = cut.Find("button.internal-nav-toggle");
+
+        Assert.Equal("false", toggle.GetAttribute("aria-expanded"));
+        toggle.Click();
+
+        Assert.Equal("true", toggle.GetAttribute("aria-expanded"));
+        Assert.Contains("open", cut.Find("nav#internal-navigation").ClassList);
     }
 
     private sealed class HealthyHealthChecks : HealthCheckService

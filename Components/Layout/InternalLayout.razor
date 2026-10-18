@@ -14,8 +14,8 @@
         @if (!string.IsNullOrEmpty(userName))
         {
             <div class="internal-header-status">
-                <a class="internal-health @(isHealthy ? "healthy" : "unhealthy")" href="/internal/operations" title="@(isHealthy ? AppText.Get("DatabaseHealthy") : AppText.Get("DatabaseUnverified"))">
-                    <span aria-hidden="true"></span>@(isHealthy ? string.Format(AppText.Get("SystemHealthyAt"), healthCheckedAt) : AppText.Get("CheckSystem"))
+                <a class="internal-health @(isHealthy ? "healthy" : "unhealthy")" href="/internal/operations" aria-label="@AppText.Get("SystemStatus")" title="@(isHealthy ? AppText.Get("DatabaseHealthy") : AppText.Get("DatabaseUnverified"))">
+                    <span class="internal-health-indicator" aria-hidden="true"></span><span class="internal-health-label">@(isHealthy ? AppText.Get("SystemHealthy") : AppText.Get("CheckSystem"))</span>
                 </a>
                 <span class="internal-user">
                     <span class="internal-badge">@userName</span>
@@ -24,23 +24,26 @@
             </div>
         }
     </header>
+    <button class="internal-nav-toggle" type="button" aria-controls="internal-navigation" aria-expanded="@(navigationOpen ? "true" : "false")" @onclick="ToggleNavigation">
+        @AppText.Get("NavigationMenu")
+    </button>
     <div class="internal-body">
-        <aside class="internal-nav">
+        <nav id="internal-navigation" class="internal-nav @(navigationOpen ? "open" : "")" aria-label="@AppText.Get("InternalNavigation")">
             <a href="/" class="internal-nav-back"><span aria-hidden="true">&larr;</span>@AppText.Get("Back")</a>
-            <span class="internal-nav-divider" aria-hidden="true"></span>
-            <a href="/internal" class="@(IsWaitingTimesRoute ? "active" : "")">@AppText.Get("EditWaitingTimes")</a>
-            @if (isSuperAdmin)
-            {
-                <a href="/internal?new=true" class="@(IsCreateRoute ? "active" : "")">@AppText.Get("AddWaitingTime")</a>
-            }
-            <span class="internal-nav-divider" aria-hidden="true"></span>
-            <a href="/internal/history" class="@(IsHistoryRoute ? "active" : "")">@AppText.Get("History")</a>
-            <a href="/internal/operations" class="@(IsOperationsRoute ? "active" : "")">@AppText.Get("Operations")</a>
-            @if (isSuperAdmin)
-            {
-                <a href="/internal/settings" class="@(IsSettingsRoute ? "active" : "")">@AppText.Get("Settings")</a>
-            }
-        </aside>
+            <div class="internal-nav-group">
+                <span class="internal-nav-label">@AppText.Get("WaitingTimesNavigation")</span>
+                <a href="/internal" class="@(IsWaitingTimesRoute ? "active" : "")" aria-current="@(IsWaitingTimesRoute ? "page" : null)">@AppText.Get("EditWaitingTimes")</a>
+            </div>
+            <div class="internal-nav-group">
+                <span class="internal-nav-label">@AppText.Get("AdministrationToolsNavigation")</span>
+                <a href="/internal/history" class="@(IsHistoryRoute ? "active" : "")" aria-current="@(IsHistoryRoute ? "page" : null)">@AppText.Get("History")</a>
+                <a href="/internal/operations" class="@(IsOperationsRoute ? "active" : "")" aria-current="@(IsOperationsRoute ? "page" : null)">@AppText.Get("Operations")</a>
+                @if (isSuperAdmin)
+                {
+                    <a href="/internal/settings" class="@(IsSettingsRoute ? "active" : "")" aria-current="@(IsSettingsRoute ? "page" : null)">@AppText.Get("Settings")</a>
+                }
+            </div>
+        </nav>
         <main id="internal-content" class="internal-content" tabindex="-1">
             @Body
         </main>
@@ -56,12 +59,12 @@
     private bool isHealthy;
     private DateTime healthCheckedAt;
     private string AdminGroup => AdGroupsOptions.Value.Admin;
-    private string CurrentRoute => NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-    private bool IsWaitingTimesRoute => string.Equals(CurrentRoute, "internal", StringComparison.OrdinalIgnoreCase);
-    private bool IsHistoryRoute => CurrentRoute.StartsWith("internal/history", StringComparison.OrdinalIgnoreCase);
-    private bool IsOperationsRoute => CurrentRoute.StartsWith("internal/operations", StringComparison.OrdinalIgnoreCase);
-    private bool IsSettingsRoute => CurrentRoute.StartsWith("internal/settings", StringComparison.OrdinalIgnoreCase);
-    private bool IsCreateRoute => CurrentRoute.StartsWith("internal?new=true", StringComparison.OrdinalIgnoreCase);
+    private string CurrentPath => new Uri(NavigationManager.Uri).AbsolutePath.TrimEnd('/');
+    private bool IsWaitingTimesRoute => string.Equals(CurrentPath, "/internal", StringComparison.OrdinalIgnoreCase);
+    private bool IsHistoryRoute => CurrentPath.StartsWith("/internal/history", StringComparison.OrdinalIgnoreCase);
+    private bool IsOperationsRoute => CurrentPath.StartsWith("/internal/operations", StringComparison.OrdinalIgnoreCase);
+    private bool IsSettingsRoute => CurrentPath.StartsWith("/internal/settings", StringComparison.OrdinalIgnoreCase);
+    private bool navigationOpen;
 
     protected override void OnInitialized()
     {
@@ -88,7 +91,13 @@
         healthCheckedAt = TimeProvider.GetLocalNow().DateTime;
     }
 
-    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args) => _ = InvokeAsync(StateHasChanged);
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args) => _ = InvokeAsync(() =>
+    {
+        navigationOpen = false;
+        StateHasChanged();
+    });
+
+    private void ToggleNavigation() => navigationOpen = !navigationOpen;
 
     public void Dispose() => NavigationManager.LocationChanged -= HandleLocationChanged;
 }

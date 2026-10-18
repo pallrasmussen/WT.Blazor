@@ -110,8 +110,18 @@
   <data name="Operations" xml:space="preserve"><value>Rakstur</value></data>
   <data name="DatabaseHealthy" xml:space="preserve"><value>Samband við dátugrunn er í lagi</value></data>
   <data name="DatabaseUnverified" xml:space="preserve"><value>Samband við dátugrunn kann ikki váttast</value></data>
+  <data name="SystemHealthy" xml:space="preserve"><value>Rakstur í lagi</value></data>
   <data name="SystemHealthyAt" xml:space="preserve"><value>Rakstur í lagi · {0:HH:mm}</value></data>
   <data name="CheckSystem" xml:space="preserve"><value>Kanna rakstur</value></data>
+  <data name="SystemStatus" xml:space="preserve"><value>Rakstrarstøða</value></data>
+  <data name="NavigationMenu" xml:space="preserve"><value>Vís valmynd</value></data>
+  <data name="InternalNavigation" xml:space="preserve"><value>Umsitingarvalmynd</value></data>
+  <data name="WaitingTimesNavigation" xml:space="preserve"><value>Bíðitíðir</value></data>
+  <data name="AdministrationToolsNavigation" xml:space="preserve"><value>Umsiting</value></data>
+  <data name="Breadcrumb" xml:space="preserve"><value>Slóð</value></data>
+  <data name="ApplicationError" xml:space="preserve"><value>Nakað fór galið</value></data>
+  <data name="ApplicationErrorText" xml:space="preserve"><value>Vit kundu ikki fullføra umbønina. Royn aftur um eina løtu, ella far aftur til bíðitíðirnar.</value></data>
+  <data name="ErrorRequestId" xml:space="preserve"><value>Frágreiðingarmerki</value></data>
   <data name="Administrator" xml:space="preserve"><value>Umsitari</value></data>
   <data name="SuperAdministrator" xml:space="preserve"><value>Høvuðsumsitari</value></data>
   <data name="OperationsIntro" xml:space="preserve"><value>Støðan á trygdaravritum og varðveiting av loggi.</value></data>

@@ -22,6 +22,16 @@ public class NotFoundPageTests : BunitContext
         Assert.Contains("cancel the sign-in prompt", cut.Markup);
     }
 
+    [Fact]
+    public void ErrorPageProvidesALocalizedRecoveryAction()
+    {
+        var cut = Render<Error>();
+
+        Assert.Contains("Something went wrong", cut.Markup);
+        Assert.Contains("We could not complete your request", cut.Markup);
+        Assert.Equal("/", cut.Find("a.btn-secondary").GetAttribute("href"));
+    }
+
     private sealed class AuthenticationFailureFeature : IStatusCodeReExecuteFeature
     {
         public string OriginalPathBase { get; set; } = "";

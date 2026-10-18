@@ -7,8 +7,9 @@
 <PageTitle>@(report is null ? $"{AppText.Get("TrendHeading")} | Sjúkrahúsverkið" : $"{report.Name} | Sjúkrahúsverkið")</PageTitle>
 
 <section class="public-hero">
-    <nav class="trend-navigation" aria-label="Navigation">
+    <nav class="trend-navigation" aria-label="@AppText.Get("Breadcrumb")">
         <a class="trend-back" href="@BackUrl">@AppText.Get("Back")</a>
+        <span aria-current="page">@AppText.Get("TrendHeading")</span>
     </nav>
     <p class="eyebrow">Sjúkrahúsverkið</p>
     <h1>@AppText.Get("TrendHeading")</h1>
@@ -63,11 +64,12 @@
     private TrendReport? report;
     private bool isLoading = true;
     private int? selectedPeriodDays;
-    private string BackUrl => !string.IsNullOrWhiteSpace(ReturnUrl)
-        && ReturnUrl.StartsWith('/')
-        && !ReturnUrl.StartsWith("//")
-        ? ReturnUrl
-        : "/";
+    private string BackUrl => ReturnUrl switch
+    {
+        { } returnUrl when returnUrl.StartsWith('/') && !returnUrl.StartsWith("//") => returnUrl,
+        { } returnUrl when returnUrl.StartsWith('#') => $"/{returnUrl}",
+        _ => "/"
+    };
     protected override async Task OnParametersSetAsync()
     {
         await LoadReportAsync();

@@ -228,6 +228,11 @@
 		}), replace: true);
 	}
 
-	private string TrendUri(int id) => $"/gongd/{id}?returnUrl={Uri.EscapeDataString($"{NavigationManager.ToBaseRelativePath(NavigationManager.Uri)}#waiting-time-{id}")}";
+	private string TrendUri(int id)
+	{
+		var pathAndQuery = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+		var returnUrl = $"/{pathAndQuery}#waiting-time-{id}";
+		return $"/gongd/{id}?returnUrl={Uri.EscapeDataString(returnUrl)}";
+	}
 
 }
