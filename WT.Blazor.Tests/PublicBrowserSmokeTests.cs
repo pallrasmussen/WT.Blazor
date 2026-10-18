@@ -43,6 +43,10 @@ public class PublicBrowserSmokeTests : IAsyncLifetime
         var exportLinkName = (await exportLink.InnerTextAsync()).Trim();
         Assert.False(string.IsNullOrWhiteSpace(exportLinkName));
         await Assertions.Expect(page.GetByRole(AriaRole.Link, new() { Name = exportLinkName })).ToHaveCountAsync(1);
+        await page.Locator("#trend-period").FocusAsync();
+        await page.Keyboard.PressAsync("Tab");
+        await page.Keyboard.PressAsync("Tab");
+        Assert.True(await exportLink.EvaluateAsync<bool>("element => element === document.activeElement"));
 
         var download = await page.RunAndWaitForDownloadAsync(async () => await exportLink.ClickAsync());
         Assert.EndsWith(".pdf", download.SuggestedFilename, StringComparison.OrdinalIgnoreCase);
