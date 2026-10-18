@@ -22,9 +22,15 @@ public sealed class HistoryExportService(
     public async Task<ExportFile> CreateCsvAsync(HistoryQuery query, CancellationToken cancellationToken = default)
     {
         var rows = await GetRowsAsync(query, cancellationToken);
-        static string Csv(string value) => $"\"{value.Replace("\"", "\"\"")}\"";
+        static string Csv(string value, bool mayContainUntrustedText)
+        {
+            var firstNonWhitespace = value.AsSpan().TrimStart();
+            if (mayContainUntrustedText && !firstNonWhitespace.IsEmpty && firstNonWhitespace[0] is '=' or '+' or '-' or '@')
+                value = $"'{value}";
+            return $"\"{value.Replace("\"", "\"\"")}\"";
+        }
         var content = string.Join(',', HistoryExportSchema.Columns.Select(column => column.Header)) + "\r\n"
-            + string.Join("\r\n", rows.Select(row => string.Join(',', HistoryExportSchema.Columns.Select(column => Csv(column.Value(row))))));
+            + string.Join("\r\n", rows.Select(row => string.Join(',', HistoryExportSchema.Columns.Select(column => Csv(column.Value(row), column.MayContainUntrustedText)))));
         return new ExportFile(System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(content)).ToArray(), "text/csv", $"{AppText.Get(AppTextKey.HistoryExportFileName)}.csv");
     }
 

@@ -1,6 +1,6 @@
 namespace WT.Blazor.Services;
 
-public record HistoryExportColumn(string Header, float PdfWidth, Func<HistoryExportRow, string> Value);
+public record HistoryExportColumn(string Header, float PdfWidth, Func<HistoryExportRow, string> Value, bool MayContainUntrustedText = false);
 
 public static class HistoryExportSchema
 {
@@ -9,12 +9,12 @@ public static class HistoryExportSchema
         new("Dagfesting og tíð", 1.1f, row => row.Timestamp),
         new("Sjúkrahús", 1.1f, row => row.Hospital),
         new("Depil", 1.1f, row => row.Department),
-        new("Sergrein / viðgerð", 1.3f, row => row.Name),
+        new("Sergrein / viðgerð", 1.3f, row => row.Name, true),
         new("Gerð", .8f, row => row.Action),
-        new("Broyting", 1.3f, row => row.Detail),
+        new("Broyting", 1.3f, row => row.Detail, true),
         new("Gamla bíðitíð", .85f, row => row.OldWait),
         new("Nýggja bíðitíð", .85f, row => row.NewWait),
-        new("HN-brúkari", .9f, row => row.Username),
-        new("Request ID", 1f, row => row.RequestId)
+        new("HN-brúkari", .9f, row => row.Username, true),
+        new("Request ID", 1f, row => row.RequestId, true)
     ];
 }
