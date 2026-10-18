@@ -41,6 +41,7 @@ public static class HistoryExportEndpointExtensions
                 return ExportLimitProblem(exception);
             }
         })
+        .AllowAnonymous()
         .RequireRateLimiting("exports");
 
     private static IResult ExportLimitProblem(Exception exception) =>

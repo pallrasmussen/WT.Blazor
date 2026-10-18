@@ -24,7 +24,7 @@ public class TrendExportEndpointTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task TrendExportEndpointReturnsExpectedHttpContracts()
+    public async Task PublicTrendExportEndpointReturnsExpectedHttpContracts()
     {
         var (downloadId, limitedId) = await AddWaitingTimesAsync();
 
