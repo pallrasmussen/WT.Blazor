@@ -55,9 +55,16 @@ public sealed class PortalSettingsService(ApplicationDbContext db, PortalSetting
         }
         catch (DbUpdateConcurrencyException exception)
         {
+            db.Entry(current).State = EntityState.Detached;
+            foreach (var auditEntry in db.ChangeTracker.Entries<PortalSettingsAuditEntry>()
+                         .Where(entry => entry.State == EntityState.Added).ToList())
+            {
+                auditEntry.State = EntityState.Detached;
+            }
             throw new PortalSettingsConcurrencyException(exception);
         }
         changeNotifier.NotifyChanged();
+        settings.Version = current.Version;
     }
 
     public async Task<IReadOnlyList<PortalSettingsAuditEntry>> GetRecentChangesAsync(int maximumEntries = 10, CancellationToken cancellationToken = default) =>

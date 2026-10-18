@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System.Globalization;
 using WT.Blazor.Components.Pages;
 using WT.Blazor.Data;
+using WT.Blazor.Localization;
 using WT.Blazor.Models;
 using WT.Blazor.Services;
 using Xunit;
@@ -116,7 +117,7 @@ public class SettingsPageTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             Assert.Equal(1, service.SaveCalls);
-            Assert.Contains("Settings could not be saved. Try again.", cut.Markup);
+            Assert.Contains(AppText.Get("SettingsSaveFailed"), cut.Markup);
             Assert.NotEmpty(cut.FindAll(".dirty-note"));
         });
     }

@@ -4,6 +4,8 @@ param(
     [string]$Time = "02:00",
     [string]$MonitorTaskName = "WT.Blazor Database Backup Monitor",
     [string]$MonitorTime = "08:00",
+    [string]$DatabasePath = "C:\inetpub\wwwroot\WT.Blazor\App_Data\wt-blazor.db",
+    [string]$KeyRingPath = (Join-Path (Split-Path -Parent $DatabasePath) "keys"),
     [string]$BackupPath = "C:\inetpub\backups\WT.Blazor",
     [int]$MaximumBackupAgeHours = 30,
     [string]$SmtpServer,
@@ -28,7 +30,8 @@ if ($MaximumBackupAgeHours -lt 1) {
     throw "MaximumBackupAgeHours must be at least 1."
 }
 
-$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$backupScript`""
+$backupArguments = "-NoProfile -ExecutionPolicy Bypass -File `"$backupScript`" -DatabasePath `"$DatabasePath`" -KeyRingPath `"$KeyRingPath`" -BackupPath `"$BackupPath`""
+$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $backupArguments
 $trigger = New-ScheduledTaskTrigger -Daily -At $scheduledTime
 $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable

@@ -24,7 +24,11 @@ elseif ($backup.Length -eq 0) {
 }
 else {
     $ageHours = ([DateTime]::UtcNow - $backup.LastWriteTimeUtc).TotalHours
-    if ($ageHours -lt -0.1) {
+    $keyBackup = Join-Path $BackupPath "$($backup.BaseName).keys"
+    if (-not (Test-Path $keyBackup -PathType Container)) {
+        $failure = "The newest database backup has no matching Data Protection key-ring archive: $($backup.BaseName).keys."
+    }
+    elseif ($ageHours -lt -0.1) {
         $failure = "The newest database backup has a future timestamp: $($backup.FullName)."
     }
     elseif ($ageHours -gt $MaximumAgeHours) {

@@ -31,6 +31,7 @@ public class PortalSettingsServiceTests
         Assert.Equal(2, settings.GreenMaximumAgeMonths);
         Assert.Equal(5, settings.YellowMaximumAgeMonths);
         Assert.Equal(10, settings.LongWaitMonths);
+        Assert.Equal(2, settings.Version);
         var auditEntry = Assert.Single(await service.GetRecentChangesAsync());
         Assert.Equal("test-user", auditEntry.Username);
         Assert.Equal(PortalSettings.DefaultGreenMaximumAgeMonths, auditEntry.OldGreenMaximumAgeMonths);

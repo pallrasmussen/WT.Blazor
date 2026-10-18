@@ -60,15 +60,25 @@ if ($currentState -ne "Stopped") {
 try {
     $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
     $destination = Join-Path $BackupPath "wt-blazor-$timestamp.db"
+    $keyDestination = Join-Path $BackupPath "wt-blazor-$timestamp.keys"
     Copy-Item -Path $DatabasePath -Destination $destination -ErrorAction Stop
     if (Test-Path $KeyRingPath) {
-        $keyDestination = Join-Path $BackupPath "wt-blazor-$timestamp.keys"
         Copy-Item -Path $KeyRingPath -Destination $keyDestination -Recurse -ErrorAction Stop
         Write-Host "Data Protection key ring backed up: $keyDestination"
     }
     else {
-        Write-Warning "Data Protection key ring not found at $KeyRingPath; database backup was created without it."
+        New-Item -ItemType Directory -Path $keyDestination -Force | Out-Null
+        Write-Host "No Data Protection keys existed at backup time; an empty key-ring archive was created."
     }
+}
+catch {
+    if ($destination -and (Test-Path $destination)) {
+        Remove-Item -LiteralPath $destination -Force -ErrorAction SilentlyContinue
+    }
+    if ($keyDestination -and (Test-Path $keyDestination)) {
+        Remove-Item -LiteralPath $keyDestination -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    throw
 }
 finally {
     Start-AppPool
