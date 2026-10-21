@@ -4,6 +4,7 @@ param(
     [string]$DatabasePath = "C:\inetpub\wwwroot\WT.Blazor\App_Data\wt-blazor.db",
     [string]$KeyRingPath = (Join-Path (Split-Path -Parent $DatabasePath) "keys"),
     [string]$BackupPath = "C:\inetpub\backups\WT.Blazor",
+    [string]$OperationsPath = (Join-Path $PSScriptRoot '../operations/WT.Blazor.Operations.dll'),
     [int]$Keep = 30
 )
 
@@ -63,6 +64,14 @@ try {
     $keyDestination = Join-Path $BackupPath "wt-blazor-$timestamp.keys"
     Copy-Item -Path $DatabasePath -Destination $destination -ErrorAction Stop
     if (Test-Path $KeyRingPath) {
+        if ((Test-Path -LiteralPath $OperationsPath) -and (Get-ChildItem -LiteralPath $KeyRingPath -Filter '*.xml')) {
+            $probeJson = dotnet $OperationsPath backup-probe $KeyRingPath
+            if ($LASTEXITCODE -ne 0) { throw 'Creating the backup-time Data Protection recovery probe failed.' }
+            ($probeJson | ConvertFrom-Json).protectedValue | Set-Content -LiteralPath "$destination.probe" -Encoding ascii
+        }
+        else {
+            Write-Warning 'No operations tool or usable key ring was found. This legacy backup has no recovery probe; use the release bundle for full key-continuity verification.'
+        }
         Copy-Item -Path $KeyRingPath -Destination $keyDestination -Recurse -ErrorAction Stop
         Write-Host "Data Protection key ring backed up: $keyDestination"
     }
@@ -72,6 +81,9 @@ try {
     }
 }
 catch {
+    if ($destination -and (Test-Path -LiteralPath "$destination.probe")) {
+        Remove-Item -LiteralPath "$destination.probe" -Force -ErrorAction SilentlyContinue
+    }
     if ($destination -and (Test-Path $destination)) {
         Remove-Item -LiteralPath $destination -Force -ErrorAction SilentlyContinue
     }
@@ -88,6 +100,8 @@ Get-ChildItem -Path $BackupPath -Filter "wt-blazor-*.db" |
     Sort-Object LastWriteTime -Descending |
     Select-Object -Skip $Keep |
     ForEach-Object {
+        $probeBackup = "$($_.FullName).probe"
+        if (Test-Path -LiteralPath $probeBackup) { Remove-Item -LiteralPath $probeBackup -Force }
         Remove-Item -LiteralPath $_.FullName -Force
         $keyBackup = Join-Path $BackupPath "$($_.BaseName).keys"
         if (Test-Path $keyBackup) {

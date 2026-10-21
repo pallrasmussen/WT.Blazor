@@ -245,6 +245,11 @@
                             @if (quickEditErrorMessage is not null)
                             {
                                 <p class="login-error" role="alert">@quickEditErrorMessage</p>
+                                @if (quickEditConflict)
+                                {
+                                    <p>@AppText.Get("ReloadLatestHint")</p>
+                                    <button class="btn-secondary reload-latest" @onclick="() => ReloadConflictedItemAsync(true)">@AppText.Get("ReloadLatest")</button>
+                                }
                             }
                             @if (confirmDiscardQuickEdit)
                             {
@@ -270,6 +275,11 @@
                 @if (editErrorMessage is not null)
                 {
                     <div class="login-error" @ref="editErrorRef" role="alert" tabindex="-1">@editErrorMessage</div>
+                    @if (editConflict)
+                    {
+                        <p>@AppText.Get("ReloadLatestHint")</p>
+                        <button class="btn-secondary reload-latest" @onclick="() => ReloadConflictedItemAsync(false)">@AppText.Get("ReloadLatest")</button>
+                    }
                 }
                 <div class="edit-form-grid">
                     @if (isSuperAdmin)

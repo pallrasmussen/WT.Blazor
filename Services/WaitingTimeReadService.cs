@@ -117,30 +117,29 @@ public class WaitingTimeReadService(
         if (displayUnit is null) return [];
 
         var historyEntries = db.WaitingTimeHistoryEntries.AsNoTracking()
-            .Where(entry => entry.WaitingTimeId == waitingTimeId && entry.Action == HistoryAction.Updated && entry.NewWaitValue != null);
+            .Where(entry => entry.WaitingTimeId == waitingTimeId && (entry.Action == HistoryAction.Created || entry.Action == HistoryAction.Updated) && entry.NewWaitValue != null);
 
         if (periodDays is null)
         {
             var history = await historyEntries
-                .OrderBy(entry => entry.Timestamp)
+                .OrderBy(entry => entry.Timestamp).ThenBy(entry => entry.Id)
                 .Select(entry => new TrendHistoryPoint(entry.Timestamp, entry.NewWaitValue!.Value, entry.NewUnit, entry.NewWaitDays))
                 .ToListAsync(cancellationToken);
             return TrendPointReducer.Reduce(history, displayUnit.Value);
         }
 
-        var latestTimestamp = await historyEntries.MaxAsync(entry => (DateTime?)entry.Timestamp, cancellationToken);
-        if (latestTimestamp is null) return [];
-
-        var cutoff = latestTimestamp.Value.AddDays(-periodDays.Value);
+        var windowEnd = timeProvider.GetUtcNow().UtcDateTime;
+        var cutoff = windowEnd.AddDays(-periodDays.Value);
+        historyEntries = historyEntries.Where(entry => entry.Timestamp <= windowEnd);
         var latestPointBeforeCutoff = await historyEntries
             .Where(entry => entry.Timestamp < cutoff)
-            .OrderByDescending(entry => entry.Timestamp)
+            .OrderByDescending(entry => entry.Timestamp).ThenByDescending(entry => entry.Id)
             .Take(1)
             .Select(entry => new TrendHistoryPoint(entry.Timestamp, entry.NewWaitValue!.Value, entry.NewUnit, entry.NewWaitDays))
             .ToListAsync(cancellationToken);
         var pointsInPeriod = await historyEntries
             .Where(entry => entry.Timestamp >= cutoff)
-            .OrderBy(entry => entry.Timestamp)
+            .OrderBy(entry => entry.Timestamp).ThenBy(entry => entry.Id)
             .Select(entry => new TrendHistoryPoint(entry.Timestamp, entry.NewWaitValue!.Value, entry.NewUnit, entry.NewWaitDays))
             .ToListAsync(cancellationToken);
 
@@ -172,7 +171,7 @@ public class WaitingTimeReadService(
         if (ids.Count == 0) return [];
 
         var history = db.WaitingTimeHistoryEntries.AsNoTracking()
-            .Where(entry => ids.Contains(entry.WaitingTimeId) && entry.Action == HistoryAction.Updated && entry.NewWaitValue != null);
+            .Where(entry => ids.Contains(entry.WaitingTimeId) && (entry.Action == HistoryAction.Created || entry.Action == HistoryAction.Updated) && entry.NewWaitValue != null);
         // Only the first and last update determine the indicator. Keep historical
         // rows in SQLite rather than materializing the entire audit trail.
         var first = await history.Where(entry => entry.Id == history

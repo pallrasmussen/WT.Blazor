@@ -28,7 +28,7 @@
   <data name="ChangeFilters" xml:space="preserve"><value>Royn at broyta filtreringina ella leitiorðið.</value></data>
   <data name="Trend" xml:space="preserve"><value>Sí gongdina</value></data>
   <data name="TrendHeading" xml:space="preserve"><value>Gongd í bíðitíð</value></data>
-  <data name="TrendDescription" xml:space="preserve"><value>Grafurin vísir, hvussu væntaða bíðitíðin er broytt í einum tíðarskeiði.</value></data>
+  <data name="TrendDescription" xml:space="preserve"><value>Grafurin byggir á skrásettu byrjanarbíðitíðina og dagføringar. Tíðarskeið enda í dag; seinasta skrásetta virðið hvønn dag verður víst. Eingin virði verða gjørd fyri dagar uttan skráseting.</value></data>
   <data name="Current" xml:space="preserve"><value>Nú</value></data>
   <data name="NotFound" xml:space="preserve"><value>Bíðitíðin varð ikki funnin.</value></data>
   <data name="Back" xml:space="preserve"><value>Aftur til bíðitíðir</value></data>
@@ -143,8 +143,8 @@
   <data name="ReviewedByAt" xml:space="preserve"><value>Eftirkannað av {0} · {1:dd.MM.yyyy HH:mm}</value></data>
   <data name="TrendPeriod" xml:space="preserve"><value>Tíðarskeið</value></data>
   <data name="TrendPeriodAll" xml:space="preserve"><value>Alt tíðarskeiðið</value></data>
-  <data name="TrendPeriodThreeMonths" xml:space="preserve"><value>Seinastu 3 mánaðir</value></data>
-  <data name="TrendPeriodYear" xml:space="preserve"><value>Seinasta árið</value></data>
+  <data name="TrendPeriodThreeMonths" xml:space="preserve"><value>Seinastu 90 dagarnar</value></data>
+  <data name="TrendPeriodYear" xml:space="preserve"><value>Seinastu 365 dagarnar</value></data>
   <data name="ExportPreparing" xml:space="preserve"><value>Ger skjalið klárt til niðurtøku...</value></data>
   <data name="ExportLimitMessage" xml:space="preserve"><value>{0} loggpostar passa ikki í eina útskriving. Avmarka úrslitini til í mesta lagi {1}.</value></data>
   <data name="PrintResults" xml:space="preserve"><value>Printa úrslit</value></data>
@@ -243,4 +243,6 @@
   <data name="Inactive" xml:space="preserve"><value>Óvirk</value></data>
   <data name="ReactivatedMessage" xml:space="preserve"><value>{0} er virkjað á almennu síðuni.</value></data>
   <data name="ShowInactive" xml:space="preserve"><value>Vís óvirknar ({0})</value></data>
+  <data name="ReloadLatest" xml:space="preserve"><value>Heinta nýggjastu virðini</value></data>
+  <data name="ReloadLatestHint" xml:space="preserve"><value>Tá ið tú heintar nýggjastu virðini, verða tínar óvistaðu broytingar skiftar út.</value></data>
 </root>
