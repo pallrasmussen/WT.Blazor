@@ -29,11 +29,13 @@ public static class HistoryExportEndpointExtensions
         .RequireRateLimiting("exports");
 
     public static RouteHandlerBuilder MapTrendPdfExport(this IEndpointRouteBuilder endpoints, string pattern) =>
-        endpoints.MapGet(pattern, async (int id, ITrendExportService trendExportService, IOptions<ExportOptions> exportOptions, ILogger<ExportFileResult> logger, CancellationToken cancellationToken) =>
+        endpoints.MapGet(pattern, async (int id, int? periodDays, ITrendExportService trendExportService, IOptions<ExportOptions> exportOptions, ILogger<ExportFileResult> logger, CancellationToken cancellationToken) =>
         {
+            if (!TrendPeriod.IsSupported(periodDays))
+                return Results.Problem(statusCode: StatusCodes.Status400BadRequest, title: "Invalid trend period", detail: "Use 90 or 365 days, or omit periodDays for all history.");
             try
             {
-                var file = await trendExportService.CreatePdfAsync(id, cancellationToken);
+                var file = await trendExportService.CreatePdfAsync(id, cancellationToken, periodDays);
                 return file is null ? Results.NotFound() : new ExportFileResult(file, exportOptions.Value, logger);
             }
             catch (TrendExportLimitExceededException exception)

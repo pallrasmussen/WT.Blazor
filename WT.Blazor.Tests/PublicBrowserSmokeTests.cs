@@ -47,6 +47,7 @@ public class PublicBrowserSmokeTests : IAsyncLifetime
         var chartAccessibleName = await page.Locator("svg.chart-svg[role='img']").GetAttributeAsync("aria-label");
         Assert.False(string.IsNullOrWhiteSpace(chartAccessibleName));
         var exportLink = page.Locator(".trend-actions a");
+        await Assertions.Expect(exportLink).ToHaveAttributeAsync("href", new System.Text.RegularExpressions.Regex(@"/api/trend/\d+/export/pdf\?periodDays=90$"));
         var exportLinkName = (await exportLink.InnerTextAsync()).Trim();
         Assert.False(string.IsNullOrWhiteSpace(exportLinkName));
         await Assertions.Expect(page.GetByRole(AriaRole.Link, new() { Name = exportLinkName })).ToHaveCountAsync(1);
@@ -57,6 +58,7 @@ public class PublicBrowserSmokeTests : IAsyncLifetime
 
         var download = await page.RunAndWaitForDownloadAsync(async () => await exportLink.ClickAsync());
         Assert.EndsWith(".pdf", download.SuggestedFilename, StringComparison.OrdinalIgnoreCase);
+        Assert.EndsWith("_90d.pdf", download.SuggestedFilename, StringComparison.OrdinalIgnoreCase);
     }
 
     [BrowserFact]

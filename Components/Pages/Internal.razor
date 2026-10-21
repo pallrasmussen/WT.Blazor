@@ -120,7 +120,7 @@
                 </div>
                 <div>
                     <label for="new-wait">@AppText.Get("Wait")</label>
-                    <input id="new-wait" type="number" min="0" @bind="createForm.WaitValue" />
+                    <input id="new-wait" type="number" min="0" max="@WaitDuration.MaximumValue(createForm.Unit)" @bind="createForm.WaitValue" />
                 </div>
                 <div>
                     <label for="new-unit">@AppText.Get("Unit")</label>
@@ -210,7 +210,7 @@
                         <div class="admin-quick-edit">
                             <div>
                                 <label for="quick-wait-@item.Id">@AppText.Get("Wait")</label>
-                                <input id="quick-wait-@item.Id" type="number" min="0" @bind="quickEditForm.WaitValue" />
+                                <input id="quick-wait-@item.Id" type="number" min="0" max="@WaitDuration.MaximumValue(quickEditForm.Unit)" @bind="quickEditForm.WaitValue" />
                             </div>
                             <div>
                                 <label for="quick-unit-@item.Id">@AppText.Get("Unit")</label>
@@ -313,7 +313,7 @@
                     }
                     <div class="edit-form-field">
                         <label for="edit-wait">@AppText.Get("Wait")</label>
-                        <input id="edit-wait" type="number" min="0" @bind="editForm.WaitValue" />
+                        <input id="edit-wait" type="number" min="0" max="@WaitDuration.MaximumValue(editForm.Unit)" @bind="editForm.WaitValue" />
                     </div>
                     <div class="edit-form-field">
                         <label for="edit-unit">@AppText.Get("Unit")</label>

@@ -191,4 +191,7 @@
   <data name="LastRefreshed" xml:space="preserve"><value>Last refreshed</value></data>
   <data name="RefreshFailed" xml:space="preserve"><value>Could not load the latest results. Try refreshing again.</value></data>
   <data name="SettingsReloadFailed" xml:space="preserve"><value>Could not reload settings. Your unsaved changes are preserved; try again.</value></data>
+  <data name="MaximumWaitValidation" xml:space="preserve"><value>Enter a waiting time between 0 and {0} for the selected unit.</value></data>
+  <data name="TrendLoadFailed" xml:space="preserve"><value>The trend could not be loaded. Please try again.</value></data>
+  <data name="RetryTrend" xml:space="preserve"><value>Try again</value></data>
 </root>

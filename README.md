@@ -156,3 +156,18 @@ database row so a long-lived circuit does not remain stuck on an old version.
 Audit sorts use the entry ID as a final tie-breaker when other values are equal.
 This stabilizes ordering for tied timestamps; pages are not a frozen snapshot
 when new entries are inserted between requests.
+
+## Trend downloads and duration limits
+
+Trend PDFs use the period currently displayed by the chart: all history, 90 days,
+or 365 days. Filtered downloads include the period in the filename and PDF header.
+The PDF endpoint accepts `periodDays=90` or `periodDays=365`; omit the parameter for
+all history. Unsupported values return HTTP 400. Changing a trend period hides
+the previous chart and export until the latest request succeeds. Failures show a
+retry action, and leaving the page cancels its outstanding work.
+
+Waiting times must fit in a signed 32-bit count of canonical days. Limits are
+2,147,483,647 days, 306,783,378 weeks, or 71,582,788 months (30 days per month).
+Creation and both editing forms enforce the selected unit's limit; server-side
+validation rejects overflowing values before changing records or audit history.
+Existing stored values are not rewritten by this change.

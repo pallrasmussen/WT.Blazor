@@ -1,8 +1,10 @@
 @page "/gongd/{Id:int}"
 @layout Layout.PublicLayout
 @rendermode InteractiveServer
+@implements IDisposable
 @using WT.Blazor.Components.Shared
 @inject ITrendReportService TrendReportService
+@inject ILogger<Trend> Logger
 
 <PageTitle>@(report is null ? $"{AppText.Get("TrendHeading")} | Sjúkrahúsverkið" : $"{report.Name} | Sjúkrahúsverkið")</PageTitle>
 
@@ -15,21 +17,8 @@
     <h1>@AppText.Get("TrendHeading")</h1>
 </section>
 
-<section class="public-panel" aria-labelledby="trend-title">
-    @if (isLoading)
-    {
-        <div class="empty-state">
-            <strong>@AppText.Get("Loading")</strong>
-        </div>
-    }
-    else if (report is null)
-    {
-        <div class="empty-state">
-            <strong>@AppText.Get("NotFound")</strong>
-            <a class="btn-secondary" href="@BackUrl">@AppText.Get("Back")</a>
-        </div>
-    }
-    else
+<section class="public-panel" aria-label="@AppText.Get("TrendHeading")" aria-busy="@(isLoading ? "true" : "false")">
+    @if (report is not null)
     {
         <div class="section-heading">
             <div>
@@ -47,38 +36,104 @@
                 <option value="365">@AppText.Get("TrendPeriodYear")</option>
             </select>
         </div>
+    }
+    @if (isLoading)
+    {
+        <div class="empty-state" role="status"><strong>@AppText.Get("Loading")</strong></div>
+    }
+    else if (loadFailed)
+    {
+        <div class="trend-load-error">
+            <p class="login-error" role="alert">@AppText.Get("TrendLoadFailed")</p>
+            <button type="button" class="btn-secondary retry-trend" @onclick="LoadReportAsync">@AppText.Get("RetryTrend")</button>
+        </div>
+    }
+    else if (report is null)
+    {
+        <div class="empty-state">
+            <strong>@AppText.Get("NotFound")</strong>
+            <a class="btn-secondary" href="@BackUrl">@AppText.Get("Back")</a>
+        </div>
+    }
+    else
+    {
         <WaitTrendChart Points="report.Points" UnitLabel="@report.UnitLabel" />
         <div class="trend-actions">
-            <a class="btn-teal button-link" href="@($"/api/trend/{Id}/export/pdf")">@AppText.Get("ExportPdf")</a>
+            <a class="btn-teal button-link" href="@ExportUrl">@AppText.Get("ExportPdf")</a>
         </div>
     }
 </section>
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
-
-    [SupplyParameterFromQuery(Name = "returnUrl")]
-    public string? ReturnUrl { get; set; }
+    [Parameter] public int Id { get; set; }
+    [SupplyParameterFromQuery(Name = "returnUrl")] public string? ReturnUrl { get; set; }
 
     private TrendReport? report;
     private bool isLoading = true;
+    private bool loadFailed;
+    private bool disposed;
+    private long requestVersion;
+    private int? requestedId;
     private int? selectedPeriodDays;
+    private int? loadedPeriodDays;
+    private readonly CancellationTokenSource lifetime = new();
+    private string ExportUrl => $"/api/trend/{report!.WaitingTimeId}/export/pdf"
+        + (loadedPeriodDays is null ? "" : $"?periodDays={loadedPeriodDays}");
     private string BackUrl => ReturnUrl switch
     {
         { } returnUrl when returnUrl.StartsWith('/') && !returnUrl.StartsWith("//") => returnUrl,
         { } returnUrl when returnUrl.StartsWith('#') => $"/{returnUrl}",
         _ => "/"
     };
+
     protected override async Task OnParametersSetAsync()
     {
+        if (requestedId != Id)
+        {
+            requestedId = Id;
+            selectedPeriodDays = null;
+            report = null;
+        }
         await LoadReportAsync();
     }
 
     private async Task LoadReportAsync()
     {
+        if (disposed) return;
+        var request = ++requestVersion;
+        var id = Id;
+        var period = selectedPeriodDays;
+        var token = lifetime.Token;
         isLoading = true;
-        report = await TrendReportService.GetAsync(Id, periodDays: selectedPeriodDays);
-        isLoading = false;
+        loadFailed = false;
+        try
+        {
+            var loaded = await TrendReportService.GetAsync(id, token, period);
+            if (disposed || request != requestVersion) return;
+            report = loaded;
+            loadedPeriodDays = period;
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+        catch (Exception exception)
+        {
+            if (!disposed && request == requestVersion)
+            {
+                Logger.LogError(exception, "Could not load trend for waiting time {WaitingTimeId}.", id);
+                loadFailed = true;
+            }
+        }
+        finally
+        {
+            if (!disposed && request == requestVersion) isLoading = false;
+        }
+    }
+
+    public void Dispose()
+    {
+        if (disposed) return;
+        disposed = true;
+        requestVersion++;
+        lifetime.Cancel();
+        lifetime.Dispose();
     }
 }
