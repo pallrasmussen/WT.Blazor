@@ -20,6 +20,8 @@ public class NotFoundPageTests : BunitContext
 
         Assert.Contains("Administration access requires sign-in", cut.Markup);
         Assert.Contains("cancel the sign-in prompt", cut.Markup);
+        Assert.Equal("/internal", cut.Find("a[href='/internal']").GetAttribute("href"));
+        Assert.Equal("/", cut.Find("a[href='/']").GetAttribute("href"));
     }
 
     [Fact]

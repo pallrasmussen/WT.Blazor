@@ -116,6 +116,7 @@ button:disabled {
 .internal-user { order: 1; }
 .internal-health, .internal-health-label { white-space: nowrap; }
 .internal-health { align-items: center; color: var(--wt-muted); display: inline-flex; flex: 0 0 auto; font-size: .78rem; font-weight: 700; gap: .45rem; order: 2; text-decoration: none; }
+.internal-health-checked { color: var(--wt-muted); font-size: .7rem; font-weight: 400; }
 .internal-health-indicator { background: #dc2626; border-radius: 50%; box-shadow: 0 0 0 3px rgba(220, 38, 38, .13); height: .55rem; width: .55rem; }
 .internal-health.healthy { color: #176b39; }
 .internal-health.healthy .internal-health-indicator { background: #238636; box-shadow: 0 0 0 3px rgba(35, 134, 54, .13); }
@@ -201,6 +202,10 @@ input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible
 .internal-nav .internal-nav-back:hover { background: transparent; color: white; }
 .internal-nav a:hover, .internal-nav a.active { background: rgba(255,255,255,.14); }
 .internal-content { margin: 0 auto; max-width: 1400px; padding: 4rem 2rem; width: 100%; }
+.internal-breadcrumb { align-items: center; color: var(--wt-muted); display: flex; flex-wrap: wrap; font-size: .85rem; gap: .5rem; margin-bottom: 1.5rem; }
+.internal-breadcrumb a { color: var(--wt-teal); font-weight: 700; text-decoration: none; }
+.internal-breadcrumb a:hover { text-decoration: underline; text-underline-offset: .2rem; }
+.recovery-actions { align-items: center; display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
 .error-request-id { color: var(--wt-muted); font-size: .85rem; overflow-wrap: anywhere; }
 .site-footer { align-items: center; background: var(--wt-ink); border-top: 4px solid var(--wt-teal); color: var(--wt-mist); display: flex; font-size: .78rem; gap: .65rem; justify-content: center; padding: 1rem 1.25rem; text-align: center; }
 .site-footer span + span::before { content: '·'; margin-right: .65rem; }
@@ -226,6 +231,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible
     .internal-body { display: block; }
     .internal-nav-toggle { align-items: center; background: var(--wt-ink); border: 0; color: white; cursor: pointer; display: flex; font: inherit; font-weight: 700; justify-content: space-between; min-height: 3.25rem; padding: .75rem 1.25rem; text-align: left; width: 100%; }
     .internal-nav-toggle::after { content: '\2630'; font-size: 1.2rem; }
+    .internal-nav-toggle[aria-expanded="true"]::after { content: '\00d7'; font-size: 1.6rem; line-height: 1; }
     .internal-nav { display: none; gap: 1rem; padding: 1rem; width: auto; }
     .internal-nav.open { display: grid; }
     .internal-nav a { padding: .75rem .9rem; }

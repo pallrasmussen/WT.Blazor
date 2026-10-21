@@ -10,13 +10,25 @@
 	{
 		<h1>@AppText.Get("AdministrationAccessRequired")</h1>
 		<p>@AppText.Get("AdministrationAccessRequiredText")</p>
-		<a class="btn-secondary" href="/">@AppText.Get("Back")</a>
+		<div class="recovery-actions">
+			@if (IsInternalRequest)
+			{
+				<a class="btn-teal button-link" href="/internal">@AppText.Get("ReturnToAdministration")</a>
+			}
+			<a class="btn-secondary button-link" href="/">@AppText.Get("PublicHome")</a>
+		</div>
 	}
 	else
 	{
 		<h1>@AppText.Get("PageNotFound")</h1>
 		<p>@AppText.Get("PageNotFoundText")</p>
-		<a class="btn-secondary" href="/">@AppText.Get("Back")</a>
+		<div class="recovery-actions">
+			@if (IsInternalRequest)
+			{
+				<a class="btn-teal button-link" href="/internal">@AppText.Get("ReturnToAdministration")</a>
+			}
+			<a class="btn-secondary button-link" href="/">@AppText.Get("PublicHome")</a>
+		</div>
 	}
 </section>
 
@@ -25,6 +37,8 @@
 		.Features.Get<IStatusCodeReExecuteFeature>()?.OriginalStatusCode;
 
 	private bool IsAccessFailure => OriginalStatusCode is StatusCodes.Status401Unauthorized or StatusCodes.Status403Forbidden;
+	private bool IsInternalRequest => HttpContextAccessor.HttpContext?
+		.Features.Get<IStatusCodeReExecuteFeature>()?.OriginalPath.StartsWith("/internal", StringComparison.OrdinalIgnoreCase) == true;
 
 	private string PageTitle => IsAccessFailure
 		? AppText.Get("AdministrationAccessRequired")

@@ -32,7 +32,13 @@
   <data name="Current" xml:space="preserve"><value>Nú</value></data>
   <data name="NotFound" xml:space="preserve"><value>Bíðitíðin varð ikki funnin.</value></data>
   <data name="Back" xml:space="preserve"><value>Aftur til bíðitíðir</value></data>
+  <data name="PublicHome" xml:space="preserve"><value>Almenn forsíða</value></data>
+  <data name="ReturnToAdministration" xml:space="preserve"><value>Aftur til umsiting</value></data>
   <data name="Administration" xml:space="preserve"><value>Umsiting</value></data>
+  <data name="NavigationMenuForPage" xml:space="preserve"><value>Valmynd: {0}</value></data>
+  <data name="CloseNavigationMenu" xml:space="preserve"><value>Lat aftur valmynd</value></data>
+  <data name="ViewSystemStatus" xml:space="preserve"><value>Vís skipanastøðu</value></data>
+  <data name="HealthCheckedAt" xml:space="preserve"><value>Kannað {0:g}</value></data>
   <data name="AdministrationAccessRequired" xml:space="preserve"><value>Atgongd til umsiting krevur innriting</value></data>
   <data name="AdministrationAccessRequiredText" xml:space="preserve"><value>Rita inn við einum Heilsunet-brúkara, sum er limur í einum góðkendum bólki. Um tú avbrýtur innritingina ella upplýsingarnar ikki verða góðtiknar, kanst tú ikki opna umsitingina.</value></data>
   <data name="PageNotFound" xml:space="preserve"><value>Síðan finst ikki</value></data>

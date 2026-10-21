@@ -14,8 +14,10 @@
         @if (!string.IsNullOrEmpty(userName))
         {
             <div class="internal-header-status">
-                <a class="internal-health @(isHealthy ? "healthy" : "unhealthy")" href="/internal/operations" aria-label="@AppText.Get("SystemStatus")" title="@(isHealthy ? AppText.Get("DatabaseHealthy") : AppText.Get("DatabaseUnverified"))">
-                    <span class="internal-health-indicator" aria-hidden="true"></span><span class="internal-health-label">@(isHealthy ? AppText.Get("SystemHealthy") : AppText.Get("CheckSystem"))</span>
+                <a class="internal-health @(isHealthy ? "healthy" : "unhealthy")" href="/internal/operations" aria-label="@AppText.Get("ViewSystemStatus")" title="@HealthStatusTitle">
+                    <span class="internal-health-indicator" aria-hidden="true"></span>
+                    <span class="internal-health-label">@(isHealthy ? AppText.Get("SystemHealthy") : AppText.Get("CheckSystem"))</span>
+                    <span class="internal-health-checked">@string.Format(AppText.Get("HealthCheckedAt"), healthCheckedAt)</span>
                 </a>
                 <span class="internal-user">
                     <span class="internal-badge">@userName</span>
@@ -25,7 +27,9 @@
         }
     </header>
     <button class="internal-nav-toggle" type="button" aria-controls="internal-navigation" aria-expanded="@(navigationOpen ? "true" : "false")" @onclick="ToggleNavigation">
-        @AppText.Get("NavigationMenu")
+        @(navigationOpen
+            ? AppText.Get("CloseNavigationMenu")
+            : string.Format(AppText.Get("NavigationMenuForPage"), CurrentPageLabel))
     </button>
     <div class="internal-body">
         <nav id="internal-navigation" class="internal-nav @(navigationOpen ? "open" : "")" aria-label="@AppText.Get("InternalNavigation")">
@@ -45,6 +49,18 @@
             </div>
         </nav>
         <main id="internal-content" class="internal-content" tabindex="-1">
+            <nav class="internal-breadcrumb" aria-label="@AppText.Get("Breadcrumb")">
+                @if (IsWaitingTimesRoute)
+                {
+                    <span aria-current="page">@AppText.Get("Administration")</span>
+                }
+                else
+                {
+                    <a href="/internal">@AppText.Get("Administration")</a>
+                    <span aria-hidden="true">/</span>
+                    <span aria-current="page">@CurrentPageLabel</span>
+                }
+            </nav>
             @Body
         </main>
     </div>
@@ -65,6 +81,14 @@
     private bool IsOperationsRoute => CurrentPath.StartsWith("/internal/operations", StringComparison.OrdinalIgnoreCase);
     private bool IsSettingsRoute => CurrentPath.StartsWith("/internal/settings", StringComparison.OrdinalIgnoreCase);
     private bool navigationOpen;
+    private string CurrentPageLabel => IsHistoryRoute
+        ? AppText.Get("History")
+        : IsOperationsRoute
+            ? AppText.Get("Operations")
+            : IsSettingsRoute
+                ? AppText.Get("Settings")
+                : AppText.Get("Administration");
+    private string HealthStatusTitle => $"{(isHealthy ? AppText.Get("DatabaseHealthy") : AppText.Get("DatabaseUnverified"))}. {string.Format(AppText.Get("HealthCheckedAt"), healthCheckedAt)}";
 
     protected override void OnInitialized()
     {

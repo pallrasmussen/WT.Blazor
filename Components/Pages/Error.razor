@@ -1,6 +1,7 @@
 ﻿@page "/Error"
 @layout Layout.PublicLayout
 @using System.Diagnostics
+@using Microsoft.AspNetCore.Diagnostics
 
 <PageTitle>@AppText.Get("ApplicationError") | @AppText.Get("HospitalService")</PageTitle>
 
@@ -11,7 +12,13 @@
     {
         <p class="error-request-id">@AppText.Get("ErrorRequestId"): <code>@RequestId</code></p>
     }
-    <a class="btn-secondary" href="/">@AppText.Get("Back")</a>
+    <div class="recovery-actions">
+        @if (IsInternalRequest)
+        {
+            <a class="btn-teal button-link" href="/internal">@AppText.Get("ReturnToAdministration")</a>
+        }
+        <a class="btn-secondary button-link" href="/">@AppText.Get("PublicHome")</a>
+    </div>
 </section>
 
 @code{
@@ -20,6 +27,8 @@
 
     private string? RequestId { get; set; }
     private bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+    private bool IsInternalRequest => HttpContext?.Features.Get<IExceptionHandlerPathFeature>()?
+        .Path.StartsWith("/internal", StringComparison.OrdinalIgnoreCase) == true;
 
     protected override void OnInitialized() =>
         RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;

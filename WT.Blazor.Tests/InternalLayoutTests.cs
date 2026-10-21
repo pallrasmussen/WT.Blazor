@@ -50,6 +50,7 @@ public class InternalLayoutTests : BunitContext
         Assert.Equal("Administration navigation", cut.Find("nav#internal-navigation").GetAttribute("aria-label"));
         Assert.Equal("page", cut.Find("a[href='/internal']").GetAttribute("aria-current"));
         Assert.Empty(cut.FindAll("a[href='/internal?new=true']"));
+        Assert.Equal("Administration", cut.Find(".internal-breadcrumb [aria-current='page']").TextContent);
     }
 
     [Fact]
@@ -64,9 +65,11 @@ public class InternalLayoutTests : BunitContext
         var toggle = cut.Find("button.internal-nav-toggle");
 
         Assert.Equal("false", toggle.GetAttribute("aria-expanded"));
+        Assert.Contains("Menu: Administration", toggle.TextContent);
         toggle.Click();
 
         Assert.Equal("true", toggle.GetAttribute("aria-expanded"));
+        Assert.Contains("Close menu", toggle.TextContent);
         Assert.Contains("open", cut.Find("nav#internal-navigation").ClassList);
     }
 
