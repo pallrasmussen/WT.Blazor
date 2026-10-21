@@ -76,7 +76,9 @@ locally on Windows with:
 The runner creates a Development-only demo fixture, waits for health, captures
 logs and TRX results, and always stops the process it started. No production
 database is used. Windows-role browser tests still require isolated IIS staging
-and a dedicated Windows identity per role; use Run-AuthenticatedBrowserSmoke.ps1.
+and a dedicated Windows identity per role. Configure the repository variables
+documented in [staging browser checks](docs/STAGING-BROWSER-CHECKS.md) to run
+them on a schedule, or dispatch the workflow with a runner label and staging URL.
 The component suite also verifies a real two-context edit collision, preservation
 of unsaved input, explicit reload, and successful retry for full and quick edit.
 
@@ -96,8 +98,9 @@ a creation entry. Demo entries remain visible until explicitly remediated after 
 Push a version tag such as `v0.2.0`, or run the Release package workflow with a
 version. It runs validation, then publishes one package containing `app/`,
 `operations/`, `deploy/`, `docs/`, and a manifest of SHA-256 hashes. Download both
-the ZIP and its `.sha256` sidecar from the workflow artifacts. Archive approved
-packages in your release store before GitHub's artifact retention expires.
+the ZIP and its `.sha256` sidecar from the GitHub Release. Tagged releases also
+include an SPDX SBOM and build provenance attestation. Workflow artifacts remain
+available for manually dispatched pre-release packages.
 
 ```powershell
 .\deploy\Expand-Release.ps1 -PackagePath C:\releases\WT.Blazor-0.2.0.zip -DestinationPath C:\releases\0.2.0
@@ -121,6 +124,7 @@ HTTP endpoints.
 ```powershell
 .\deploy\Review-DemoHistory.ps1 -DatabasePath C:\backups\wt-blazor-20261021-020000.db -ReportPath C:\reviews\demo-history.json
 .\deploy\Test-BackupRestore.ps1 -BackupPath C:\backups -WorkPath C:\recovery-drills
+.\deploy\Install-RecoveryDrillTask.ps1 -BackupPath C:\backups -OperationsPath C:\releases\0.2.0\operations\WT.Blazor.Operations.dll
 ```
 
 The demo report groups suspected entries (`Username=demo` or `Detail=Demo`) by
@@ -138,6 +142,11 @@ they contain restored data and keys. Run under an identity able to decrypt the
 archived keys if keys are protected by Windows or a certificate. The tool does not
 test live AD membership, IIS bindings, or real users' sessions; complete those checks
 on isolated IIS staging with the existing authenticated browser scripts.
+
+The recovery-drill installation script schedules an isolated verification every
+four weeks and a paired monitor. Provide SMTP arguments to receive an alert for
+an overdue or failed drill. It runs under `SYSTEM`; make sure that identity can
+read the backup, matching key archive, and configured drill directory.
 
 ## Refreshing public results and resolving settings conflicts
 

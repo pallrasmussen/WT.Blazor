@@ -18,6 +18,7 @@ public class HomePageTests : BunitContext
         Services.AddSingleton<ITrendReadService>(new EmptyTrendReadService());
         Services.AddSingleton<IPortalSettingsService>(new DefaultPortalSettingsService());
         Services.AddSingleton<PortalSettingsChangeNotifier>();
+        Services.AddSingleton<PortalTelemetry>();
         Services.AddSingleton(TimeProvider.System);
         var navigationManager = Services.GetRequiredService<NavigationManager>();
         navigationManager.NavigateTo("/?sort=wait-desc&updated=stale");
@@ -42,6 +43,7 @@ public class HomePageTests : BunitContext
         Services.AddSingleton<ITrendReadService>(new EmptyTrendReadService());
         Services.AddSingleton<IPortalSettingsService>(new DefaultPortalSettingsService());
         Services.AddSingleton<PortalSettingsChangeNotifier>();
+        Services.AddSingleton<PortalTelemetry>();
         Services.AddSingleton(TimeProvider.System);
 
         var cut = Render<Home>();

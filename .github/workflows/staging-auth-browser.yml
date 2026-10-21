@@ -1,0 +1,81 @@
+name: Authenticated staging browser checks
+
+on:
+  workflow_dispatch:
+    inputs:
+      role:
+        description: Windows role represented by the selected runner
+        required: true
+        type: choice
+        options: [Viewer, Contributor, Admin]
+      runner_label:
+        description: Label of the self-hosted Windows runner using that role's identity
+        required: true
+        type: string
+      base_url:
+        description: Isolated staging site URL
+        required: true
+        type: string
+  schedule:
+    - cron: "0 5 * * 1-5"
+
+permissions:
+  contents: read
+
+jobs:
+  viewer:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.role == 'Viewer') ||
+      (github.event_name == 'schedule' && vars.STAGING_BROWSER_ENABLED == 'true')
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_label || vars.STAGING_VIEWER_RUNNER_LABEL }}
+    environment: staging
+    env:
+      BROWSER_BASE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.base_url || vars.STAGING_BROWSER_BASE_URL }}
+      RUN_AUTH_BROWSER_TESTS: "1"
+      STAGING_BROWSER_ROLE: Viewer
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet restore .\WT.Blazor.Tests\WT.Blazor.Tests.csproj
+      - run: .\tests\Install-PlaywrightBrowsers.ps1
+      - run: dotnet test .\WT.Blazor.Tests\WT.Blazor.Tests.csproj --no-restore --filter "FullyQualifiedName~AuthenticatedStagingBrowserSmokeTests"
+
+  contributor:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.role == 'Contributor') ||
+      (github.event_name == 'schedule' && vars.STAGING_BROWSER_ENABLED == 'true')
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_label || vars.STAGING_CONTRIBUTOR_RUNNER_LABEL }}
+    environment: staging
+    env:
+      BROWSER_BASE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.base_url || vars.STAGING_BROWSER_BASE_URL }}
+      RUN_AUTH_BROWSER_TESTS: "1"
+      STAGING_BROWSER_ROLE: Contributor
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet restore .\WT.Blazor.Tests\WT.Blazor.Tests.csproj
+      - run: .\tests\Install-PlaywrightBrowsers.ps1
+      - run: dotnet test .\WT.Blazor.Tests\WT.Blazor.Tests.csproj --no-restore --filter "FullyQualifiedName~AuthenticatedStagingBrowserSmokeTests"
+
+  admin:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.role == 'Admin') ||
+      (github.event_name == 'schedule' && vars.STAGING_BROWSER_ENABLED == 'true')
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_label || vars.STAGING_ADMIN_RUNNER_LABEL }}
+    environment: staging
+    env:
+      BROWSER_BASE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.base_url || vars.STAGING_BROWSER_BASE_URL }}
+      RUN_AUTH_BROWSER_TESTS: "1"
+      STAGING_BROWSER_ROLE: Admin
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet restore .\WT.Blazor.Tests\WT.Blazor.Tests.csproj
+      - run: .\tests\Install-PlaywrightBrowsers.ps1
+      - run: dotnet test .\WT.Blazor.Tests\WT.Blazor.Tests.csproj --no-restore --filter "FullyQualifiedName~AuthenticatedStagingBrowserSmokeTests"

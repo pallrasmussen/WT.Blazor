@@ -92,6 +92,7 @@ public class HomeRefreshTests : BunitContext
         Services.AddSingleton(trends);
         Services.AddSingleton<IPortalSettingsService>(new DefaultSettings());
         Services.AddSingleton<PortalSettingsChangeNotifier>();
+        Services.AddSingleton<PortalTelemetry>();
         Services.AddSingleton(clock);
     }
 

@@ -6,10 +6,10 @@
 - [ ] Run `tests\Test-WithCoverage.ps1` and keep total coverage at or above 80% line and 52% branch.
 - [ ] Ensure CI's NuGet vulnerability audit and `dotnet format --verify-no-changes` quality gates pass.
 - [ ] Confirm the daily database backup and freshness-monitor scheduled tasks both ran successfully; respond to any stale/missing backup alert.
-- [ ] Monthly, run `deploy/Test-BackupRestore.ps1` from the release bundle against the newest database and matching key archive. Confirm record counts, settings, migration history, integrity, foreign keys, file hashes and key continuity; then verify Windows-role workflows on isolated IIS staging.
+- [ ] Install `deploy/Install-RecoveryDrillTask.ps1` from the release bundle and confirm its latest scheduled recovery drill passed. Investigate any monitor alert immediately.
 - [ ] After `tests\Install-PlaywrightBrowsers.ps1`, run `tests\Run-BrowserSmoke.ps1 -BaseUrl http://SERVER-NAME:8081` for the public browser workflow.
 - [ ] Run `dotnet ef migrations has-pending-model-changes --no-build`.
-- [ ] Obtain the versioned ZIP and SHA-256 file from the release workflow. Verify and extract with `deploy/Expand-Release.ps1`; promote this same package through staging and production without rebuilding.
+- [ ] Obtain the versioned ZIP, SHA-256, SPDX SBOM, and provenance attestation from the GitHub Release. Verify and extract the ZIP with `deploy/Expand-Release.ps1`; promote this same package through staging and production without rebuilding.
 - [ ] Confirm the release manifest exists in `WT.Blazor-publish`.
 - [ ] Confirm the real Viewer, Contributor, and Admin group names for the IIS command.
 - [ ] On the isolated IIS staging site, verify Viewer, Contributor, and Admin workflows with dedicated test accounts before production deployment.

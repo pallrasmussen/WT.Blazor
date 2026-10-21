@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -109,6 +110,8 @@ builder.Services.AddScoped<IOperationsReadService>(services => services.GetRequi
 builder.Services.AddScoped<ITrendReadService>(services => services.GetRequiredService<WaitingTimeReadService>());
 builder.Services.AddScoped<IWaitingTimeManagementService, WaitingTimeManagementService>();
 builder.Services.AddSingleton<PortalSettingsChangeNotifier>();
+builder.Services.AddSingleton<PortalTelemetry>();
+builder.Services.AddScoped<CircuitHandler, CircuitTelemetryHandler>();
 builder.Services.AddScoped<IPortalSettingsService, PortalSettingsService>();
 builder.Services.AddScoped<IHistoryExportService, HistoryExportService>();
 builder.Services.AddScoped<ITrendExportService, TrendExportService>();

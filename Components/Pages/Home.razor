@@ -10,6 +10,7 @@
 @inject TimeProvider TimeProvider
 @inject NavigationManager NavigationManager
 @inject ILogger<Home> Logger
+@inject PortalTelemetry Telemetry
 
 <PageTitle>Bíðitíðir | Sjúkrahúsverkið</PageTitle>
 
@@ -38,7 +39,7 @@
 			}
 		</div>
 		<div class="utility-actions">
-            <button type="button" class="btn-secondary refresh-results" @onclick="RefreshAsync" disabled="@isLoading">@AppText.Get("RefreshResults")</button>
+            <button type="button" class="btn-secondary refresh-results" @onclick="() => RefreshAsync()" disabled="@isLoading">@AppText.Get("RefreshResults")</button>
 			@if (!isLoading && visibleItems.Count > 0)
 			{
 				<button type="button" class="print-results" onclick="window.print()" title="@AppText.Get("PrintResults")"><span class="print-icon" aria-hidden="true">&#128424;</span><span>@AppText.Get("Print")</span></button>
@@ -205,14 +206,14 @@
 		selectedPreset = PresetFor(hospital);
 		searchText = QuerySearch ?? "";
 		hasSearched = true;
-		await LoadItemsAsync(hospital, department);
+		await LoadItemsAsync(hospital, department, source: "initial");
 	}
 
 	protected override void OnInitialized() => PortalSettingsNotifier.Changed += HandleSettingsChanged;
 
     private void HandleSettingsChanged(object? sender, EventArgs args) => _ = InvokeAsync(async () =>
     {
-        await RefreshAsync();
+        await RefreshAsync("settings-change");
         if (!disposed) StateHasChanged();
     });
 
@@ -231,7 +232,7 @@
 		selectedPreset = AllPreset;
 		UpdateUrl();
 		hasSearched = true;
-		await LoadItemsAsync(null, null, clearResults: true);
+		await LoadItemsAsync(null, null, clearResults: true, source: "filters-cleared");
 	}
 
 	private async Task ApplyPresetAsync(string preset)
@@ -248,16 +249,17 @@
 		selectedDepartmentName = "";
 		UpdateUrl();
 		hasSearched = true;
-		await LoadItemsAsync(DisplayNames.TryHospitalFrom(selectedHospitalName), null, clearResults: true);
+		await LoadItemsAsync(DisplayNames.TryHospitalFrom(selectedHospitalName), null, clearResults: true, source: "preset");
 	}
 
-    private Task RefreshAsync() => LoadItemsAsync(
-        DisplayNames.TryHospitalFrom(selectedHospitalName), DisplayNames.TryDepartmentFrom(selectedDepartmentName));
+    private Task RefreshAsync(string source = "manual") => LoadItemsAsync(
+        DisplayNames.TryHospitalFrom(selectedHospitalName), DisplayNames.TryDepartmentFrom(selectedDepartmentName), source: source);
 
-    private async Task LoadItemsAsync(Hospital? hospital, Department? department, bool clearResults = false)
+    private async Task LoadItemsAsync(Hospital? hospital, Department? department, bool clearResults = false, string source = "unknown")
     {
         if (disposed) return;
         var request = ++loadVersion;
+        Telemetry.RecordPublicRefreshStarted(source);
         isLoading = true;
         loadFailed = false;
         if (clearResults)
@@ -269,22 +271,40 @@
         try
         {
             var loadedItems = await WaitingTimeCatalog.GetActiveAsync(hospital, department);
-            if (disposed || request != loadVersion) return;
+            if (disposed || request != loadVersion)
+            {
+                Telemetry.RecordPublicRefreshDiscarded(source);
+                Logger.LogDebug("Discarded superseded public waiting-time refresh from {Source}.", source);
+                return;
+            }
             var loadedTrends = await TrendReader.GetTrendChangesAsync(loadedItems.Select(item => item.Id));
-            if (disposed || request != loadVersion) return;
+            if (disposed || request != loadVersion)
+            {
+                Telemetry.RecordPublicRefreshDiscarded(source);
+                Logger.LogDebug("Discarded superseded public waiting-time refresh from {Source}.", source);
+                return;
+            }
             var loadedSettings = await PortalSettingsReader.GetAsync();
-            if (disposed || request != loadVersion) return;
+            if (disposed || request != loadVersion)
+            {
+                Telemetry.RecordPublicRefreshDiscarded(source);
+                Logger.LogDebug("Discarded superseded public waiting-time refresh from {Source}.", source);
+                return;
+            }
             // Publish a complete result only if this is still the latest request.
             items = loadedItems;
             trendChanges = loadedTrends;
             portalSettings = loadedSettings;
             lastRefreshed = TimeProvider.GetLocalNow();
+            Telemetry.RecordPublicRefreshSucceeded(source);
+            Logger.LogDebug("Completed public waiting-time refresh from {Source} with {ItemCount} items.", source, loadedItems.Count);
         }
         catch (Exception exception)
         {
             if (!disposed && request == loadVersion)
             {
-                Logger.LogError(exception, "Could not load public waiting times.");
+                Telemetry.RecordPublicRefreshFailed(source);
+                Logger.LogError(exception, "Could not load public waiting times from {Source}.", source);
                 loadFailed = true;
             }
         }
