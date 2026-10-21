@@ -50,7 +50,11 @@ public class WaitingTimeManagementService(
         var requestId = RequestId();
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var entity = await db.WaitingTimes.FindAsync(update.Id) ?? throw new WaitingTimeNotFoundException(update.Id);
-        if (entity.Version != update.ExpectedVersion) throw new WaitingTimeConcurrencyException();
+        if (entity.Version != update.ExpectedVersion)
+        {
+            db.ChangeTracker.Clear();
+            throw new WaitingTimeConcurrencyException();
+        }
         db.Entry(entity).Property(waitingTime => waitingTime.Version).OriginalValue = update.ExpectedVersion;
 
         var oldWait = entity.WaitValue;
@@ -96,7 +100,11 @@ public class WaitingTimeManagementService(
         var requestId = RequestId();
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var entity = await db.WaitingTimes.FindAsync(id) ?? throw new WaitingTimeNotFoundException(id);
-        if (entity.Version != expectedVersion) throw new WaitingTimeConcurrencyException();
+        if (entity.Version != expectedVersion)
+        {
+            db.ChangeTracker.Clear();
+            throw new WaitingTimeConcurrencyException();
+        }
         db.Entry(entity).Property(waitingTime => waitingTime.Version).OriginalValue = expectedVersion;
         entity.IsActive = false;
         entity.Version++;
@@ -117,7 +125,11 @@ public class WaitingTimeManagementService(
         var requestId = RequestId();
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var entity = await db.WaitingTimes.FindAsync(id) ?? throw new WaitingTimeNotFoundException(id);
-        if (entity.Version != expectedVersion) throw new WaitingTimeConcurrencyException();
+        if (entity.Version != expectedVersion)
+        {
+            db.ChangeTracker.Clear();
+            throw new WaitingTimeConcurrencyException();
+        }
         db.Entry(entity).Property(waitingTime => waitingTime.Version).OriginalValue = expectedVersion;
 
         entity.IsActive = true;
@@ -143,7 +155,11 @@ public class WaitingTimeManagementService(
         var requestId = RequestId();
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var entity = await db.WaitingTimes.FindAsync(id) ?? throw new WaitingTimeNotFoundException(id);
-        if (entity.Version != expectedVersion) throw new WaitingTimeConcurrencyException();
+        if (entity.Version != expectedVersion)
+        {
+            db.ChangeTracker.Clear();
+            throw new WaitingTimeConcurrencyException();
+        }
         db.Entry(entity).Property(waitingTime => waitingTime.Version).OriginalValue = expectedVersion;
 
         entity.UpdatedAt = now;

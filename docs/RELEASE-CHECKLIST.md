@@ -6,10 +6,10 @@
 - [ ] Run `tests\Test-WithCoverage.ps1` and keep total coverage at or above 80% line and 52% branch.
 - [ ] Ensure CI's NuGet vulnerability audit and `dotnet format --verify-no-changes` quality gates pass.
 - [ ] Confirm the daily database backup and freshness-monitor scheduled tasks both ran successfully; respond to any stale/missing backup alert.
-- [ ] Monthly, restore the newest database and matching Data Protection key archive in an isolated location, then confirm the SQLite integrity check succeeds.
+- [ ] Monthly, run `deploy/Test-BackupRestore.ps1` from the release bundle against the newest database and matching key archive. Confirm record counts, settings, migration history, integrity, foreign keys, file hashes and key continuity; then verify Windows-role workflows on isolated IIS staging.
 - [ ] After `tests\Install-PlaywrightBrowsers.ps1`, run `tests\Run-BrowserSmoke.ps1 -BaseUrl http://SERVER-NAME:8081` for the public browser workflow.
 - [ ] Run `dotnet ef migrations has-pending-model-changes --no-build`.
-- [ ] Publish with `dotnet publish .\WT.Blazor.csproj -c Release -o ..\WT.Blazor-publish --no-restore`.
+- [ ] Obtain the versioned ZIP and SHA-256 file from the release workflow. Verify and extract with `deploy/Expand-Release.ps1`; promote this same package through staging and production without rebuilding.
 - [ ] Confirm the release manifest exists in `WT.Blazor-publish`.
 - [ ] Confirm the real Viewer, Contributor, and Admin group names for the IIS command.
 - [ ] On the isolated IIS staging site, verify Viewer, Contributor, and Admin workflows with dedicated test accounts before production deployment.
@@ -22,6 +22,8 @@
 - [ ] Confirm the IIS application pool is started and WebSockets are enabled.
 - [ ] Confirm the backup and backup-monitor tasks are enabled and the backup destination is access-restricted.
 - [ ] For HTTPS, provide both `-CertificateThumbprint` and `-HostName`, then confirm the HTTPS smoke test passes.
+
+- [ ] Run `deploy/Review-DemoHistory.ps1` against a backup and review any flagged records. Preserve the immutable audit history.
 
 ## Acceptance check
 

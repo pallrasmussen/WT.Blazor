@@ -67,6 +67,8 @@ public partial class Internal
     private WaitingTime? editItem;
     private readonly WaitingTimeFormState editForm = new();
     private string? editErrorMessage;
+    private bool editConflict;
+    private bool quickEditConflict;
     private ElementReference editModalRef;
     private ElementReference editErrorRef;
     private bool shouldFocusEditModal;
@@ -262,6 +264,7 @@ public partial class Internal
         editItem = item;
         editForm.Load(item);
         editErrorMessage = null;
+        editConflict = false;
         showEditPreview = false;
         confirmDiscardEdit = false;
         shouldFocusEditModal = true;
@@ -301,6 +304,7 @@ public partial class Internal
         quickEditItem = item;
         quickEditForm.Load(item);
         quickEditErrorMessage = null;
+        quickEditConflict = false;
         showQuickEditPreview = false;
         confirmDiscardQuickEdit = false;
     }
@@ -309,6 +313,7 @@ public partial class Internal
     {
         quickEditItem = null;
         quickEditErrorMessage = null;
+        quickEditConflict = false;
         confirmDiscardQuickEdit = false;
         showQuickEditPreview = false;
     }
@@ -415,6 +420,7 @@ public partial class Internal
         }
         catch (WaitingTimeConcurrencyException)
         {
+            editConflict = true;
             SetEditError(AppText.Get("WaitingTimeConflict"));
             return;
         }
@@ -452,6 +458,7 @@ public partial class Internal
         var previous = WaitingTimeSnapshot.From(quickEditItem);
         isQuickSaving = true;
         quickEditErrorMessage = null;
+        quickEditConflict = false;
         try
         {
             await WaitingTimeManager.UpdateAsync(new WaitingTimeUpdate(
@@ -475,6 +482,7 @@ public partial class Internal
         }
         catch (WaitingTimeConcurrencyException)
         {
+            quickEditConflict = true;
             quickEditErrorMessage = AppText.Get("WaitingTimeConflict");
         }
         catch (WaitingTimeNotFoundException)
@@ -485,6 +493,22 @@ public partial class Internal
         {
             isQuickSaving = false;
         }
+    }
+
+    private async Task ReloadConflictedItemAsync(bool quick)
+    {
+        var id = (quick ? quickEditItem : editItem)?.Id;
+        await LoadAsync();
+        var latest = items.FirstOrDefault(item => item.Id == id && item.IsActive);
+        if (latest is null)
+        {
+            CloseEdit();
+            CloseQuickEdit();
+            ShowStatus(AppText.Get("WaitingTimeNotFound"));
+            return;
+        }
+        if (quick) OpenQuickEdit(latest);
+        else OpenEdit(latest);
     }
 
     private void SetEditError(string message)

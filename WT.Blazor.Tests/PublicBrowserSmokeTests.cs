@@ -61,10 +61,13 @@ public class PublicBrowserSmokeTests : IAsyncLifetime
 
         var skipLink = page.Locator("a.skip-link");
         await Assertions.Expect(skipLink).ToHaveAttributeAsync("href", "#public-content");
+        // Blazor focuses the page heading on navigation. Start this tab-order
+        // assertion at the beginning of the document rather than at that heading.
+        await page.Locator("body").EvaluateAsync("element => { element.tabIndex = -1; element.focus(); element.removeAttribute('tabindex'); }");
         await page.Keyboard.PressAsync("Tab");
-        Assert.True(await skipLink.EvaluateAsync<bool>("element => element === document.activeElement"));
+        await Assertions.Expect(skipLink).ToBeFocusedAsync();
         await page.Keyboard.PressAsync("Enter");
-        Assert.True(await page.Locator("#public-content").EvaluateAsync<bool>("element => element === document.activeElement"));
+        await Assertions.Expect(page.Locator("#public-content")).ToBeFocusedAsync();
 
         await Assertions.Expect(page.GetByRole(AriaRole.Main)).ToHaveCountAsync(1);
         await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Level = 1 })).ToHaveCountAsync(1);
@@ -101,6 +104,6 @@ public sealed class BrowserFactAttribute : FactAttribute
     {
         if (!string.Equals(Environment.GetEnvironmentVariable("RUN_BROWSER_TESTS"), "1", StringComparison.Ordinal)
             || string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("BROWSER_BASE_URL")))
-            Skip = "Set RUN_BROWSER_TESTS=1 and BROWSER_BASE_URL to an IIS staging URL after installing Playwright Chromium.";
+            Skip = "Set RUN_BROWSER_TESTS=1 and BROWSER_BASE_URL to a running test site after installing Playwright Chromium, or use tests/Run-LocalBrowserSmoke.ps1.";
     }
 }

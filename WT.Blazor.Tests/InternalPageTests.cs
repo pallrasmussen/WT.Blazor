@@ -1,3 +1,8 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
+using WT.Blazor.Data;
 using Bunit;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -190,13 +195,67 @@ public class InternalPageTests : BunitContext
         cut.WaitForAssertion(() => Assert.Equal(5, manager.UpdateRequest?.WaitValue));
     }
 
-    private IRenderedComponent<CascadingAuthenticationState> RenderInternal(WaitingTimeManager manager, bool openCreateForm = false, bool reviewQueue = false)
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task TwoUsersCanReloadAndRetryAfterASaveTimeConflict(bool quick)
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connection).Options;
+        await using var firstDb = new ApplicationDbContext(options);
+        await using var secondDb = new ApplicationDbContext(options);
+        await firstDb.Database.EnsureCreatedAsync();
+        var clock = new OldTimeProvider();
+        WT.Blazor.Services.WaitingTimeManagementService Manager(ApplicationDbContext db) =>
+            new(db, NullLogger<WT.Blazor.Services.WaitingTimeManagementService>.Instance, new HttpContextAccessor(), clock);
+        var first = Manager(firstDb);
+        var item = await first.CreateAsync(new WaitingTimeCreate("Two-user record", Hospital.Klaksvikar, null, 2, WaitUnit.Vikur, null, "first"));
+        await secondDb.WaitingTimes.FindAsync(item.Id);
+        var reader = new WaitingTimeReadService(secondDb, clock);
+        var cut = RenderInternal(Manager(secondDb), reviewQueue: quick, catalog: reader, history: reader);
+        cut.WaitForAssertion(() => Assert.Contains("Two-user record", cut.Markup));
+        if (quick) cut.Find(".admin-list").KeyDown("ArrowDown");
+        else cut.FindAll("button").Single(button => button.TextContent == AppText.Get("Edit")).Click();
+        var input = quick ? $"#quick-wait-{item.Id}" : "#edit-wait";
+        cut.WaitForAssertion(() => Assert.Single(cut.FindAll(input)));
+        cut.Find(input).Change("9");
+
+        await first.UpdateAsync(new WaitingTimeUpdate(item.Id, 1, item.Name, Hospital.Klaksvikar, null, 5, WaitUnit.Vikur, null, "first"));
+        void Save()
+        {
+            cut.FindAll("button").Single(button => button.TextContent == AppText.Get("SaveChanges")).Click();
+            cut.WaitForAssertion(() => Assert.Single(cut.FindAll("button"), button => button.TextContent == AppText.Get("ConfirmSave")));
+            cut.FindAll("button").Single(button => button.TextContent == AppText.Get("ConfirmSave")).Click();
+        }
+        Save();
+        cut.WaitForAssertion(() => Assert.Contains(AppText.Get("WaitingTimeConflict"), cut.Markup));
+        Assert.Equal("9", cut.Find(input).GetAttribute("value"));
+        cut.Find(".reload-latest").Click();
+        cut.WaitForAssertion(() => Assert.Equal("5", cut.Find(input).GetAttribute("value")));
+        Assert.DoesNotContain(AppText.Get("WaitingTimeConflict"), cut.Markup);
+        cut.Find(input).Change("7");
+        Save();
+        cut.WaitForAssertion(() => Assert.Empty(cut.FindAll(input)));
+        var saved = await firstDb.WaitingTimes.AsNoTracking().SingleAsync();
+        Assert.Equal(7, saved.WaitValue);
+        Assert.Equal(3, saved.Version);
+        Assert.Equal(3, await firstDb.WaitingTimeHistoryEntries.CountAsync());
+    }
+
+    private sealed class OldTimeProvider : TimeProvider
+    {
+        public override DateTimeOffset GetUtcNow() => new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+    }
+
+    private IRenderedComponent<CascadingAuthenticationState> RenderInternal(IWaitingTimeManagementService manager, bool openCreateForm = false, bool reviewQueue = false, IWaitingTimeCatalogService? catalog = null, IHistoryReadService? history = null)
     {
         const string adminGroup = @"TEST-SERVER\WT-Admins";
         Services.AddSingleton<AuthenticationStateProvider>(new TestAuthenticationStateProvider(adminGroup));
         Services.Configure<AdGroupsOptions>(options => options.Admin = adminGroup);
-        Services.AddSingleton<IWaitingTimeCatalogService>(new CatalogService());
-        Services.AddSingleton<IHistoryReadService>(new HistoryReader());
+        Services.AddSingleton<IWaitingTimeCatalogService>(catalog ?? new CatalogService());
+        Services.AddSingleton<IHistoryReadService>(history ?? new HistoryReader());
         Services.AddSingleton<IWaitingTimeManagementService>(manager);
         Services.AddSingleton<IPortalSettingsService>(new PortalSettingsService());
         Services.AddSingleton<PortalSettingsChangeNotifier>();

@@ -1,6 +1,7 @@
 name: Validate
 
 on:
+  workflow_call:
   pull_request:
   push:
     branches: [master]
@@ -17,3 +18,15 @@ jobs:
       - run: dotnet format .\WT.Blazor.csproj --verify-no-changes --no-restore
       - run: dotnet format .\WT.Blazor.Tests\WT.Blazor.Tests.csproj --verify-no-changes --no-restore
       - run: .\tests\Test-WithCoverage.ps1 -MinimumLineCoverage 80 -MinimumBranchCoverage 52
+      - run: dotnet restore .\tools\WT.Blazor.Operations\WT.Blazor.Operations.csproj -p:NuGetAudit=true -p:NuGetAuditLevel=low -warnaserror:NU1901 -warnaserror:NU1902 -warnaserror:NU1903 -warnaserror:NU1904
+      - run: dotnet format .\tools\WT.Blazor.Operations\WT.Blazor.Operations.csproj --verify-no-changes --no-restore
+      - run: dotnet build .\tools\WT.Blazor.Operations\WT.Blazor.Operations.csproj --no-restore
+      - run: .\tests\Install-PlaywrightBrowsers.ps1
+      - run: .\tests\Run-LocalBrowserSmoke.ps1 -WorkPath "${{ runner.temp }}\wt-browser"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-test-results
+          path: |
+            ${{ runner.temp }}/wt-browser/*.log
+            ${{ runner.temp }}/wt-browser/results/*.trx
