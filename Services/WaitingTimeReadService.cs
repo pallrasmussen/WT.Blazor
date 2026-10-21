@@ -10,6 +10,7 @@ public class WaitingTimeReadService(
 {
     public async Task<List<WaitingTime>> GetActiveAsync(Hospital? hospital, Department? department)
     {
+        using var operation = await DatabaseOperation.EnterAsync(db);
         var query = db.WaitingTimes.AsNoTracking().Where(waitingTime => waitingTime.IsActive);
         if (hospital is not null) query = query.Where(waitingTime => waitingTime.Hospital == hospital);
         if (department is not null) query = query.Where(waitingTime => waitingTime.Department == department);
@@ -18,20 +19,28 @@ public class WaitingTimeReadService(
 
     public async Task<List<WaitingTime>> GetAllAsync(Hospital? hospital, Department? department)
     {
+        using var operation = await DatabaseOperation.EnterAsync(db);
         var query = db.WaitingTimes.AsNoTracking();
         if (hospital is not null) query = query.Where(waitingTime => waitingTime.Hospital == hospital);
         if (department is not null) query = query.Where(waitingTime => waitingTime.Department == department);
         return await query.OrderBy(waitingTime => waitingTime.Name).ToListAsync();
     }
 
-    public Task<WaitingTime?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
-        db.WaitingTimes.AsNoTracking().FirstOrDefaultAsync(waitingTime => waitingTime.Id == id, cancellationToken);
+    public async Task<WaitingTime?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        using var operation = await DatabaseOperation.EnterAsync(db, cancellationToken);
+        return await db.WaitingTimes.AsNoTracking().FirstOrDefaultAsync(waitingTime => waitingTime.Id == id, cancellationToken);
+    }
 
-    public async Task<List<WaitingTimeHistoryEntry>> GetHistoryAsync(HistoryQuery query, CancellationToken cancellationToken = default) =>
-        await SortHistory(FilterHistory(query), query.SortBy, query.Descending).ToListAsync(cancellationToken);
+    public async Task<List<WaitingTimeHistoryEntry>> GetHistoryAsync(HistoryQuery query, CancellationToken cancellationToken = default)
+    {
+        using var operation = await DatabaseOperation.EnterAsync(db, cancellationToken);
+        return await SortHistory(FilterHistory(query), query.SortBy, query.Descending).ToListAsync(cancellationToken);
+    }
 
     public async Task<HistoryPage> GetHistoryPageAsync(HistoryQuery query, CancellationToken cancellationToken = default)
     {
+        using var operation = await DatabaseOperation.EnterAsync(db, cancellationToken);
         var filteredQuery = FilterHistory(query);
         var totalCount = await filteredQuery.CountAsync(cancellationToken);
         var entries = await SortHistory(filteredQuery, query.SortBy, query.Descending)
@@ -41,19 +50,26 @@ public class WaitingTimeReadService(
         return new HistoryPage(entries, totalCount);
     }
 
-    public async Task<List<string>> GetHistoryNamesAsync() =>
-        await db.WaitingTimeHistoryEntries.Select(entry => entry.Name).Distinct().OrderBy(name => name).ToListAsync();
+    public async Task<List<string>> GetHistoryNamesAsync()
+    {
+        using var operation = await DatabaseOperation.EnterAsync(db);
+        return await db.WaitingTimeHistoryEntries.Select(entry => entry.Name).Distinct().OrderBy(name => name).ToListAsync();
+    }
 
-    public async Task<List<string>> GetHistoryUsersAsync() =>
-        await db.WaitingTimeHistoryEntries
+    public async Task<List<string>> GetHistoryUsersAsync()
+    {
+        using var operation = await DatabaseOperation.EnterAsync(db);
+        return await db.WaitingTimeHistoryEntries
             .Where(entry => !string.IsNullOrEmpty(entry.Username))
             .Select(entry => entry.Username!)
             .Distinct()
             .OrderBy(username => username)
             .ToListAsync();
+    }
 
     public async Task<OperationsSummary> GetOperationsSummaryAsync(int retentionDays, int greenMaximumAgeMonths, int longWaitMonths)
     {
+        using var operation = await DatabaseOperation.EnterAsync(db);
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var reviewCutoff = UpdatedStatus.ReviewCutoff(now, greenMaximumAgeMonths);
         var longWaitDays = WaitDuration.ToDays(longWaitMonths, WaitUnit.Manadir);
@@ -91,6 +107,7 @@ public class WaitingTimeReadService(
 
     public async Task<List<TrendPoint>> GetTrendPointsAsync(int waitingTimeId, CancellationToken cancellationToken = default, int? periodDays = null)
     {
+        using var operation = await DatabaseOperation.EnterAsync(db, cancellationToken);
         if (periodDays is <= 0) throw new ArgumentOutOfRangeException(nameof(periodDays), "Trend periods must contain at least one day.");
 
         var displayUnit = await db.WaitingTimes.AsNoTracking()
@@ -134,6 +151,7 @@ public class WaitingTimeReadService(
 
     public async Task<Dictionary<int, ReviewInfo>> GetLatestReviewsAsync(IEnumerable<int> waitingTimeIds)
     {
+        using var operation = await DatabaseOperation.EnterAsync(db);
         var ids = waitingTimeIds.Distinct().ToList();
         if (ids.Count == 0) return [];
 
@@ -149,17 +167,30 @@ public class WaitingTimeReadService(
 
     public async Task<Dictionary<int, int>> GetTrendChangesAsync(IEnumerable<int> waitingTimeIds)
     {
+        using var operation = await DatabaseOperation.EnterAsync(db);
         var ids = waitingTimeIds.Distinct().ToList();
         if (ids.Count == 0) return [];
 
-        var points = await db.WaitingTimeHistoryEntries.AsNoTracking()
-            .Where(entry => ids.Contains(entry.WaitingTimeId) && entry.Action == HistoryAction.Updated && entry.NewWaitValue != null)
-            .OrderBy(entry => entry.Timestamp)
+        var history = db.WaitingTimeHistoryEntries.AsNoTracking()
+            .Where(entry => ids.Contains(entry.WaitingTimeId) && entry.Action == HistoryAction.Updated && entry.NewWaitValue != null);
+        // Only the first and last update determine the indicator. Keep historical
+        // rows in SQLite rather than materializing the entire audit trail.
+        var first = await history.Where(entry => entry.Id == history
+                .Where(candidate => candidate.WaitingTimeId == entry.WaitingTimeId)
+                .OrderBy(candidate => candidate.Timestamp).ThenBy(candidate => candidate.Id)
+                .Select(candidate => candidate.Id).First())
+            .Select(entry => new { entry.WaitingTimeId, Point = new TrendHistoryPoint(entry.Timestamp, entry.NewWaitValue!.Value, entry.NewUnit, entry.NewWaitDays) })
+            .ToListAsync();
+        var last = await history.Where(entry => entry.Id == history
+                .Where(candidate => candidate.WaitingTimeId == entry.WaitingTimeId)
+                .OrderByDescending(candidate => candidate.Timestamp).ThenByDescending(candidate => candidate.Id)
+                .Select(candidate => candidate.Id).First())
             .Select(entry => new { entry.WaitingTimeId, Point = new TrendHistoryPoint(entry.Timestamp, entry.NewWaitValue!.Value, entry.NewUnit, entry.NewWaitDays) })
             .ToListAsync();
 
-        return points.GroupBy(point => point.WaitingTimeId)
-            .ToDictionary(group => group.Key, group => TrendPointReducer.Change(group.Select(point => point.Point)));
+        var latest = last.ToDictionary(entry => entry.WaitingTimeId, entry => entry.Point);
+        return first.ToDictionary(entry => entry.WaitingTimeId,
+            entry => TrendPointReducer.Change([entry.Point, latest[entry.WaitingTimeId]]));
     }
 
     private IQueryable<WaitingTimeHistoryEntry> FilterHistory(HistoryQuery historyQuery)

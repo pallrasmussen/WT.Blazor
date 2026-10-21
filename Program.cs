@@ -126,7 +126,8 @@ app.Logger.LogInformation("Deployment manifest: BuildVersion={BuildVersion}, Com
 
 using (var scope = app.Services.CreateScope())
 {
-    await SeedData.InitializeAsync(scope.ServiceProvider);
+    await SeedData.InitializeAsync(scope.ServiceProvider,
+        app.Environment.IsDevelopment() && app.Configuration.GetValue<bool>("SeedData:EnableDemoData"));
 }
 
 // Configure the HTTP request pipeline.

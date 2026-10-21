@@ -13,12 +13,16 @@ public interface IPortalSettingsService
 
 public sealed class PortalSettingsService(ApplicationDbContext db, PortalSettingsChangeNotifier changeNotifier, TimeProvider timeProvider) : IPortalSettingsService
 {
-    public async Task<PortalSettings> GetAsync(CancellationToken cancellationToken = default) =>
-        await db.PortalSettings.AsNoTracking().SingleOrDefaultAsync(settings => settings.Id == 1, cancellationToken)
+    public async Task<PortalSettings> GetAsync(CancellationToken cancellationToken = default)
+    {
+        using var operation = await DatabaseOperation.EnterAsync(db, cancellationToken);
+        return await db.PortalSettings.AsNoTracking().SingleOrDefaultAsync(settings => settings.Id == 1, cancellationToken)
         ?? new PortalSettings();
+    }
 
     public async Task SaveAsync(PortalSettings settings, string username, CancellationToken cancellationToken = default)
     {
+        using var operation = await DatabaseOperation.EnterAsync(db, cancellationToken);
         Validate(settings);
 
         var current = await db.PortalSettings.SingleOrDefaultAsync(item => item.Id == 1, cancellationToken);
@@ -67,11 +71,14 @@ public sealed class PortalSettingsService(ApplicationDbContext db, PortalSetting
         settings.Version = current.Version;
     }
 
-    public async Task<IReadOnlyList<PortalSettingsAuditEntry>> GetRecentChangesAsync(int maximumEntries = 10, CancellationToken cancellationToken = default) =>
-        await db.PortalSettingsAuditEntries.AsNoTracking()
+    public async Task<IReadOnlyList<PortalSettingsAuditEntry>> GetRecentChangesAsync(int maximumEntries = 10, CancellationToken cancellationToken = default)
+    {
+        using var operation = await DatabaseOperation.EnterAsync(db, cancellationToken);
+        return await db.PortalSettingsAuditEntries.AsNoTracking()
             .OrderByDescending(entry => entry.Timestamp)
             .Take(maximumEntries)
             .ToListAsync(cancellationToken);
+    }
 
     private static void Validate(PortalSettings settings)
     {

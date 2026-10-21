@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WT.Blazor.Data;
 using WT.Blazor.Models;
 
@@ -11,6 +12,7 @@ public class WaitingTimeManagementService(
 {
     public async Task<WaitingTime> CreateAsync(WaitingTimeCreate create)
     {
+        using var operation = await DatabaseOperation.EnterAsync(db);
         var input = NormalizeInput(create.Name, create.Hospital, create.Department, create.WaitValue, create.Unit, create.Note);
         var requestId = RequestId();
         var now = timeProvider.GetUtcNow().UtcDateTime;
@@ -28,14 +30,14 @@ public class WaitingTimeManagementService(
             Version = 1
         };
         db.WaitingTimes.Add(entity);
-        await db.SaveChangesAsync();
+        await SaveChangesAsync();
 
         var historyEntry = CreateHistoryEntry(entity, requestId, now, HistoryAction.Created, "Nýggj bíðitíð stovnað", create.Username);
         historyEntry.NewWaitValue = input.WaitValue;
         historyEntry.NewUnit = input.Unit;
         historyEntry.NewWaitDays = WaitDuration.ToDays(input.WaitValue, input.Unit);
         db.WaitingTimeHistoryEntries.Add(historyEntry);
-        await db.SaveChangesAsync();
+        await SaveChangesAsync();
         await transaction.CommitAsync();
         logger.LogInformation("Waiting time created. WaitingTimeId: {WaitingTimeId}, Name: {Name}, User: {Username}, RequestId: {RequestId}", entity.Id, entity.Name, create.Username, requestId);
         return entity;
@@ -43,6 +45,7 @@ public class WaitingTimeManagementService(
 
     public async Task UpdateAsync(WaitingTimeUpdate update)
     {
+        using var operation = await DatabaseOperation.EnterAsync(db);
         var input = NormalizeInput(update.Name, update.Hospital, update.Department, update.WaitValue, update.Unit, update.Note);
         var requestId = RequestId();
         var now = timeProvider.GetUtcNow().UtcDateTime;
@@ -83,12 +86,13 @@ public class WaitingTimeManagementService(
         historyEntry.NewUnit = input.Unit;
         historyEntry.NewWaitDays = WaitDuration.ToDays(input.WaitValue, input.Unit);
         db.WaitingTimeHistoryEntries.Add(historyEntry);
-        await db.SaveChangesAsync();
+        await SaveChangesAsync();
         logger.LogInformation("Waiting time updated. WaitingTimeId: {WaitingTimeId}, Name: {Name}, WaitChanged: {WaitChanged}, User: {Username}, RequestId: {RequestId}", entity.Id, entity.Name, waitChanged, update.Username, requestId);
     }
 
     public async Task DeactivateAsync(int id, int expectedVersion, string username, string? reason = null)
     {
+        using var operation = await DatabaseOperation.EnterAsync(db);
         var requestId = RequestId();
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var entity = await db.WaitingTimes.FindAsync(id) ?? throw new WaitingTimeNotFoundException(id);
@@ -103,12 +107,13 @@ public class WaitingTimeManagementService(
         historyEntry.OldUnit = entity.Unit;
         historyEntry.OldWaitDays = WaitDuration.ToDays(entity.WaitValue, entity.Unit);
         db.WaitingTimeHistoryEntries.Add(historyEntry);
-        await db.SaveChangesAsync();
+        await SaveChangesAsync();
         logger.LogInformation("Waiting time deactivated. WaitingTimeId: {WaitingTimeId}, Name: {Name}, User: {Username}, RequestId: {RequestId}", entity.Id, entity.Name, username, requestId);
     }
 
     public async Task<WaitingTime> ReactivateAsync(int id, int expectedVersion, string username)
     {
+        using var operation = await DatabaseOperation.EnterAsync(db);
         var requestId = RequestId();
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var entity = await db.WaitingTimes.FindAsync(id) ?? throw new WaitingTimeNotFoundException(id);
@@ -127,13 +132,14 @@ public class WaitingTimeManagementService(
         historyEntry.NewUnit = entity.Unit;
         historyEntry.NewWaitDays = WaitDuration.ToDays(entity.WaitValue, entity.Unit);
         db.WaitingTimeHistoryEntries.Add(historyEntry);
-        await db.SaveChangesAsync();
+        await SaveChangesAsync();
         logger.LogInformation("Waiting time reactivated. WaitingTimeId: {WaitingTimeId}, Name: {Name}, User: {Username}, RequestId: {RequestId}", entity.Id, entity.Name, username, requestId);
         return entity;
     }
 
     public async Task MarkReviewedAsync(int id, int expectedVersion, string username)
     {
+        using var operation = await DatabaseOperation.EnterAsync(db);
         var requestId = RequestId();
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var entity = await db.WaitingTimes.FindAsync(id) ?? throw new WaitingTimeNotFoundException(id);
@@ -150,8 +156,21 @@ public class WaitingTimeManagementService(
         historyEntry.NewUnit = entity.Unit;
         historyEntry.NewWaitDays = WaitDuration.ToDays(entity.WaitValue, entity.Unit);
         db.WaitingTimeHistoryEntries.Add(historyEntry);
-        await db.SaveChangesAsync();
+        await SaveChangesAsync();
         logger.LogInformation("Waiting time reviewed. WaitingTimeId: {WaitingTimeId}, Name: {Name}, User: {Username}, RequestId: {RequestId}", entity.Id, entity.Name, username, requestId);
+    }
+
+    private async Task SaveChangesAsync()
+    {
+        try
+        {
+            await db.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException exception)
+        {
+            db.ChangeTracker.Clear();
+            throw new WaitingTimeConcurrencyException(exception);
+        }
     }
 
     private static string WaitText(int value, WaitUnit unit) => $"{value} {DisplayNames.For(unit, value)}";

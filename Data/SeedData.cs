@@ -5,7 +5,7 @@ namespace WT.Blazor.Data;
 
 public static class SeedData
 {
-    public static async Task InitializeAsync(IServiceProvider services)
+    public static async Task InitializeAsync(IServiceProvider services, bool seedDemoData = false)
     {
         var db = services.GetRequiredService<ApplicationDbContext>();
         var now = services.GetRequiredService<TimeProvider>().GetUtcNow().UtcDateTime;
@@ -17,13 +17,13 @@ public static class SeedData
             await db.SaveChangesAsync();
         }
 
-        if (!await db.WaitingTimes.AnyAsync())
+        if (seedDemoData && !await db.WaitingTimes.AnyAsync())
         {
             SeedWaitingTimes(db, now);
             await db.SaveChangesAsync();
         }
 
-        await SeedDemoTrendHistoryAsync(db, now);
+        if (seedDemoData) await SeedDemoTrendHistoryAsync(db, now);
     }
 
     // Gives every seeded item a few months of synthetic history so the "Sí gongdina" trend
