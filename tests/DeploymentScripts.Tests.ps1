@@ -1,32 +1,34 @@
-$deployPath = Join-Path $PSScriptRoot '..\deploy'
-$alertDefinitions = Join-Path $deployPath 'OperationsAlert.ps1'
-$monitorScript = Join-Path $deployPath 'Monitor-RecoveryDrill.ps1'
-$taskDefinitions = Join-Path $deployPath 'RecoveryDrillTaskDefinitions.ps1'
-. $alertDefinitions
-. $taskDefinitions
+BeforeAll {
+    $deployPath = Join-Path $PSScriptRoot '..\deploy'
+    $alertDefinitions = Join-Path $deployPath 'OperationsAlert.ps1'
+    $monitorScript = Join-Path $deployPath 'Monitor-RecoveryDrill.ps1'
+    $taskDefinitions = Join-Path $deployPath 'RecoveryDrillTaskDefinitions.ps1'
+    . $alertDefinitions
+    . $taskDefinitions
 
-function Assert-DoesNotThrow([scriptblock]$Action) {
-    try {
-        & $Action
+    function Assert-DoesNotThrow([scriptblock]$Action) {
+        try {
+            & $Action
+        }
+        catch {
+            throw "Expected the action not to throw, but it failed with: $($_.Exception.Message)"
+        }
     }
-    catch {
-        throw "Expected the action not to throw, but it failed with: $($_.Exception.Message)"
-    }
-}
 
-function Assert-Throws([scriptblock]$Action) {
-    try {
-        & $Action
+    function Assert-Throws([scriptblock]$Action) {
+        try {
+            & $Action
+        }
+        catch {
+            return
+        }
+        throw 'Expected the action to throw, but it completed successfully.'
     }
-    catch {
-        return
-    }
-    throw 'Expected the action to throw, but it completed successfully.'
-}
 
-function Assert-SequenceEqual([string[]]$Actual, [string[]]$Expected) {
-    if ($Actual.Count -ne $Expected.Count -or ($Actual -join "`0") -ne ($Expected -join "`0")) {
-        throw "Expected '$($Expected -join ', ')', but received '$($Actual -join ', ')'."
+    function Assert-SequenceEqual([string[]]$Actual, [string[]]$Expected) {
+        if ($Actual.Count -ne $Expected.Count -or ($Actual -join "`0") -ne ($Expected -join "`0")) {
+            throw "Expected '$($Expected -join ', ')', but received '$($Actual -join ', ')'."
+        }
     }
 }
 
