@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="4" errors="0" failures="4" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2026-10-21" time="17:46:34">
+  <environment machine-name="runnervm8k3b6" platform="Linux" user-domain="" user="runner" clr-version="10.0.12" cwd="/home/runner/work/WT.Blazor/WT.Blazor" nunit-version="2.5.8.0" os-version="6.17.0-1022-azure" />
+  <culture-info current-culture="" current-uiculture="" />
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Failure" success="False" time="3.105" asserts="0" description="Pester">
+    <results>
+      <test-suite type="TestFixture" name="/home/runner/work/WT.Blazor/WT.Blazor/tests/DeploymentScripts.Tests.ps1" executed="True" result="Failure" success="False" time="3.105" asserts="0" description="/home/runner/work/WT.Blazor/WT.Blazor/tests/DeploymentScripts.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Send-OperationsAlert" executed="True" result="Failure" success="False" time="2.5" asserts="0" description="Send-OperationsAlert">
+            <results>
+              <test-case description="does not create a mail client when SMTP is not configured" name="Send-OperationsAlert.does not create a mail client when SMTP is not configured" time="2.4709" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>CommandNotFoundException: The term 'Assert-DoesNotThrow' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.</message>
+                  <stack-trace>at &lt;ScriptBlock&gt;, /home/runner/work/WT.Blazor/WT.Blazor/tests/DeploymentScripts.Tests.ps1:35</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Monitor-RecoveryDrill" executed="True" result="Failure" success="False" time="2.6133" asserts="0" description="Monitor-RecoveryDrill">
+            <results>
+              <test-case description="fails when the scheduled recovery drill has never run" name="Monitor-RecoveryDrill.fails when the scheduled recovery drill has never run" time="0.063" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>CommandNotFoundException: Could not find Command Get-ScheduledTask</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="succeeds for a recent successful recovery drill" name="Monitor-RecoveryDrill.succeeds for a recent successful recovery drill" time="0.0443" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>CommandNotFoundException: Could not find Command Get-ScheduledTask</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Install-RecoveryDrillTask" executed="True" result="Failure" success="False" time="2.7754" asserts="0" description="Install-RecoveryDrillTask">
+            <results>
+              <test-case description="registers the drill and its monitor with the configured names" name="Install-RecoveryDrillTask.registers the drill and its monitor with the configured names" time="0.1553" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>CommandNotFoundException: Could not find Command New-ScheduledTaskPrincipal</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>
