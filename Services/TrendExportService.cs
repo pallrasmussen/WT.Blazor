@@ -9,7 +9,7 @@ namespace WT.Blazor.Services;
 
 public interface ITrendExportService
 {
-    Task<ExportFile?> CreatePdfAsync(int waitingTimeId, CancellationToken cancellationToken = default);
+    Task<ExportFile?> CreatePdfAsync(int waitingTimeId, CancellationToken cancellationToken = default, int? periodDays = null);
 }
 
 public sealed class TrendExportService(
@@ -18,10 +18,11 @@ public sealed class TrendExportService(
     IOptions<ExportOptions> exportOptions,
     ILogger<TrendExportService> logger) : ITrendExportService
 {
-    public async Task<ExportFile?> CreatePdfAsync(int waitingTimeId, CancellationToken cancellationToken = default)
+    public async Task<ExportFile?> CreatePdfAsync(int waitingTimeId, CancellationToken cancellationToken = default, int? periodDays = null)
     {
+        if (!TrendPeriod.IsSupported(periodDays)) throw new ArgumentOutOfRangeException(nameof(periodDays));
         var startedAt = timeProvider.GetTimestamp();
-        var report = await trendReportService.GetAsync(waitingTimeId, cancellationToken);
+        var report = await trendReportService.GetAsync(waitingTimeId, cancellationToken, periodDays);
         if (report is null) return null;
 
         var maximumPoints = exportOptions.Value.MaximumTrendPoints;
@@ -44,6 +45,8 @@ public sealed class TrendExportService(
                 {
                     column.Item().Text(AppText.Get(AppTextKey.TrendHeading)).FontSize(20).SemiBold();
                     column.Item().Text(report.Name).FontSize(14).SemiBold();
+                    var periodLabel = AppText.Get(periodDays switch { 90 => "TrendPeriodThreeMonths", 365 => "TrendPeriodYear", _ => "TrendPeriodAll" });
+                    column.Item().Text($"{AppText.Get("TrendPeriod")}: {periodLabel}");
                     column.Item().Text(report.Department is null ? report.Hospital : $"{report.Hospital} · {report.Department}");
                     column.Item().PaddingTop(6).Text($"{AppText.Get(AppTextKey.Current)}: {report.CurrentWait}").SemiBold();
                 });
@@ -72,7 +75,8 @@ public sealed class TrendExportService(
                 page.Footer().AlignCenter().Text($"{AppText.Get(AppTextKey.ExportedAt)}: {generatedAt:g}");
             });
         });
-        return ExportFile.FromWriter("application/pdf", $"{AppText.Get(AppTextKey.TrendExportFileName)}_{waitingTimeId}.pdf", (stream, token) =>
+        var periodSuffix = periodDays is null ? "" : $"_{periodDays}d";
+        return ExportFile.FromWriter("application/pdf", $"{AppText.Get(AppTextKey.TrendExportFileName)}_{waitingTimeId}{periodSuffix}.pdf", (stream, token) =>
         {
             token.ThrowIfCancellationRequested();
             document.GeneratePdf(stream);

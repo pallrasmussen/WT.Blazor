@@ -24,6 +24,31 @@ public class TrendExportEndpointTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task TrendExportUsesTheRequestedWindowAndRejectsUnsupportedPeriods()
+    {
+        int id;
+        await using (var scope = factory.Services.CreateAsyncScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var item = new WaitingTime { Name = "Period test", Hospital = Hospital.Klaksvikar, Unit = WaitUnit.Dagar };
+            db.WaitingTimes.Add(item);
+            await db.SaveChangesAsync();
+            id = item.Id;
+            db.WaitingTimeHistoryEntries.AddRange(
+                new WaitingTimeHistoryEntry { WaitingTimeId = id, Name = item.Name, Action = HistoryAction.Created, Timestamp = DateTime.UtcNow.AddDays(-200), NewWaitValue = 5, NewUnit = WaitUnit.Dagar },
+                new WaitingTimeHistoryEntry { WaitingTimeId = id, Name = item.Name, Action = HistoryAction.Updated, Timestamp = DateTime.UtcNow.AddDays(-1), NewWaitValue = 3, NewUnit = WaitUnit.Dagar });
+            await db.SaveChangesAsync();
+        }
+        Assert.Equal(HttpStatusCode.RequestEntityTooLarge, (await client.GetAsync($"/api/trend/{id}/export/pdf")).StatusCode);
+        var recent = await client.GetAsync($"/api/trend/{id}/export/pdf?periodDays=90");
+        Assert.Equal(HttpStatusCode.OK, recent.StatusCode);
+        Assert.Contains("_90d.pdf", recent.Content.Headers.ContentDisposition?.ToString());
+        Assert.Equal(HttpStatusCode.RequestEntityTooLarge, (await client.GetAsync($"/api/trend/{id}/export/pdf?periodDays=365")).StatusCode);
+        foreach (var invalid in new[] { "0", "-1", "1", "366", "2147483647", "invalid" })
+            Assert.Equal(HttpStatusCode.BadRequest, (await client.GetAsync($"/api/trend/{id}/export/pdf?periodDays={invalid}")).StatusCode);
+    }
+
+    [Fact]
     public async Task PublicTrendExportEndpointReturnsExpectedHttpContracts()
     {
         var (downloadId, limitedId) = await AddWaitingTimesAsync();

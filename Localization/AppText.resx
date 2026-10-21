@@ -249,4 +249,7 @@
   <data name="LastRefreshed" xml:space="preserve"><value>Seinast heintað</value></data>
   <data name="RefreshFailed" xml:space="preserve"><value>Tað bar ikki til at heinta nýggjastu úrslitini. Royn aftur.</value></data>
   <data name="SettingsReloadFailed" xml:space="preserve"><value>Tað bar ikki til at heinta stillingarnar. Tínar óvistaðu broytingar eru varðveittar; royn aftur.</value></data>
+  <data name="MaximumWaitValidation" xml:space="preserve"><value>Skriva eina bíðitíð millum 0 og {0} fyri valdu eindina.</value></data>
+  <data name="TrendLoadFailed" xml:space="preserve"><value>Tað bar ikki til at heinta gongdina. Royn aftur.</value></data>
+  <data name="RetryTrend" xml:space="preserve"><value>Royn aftur</value></data>
 </root>

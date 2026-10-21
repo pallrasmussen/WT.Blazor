@@ -20,6 +20,35 @@ namespace WT.Blazor.Tests;
 
 public class InternalPageTests : BunitContext
 {
+    [Theory]
+    [InlineData("create")]
+    [InlineData("edit")]
+    [InlineData("quick")]
+    public void OverflowingDurationsAreRejectedBeforeSaving(string mode)
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        var manager = new WaitingTimeManager();
+        var cut = RenderInternal(manager, openCreateForm: mode == "create", reviewQueue: mode == "quick");
+        var prefix = mode == "create" ? "new" : mode == "edit" ? "edit" : "quick";
+        if (mode == "create")
+        {
+            cut.Find("#new-hospital").Change(DisplayNames.For(Hospital.Klaksvikar));
+            cut.Find("#new-name").Change("Too large");
+        }
+        else if (mode == "edit")
+            cut.FindAll("button").Single(button => button.TextContent == AppText.Get("Edit")).Click();
+        else cut.Find(".admin-list").KeyDown("ArrowDown");
+        var suffix = mode == "quick" ? "-1" : "";
+        cut.Find($"#{prefix}-unit{suffix}").Change(WaitUnit.Manadir.ToString());
+        cut.Find($"#{prefix}-wait{suffix}").Change("71582789");
+        if (mode == "create") cut.Find("button.btn-teal").Click();
+        else cut.FindAll("button").Single(button => button.TextContent == AppText.Get("SaveChanges")).Click();
+        cut.WaitForAssertion(() => Assert.Contains(string.Format(AppText.Get("MaximumWaitValidation"), 71582788), cut.Markup));
+        Assert.Equal("71582788", cut.Find($"#{prefix}-wait{suffix}").GetAttribute("max"));
+        Assert.Null(manager.CreateRequest);
+        Assert.Null(manager.UpdateRequest);
+    }
+
     [Fact]
     public void HospitalFilterIncludesSharedAndAllWaitingListsOptions()
     {

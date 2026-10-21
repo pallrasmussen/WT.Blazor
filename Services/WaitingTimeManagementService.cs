@@ -202,6 +202,7 @@ public class WaitingTimeManagementService(
         if (hospital == Hospital.Landssjukrahusid && department is null) throw new ArgumentException("Landssjúkrahúsið requires a department.", nameof(department));
         if (department is not null && !Enum.IsDefined(department.Value)) throw new ArgumentOutOfRangeException(nameof(department));
         if (!Enum.IsDefined(unit)) throw new ArgumentOutOfRangeException(nameof(unit));
+        _ = WaitDuration.ToDays(wait, unit);
         if (note?.Length > 500) throw new ArgumentException("A note cannot exceed 500 characters.", nameof(note));
         return new WaitingTimeInput(name, hospital, hospital == Hospital.Landssjukrahusid ? department : null, wait, unit, note);
     }

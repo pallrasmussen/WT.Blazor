@@ -224,7 +224,7 @@ public partial class Internal
         if (string.IsNullOrEmpty(createForm.HospitalName)) { createErrorMessage = AppText.Get("SelectHospitalValidation"); return; }
         if (createForm.HospitalName == LandssjukrahusidName && string.IsNullOrEmpty(createForm.DepartmentName)) { createErrorMessage = AppText.Get("SelectDepartmentValidation"); return; }
         if (string.IsNullOrWhiteSpace(createForm.Name)) { createErrorMessage = AppText.Get("EnterNameValidation"); return; }
-        if (createForm.WaitValue < 0) { createErrorMessage = AppText.Get("NegativeWaitValidation"); return; }
+        if (WaitValidation(createForm) is { } waitError) { createErrorMessage = waitError; return; }
 
         createErrorMessage = null;
         isSaving = true;
@@ -344,7 +344,7 @@ public partial class Internal
     private void BeginEditPreview()
     {
         if (editItem is null) return;
-        if (editForm.WaitValue < 0) { SetEditError(AppText.Get("NegativeWaitValidation")); return; }
+        if (WaitValidation(editForm) is { } waitError) { SetEditError(waitError); return; }
         if (isSuperAdmin && string.IsNullOrWhiteSpace(editForm.Name)) { SetEditError(AppText.Get("EnterNameValidation")); return; }
         if (!EditFormHasChanges()) { SetEditError(AppText.Get("NoChanges")); return; }
         showEditPreview = true;
@@ -355,7 +355,7 @@ public partial class Internal
     private void BeginQuickEditPreview()
     {
         if (quickEditItem is null) return;
-        if (quickEditForm.WaitValue < 0) { quickEditErrorMessage = AppText.Get("NegativeWaitValidation"); return; }
+        if (WaitValidation(quickEditForm) is { } waitError) { quickEditErrorMessage = waitError; return; }
         if (!QuickEditFormHasChanges()) { quickEditErrorMessage = AppText.Get("NoChanges"); return; }
         showQuickEditPreview = true;
     }
@@ -389,7 +389,7 @@ public partial class Internal
     private async Task SaveEdit()
     {
         if (editItem is null) return;
-        if (editForm.WaitValue < 0) { SetEditError(AppText.Get("NegativeWaitValidation")); return; }
+        if (WaitValidation(editForm) is { } waitError) { SetEditError(waitError); return; }
 
         var hospital = editItem.Hospital;
         var department = editItem.Department;
@@ -449,9 +449,9 @@ public partial class Internal
     private async Task SaveQuickEdit()
     {
         if (quickEditItem is null) return;
-        if (quickEditForm.WaitValue < 0)
+        if (WaitValidation(quickEditForm) is { } waitError)
         {
-            quickEditErrorMessage = AppText.Get("NegativeWaitValidation");
+            quickEditErrorMessage = waitError;
             return;
         }
 
@@ -540,6 +540,12 @@ public partial class Internal
         if ((quickEditForm.Note ?? "") != (quickEditItem.Note ?? ""))
             yield return $"{AppText.Get("Note")}: {(string.IsNullOrWhiteSpace(quickEditItem.Note) ? "-" : quickEditItem.Note)} -> {(string.IsNullOrWhiteSpace(quickEditForm.Note) ? "-" : quickEditForm.Note)}";
     }
+
+    private static string? WaitValidation(WaitingTimeFormState form) => form.WaitValue < 0
+        ? AppText.Get("NegativeWaitValidation")
+        : form.WaitValue > WaitDuration.MaximumValue(form.Unit)
+            ? string.Format(AppText.Get("MaximumWaitValidation"), WaitDuration.MaximumValue(form.Unit))
+            : null;
 
     private static string WaitText(int value, WaitUnit unit) => $"{value} {DisplayNames.For(unit, value)}";
 

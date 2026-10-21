@@ -155,6 +155,20 @@ public class HistoryExportServiceTests
         Assert.Equal(source.Token, reportService.LastCancellationToken);
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData(90)]
+    [InlineData(365)]
+    public async Task TrendExportPassesTheSelectedPeriodToTheReportService(int? period)
+    {
+        var reports = new StubTrendReportService(new TrendReport(42, "Record", "Hospital", null, "2 days", "days", []));
+        var service = new TrendExportService(reports, TimeProvider.System, Options.Create(new ExportOptions()), NullLogger<TrendExportService>.Instance);
+        var file = await service.CreatePdfAsync(42, periodDays: period);
+        Assert.NotNull(file);
+        Assert.Equal(period, reports.LastPeriodDays);
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => service.CreatePdfAsync(42, periodDays: 1));
+    }
+
     [Fact]
     public async Task TrendReportProjectsDisplayDataAndPoints()
     {
@@ -222,9 +236,11 @@ public class HistoryExportServiceTests
     private sealed class StubTrendReportService(TrendReport? report) : ITrendReportService
     {
         public CancellationToken LastCancellationToken { get; private set; }
+        public int? LastPeriodDays { get; private set; }
         public Task<TrendReport?> GetAsync(int waitingTimeId, CancellationToken cancellationToken = default, int? periodDays = null)
         {
             LastCancellationToken = cancellationToken;
+            LastPeriodDays = periodDays;
             return Task.FromResult(report);
         }
     }
