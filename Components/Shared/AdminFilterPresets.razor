@@ -1,7 +1,10 @@
 <div class="filter-presets" role="group" aria-label="@AppText.Get("FilterPresets")">
     <span>@AppText.Get("FilterPresets")</span>
     <button class="btn-secondary @(SelectedPreset == All ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(All)">@AppText.Get("PresetAll")</button>
-    <button class="btn-secondary @(SelectedPreset == Review ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(Review)">@AppText.Get("PresetNeedsReview")</button>
+    @if (IncludeReview)
+    {
+        <button class="btn-secondary @(SelectedPreset == Review ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(Review)">@AppText.Get("PresetNeedsReview")</button>
+    }
     <button class="btn-secondary @(SelectedPreset == Shared ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(Shared)">@AppText.Get("SharedWaitingLists")</button>
     <button class="btn-secondary @(SelectedPreset == National ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(National)">@DisplayNames.For(Hospital.Landssjukrahusid)</button>
     <button class="btn-secondary @(SelectedPreset == Klaksvik ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(Klaksvik)">@DisplayNames.For(Hospital.Klaksvikar)</button>
@@ -11,6 +14,7 @@
 @code {
     [Parameter] public string? SelectedPreset { get; set; }
     [Parameter, EditorRequired] public EventCallback<string> PresetSelected { get; set; }
+    [Parameter] public bool IncludeReview { get; set; } = true;
 
     private const string All = "all";
     private const string Review = "review";

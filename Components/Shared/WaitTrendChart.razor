@@ -31,6 +31,7 @@ else
 
     private const int Width = 820;
     private const int Height = 320;
+    private const double MinimumDateLabelSpacing = 60;
     private static readonly (int L, int R, int T, int B) Pad = (62, 28, 20, 60);
 
     private double MinTicks => Points.Min(p => p.Timestamp.Ticks);
@@ -73,7 +74,7 @@ else
         }
         sb.Append($"""<path d="{d}" fill="none" stroke="#006b73" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>""");
 
-        var labelInterval = Math.Max(1, (int)Math.Ceiling(Points.Count / 8d));
+        var dateLabelIndices = DateLabelIndices();
         for (var index = 0; index < Points.Count; index++)
         {
             var p = Points[index];
@@ -81,10 +82,31 @@ else
             var y = Y(p.Value);
             var pointLabel = System.Net.WebUtility.HtmlEncode($"{p.Timestamp:dd.MM.yyyy}: {p.Value} {UnitLabel}");
             sb.Append($"""<circle class="chart-point" cx="{F(x)}" cy="{F(y)}" r="5" fill="#fff" stroke="#006b73" stroke-width="3"><title>{pointLabel}</title></circle>""");
-            if (index % labelInterval == 0 || index == Points.Count - 1)
-                sb.Append($"""<text x="{F(x)}" y="{Height - Pad.B + 24}" text-anchor="middle" font-size="10.5" fill="#667085">{p.Timestamp:dd.MM.yy}</text>""");
+            if (dateLabelIndices.Contains(index))
+                sb.Append($"""<text class="chart-date-label" x="{F(x)}" y="{Height - Pad.B + 24}" text-anchor="middle" font-size="10.5" fill="#667085">{p.Timestamp:dd.MM.yy}</text>""");
         }
 
         return sb.ToString();
+    }
+
+    private HashSet<int> DateLabelIndices()
+    {
+        var labelIndices = new List<int> { 0 };
+        var lastIndex = Points.Count - 1;
+
+        for (var index = 1; index < lastIndex; index++)
+        {
+            if (X(Points[index].Timestamp) - X(Points[labelIndices[^1]].Timestamp) >= MinimumDateLabelSpacing)
+                labelIndices.Add(index);
+        }
+
+        while (labelIndices.Count > 0 &&
+               X(Points[lastIndex].Timestamp) - X(Points[labelIndices[^1]].Timestamp) < MinimumDateLabelSpacing)
+        {
+            labelIndices.RemoveAt(labelIndices.Count - 1);
+        }
+
+        labelIndices.Add(lastIndex);
+        return labelIndices.ToHashSet();
     }
 }

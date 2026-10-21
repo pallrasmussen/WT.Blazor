@@ -41,6 +41,27 @@ public class TrendComponentTests : BunitContext
     }
 
     [Fact]
+    public void ChartHidesDateLabelsThatWouldOverlapTheLatestDate()
+    {
+        var cut = Render<WaitTrendChart>(parameters => parameters
+            .Add(component => component.Points,
+            [
+                new TrendPoint(new DateTime(2026, 5, 15), 35),
+                new TrendPoint(new DateTime(2026, 6, 15), 34),
+                new TrendPoint(new DateTime(2026, 8, 15), 32),
+                new TrendPoint(new DateTime(2026, 9, 15), 31),
+                new TrendPoint(new DateTime(2026, 10, 15), 36),
+                new TrendPoint(new DateTime(2026, 10, 16), 38)
+            ])
+            .Add(component => component.UnitLabel, "vikur"));
+
+        var dateLabels = cut.FindAll("text.chart-date-label");
+
+        Assert.DoesNotContain(dateLabels, label => label.TextContent == "15.10.26");
+        Assert.Contains(dateLabels, label => label.TextContent == "16.10.26");
+    }
+
+    [Fact]
     public void TrendPageUsesOnlyLocalReturnUrlsAndShowsNotFoundState()
     {
         Services.AddSingleton<ITrendReportService>(new StubTrendReportService(null));

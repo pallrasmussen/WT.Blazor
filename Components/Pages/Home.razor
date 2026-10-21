@@ -18,6 +18,10 @@
 </section>
 
 <section class="public-panel public-large-text" aria-label="Bíðitíðir" aria-busy="@isLoading">
+	<div class="home-filter-presets">
+		<AdminFilterPresets SelectedPreset="selectedPreset" PresetSelected="ApplyPresetAsync" IncludeReview="false" />
+	</div>
+
 	<div class="results-toolbar public-utilities">
 		<div class="browse-actions">
 			@if (hasSearched)
@@ -135,6 +139,12 @@
 	private string selectedHospitalName = "";
 	private string selectedDepartmentName = "";
 	private string searchText = "";
+	private string? selectedPreset = AllPreset;
+	private const string AllPreset = "all";
+	private const string SharedHospitalPreset = "shared";
+	private const string NationalHospitalPreset = "national";
+	private const string KlaksvikPreset = "klaksvik";
+	private const string SuduroyPreset = "suduroy";
 	[SupplyParameterFromQuery(Name = "hospital")] public string? QueryHospital { get; set; }
 	[SupplyParameterFromQuery(Name = "department")] public string? QueryDepartment { get; set; }
 	[SupplyParameterFromQuery(Name = "q")] public string? QuerySearch { get; set; }
@@ -170,7 +180,7 @@
 	protected override async Task OnInitializedAsync()
 	{
 		portalSettings = await PortalSettingsReader.GetAsync();
-		Hospital? hospital = Enum.TryParse<Hospital>(QueryHospital, out var parsedHospital) && parsedHospital != Hospital.Sjukrahusverkid
+		Hospital? hospital = Enum.TryParse<Hospital>(QueryHospital, out var parsedHospital)
 			? parsedHospital
 			: null;
 		Department? department = hospital == Hospital.Landssjukrahusid
@@ -179,6 +189,7 @@
 			: null;
 		if (hospital is not null) selectedHospitalName = DisplayNames.For(hospital.Value);
 		if (department is not null) selectedDepartmentName = DisplayNames.For(department.Value);
+		selectedPreset = PresetFor(hospital);
 		searchText = QuerySearch ?? "";
 		hasSearched = true;
 		isLoading = true;
@@ -201,12 +212,34 @@
 		selectedHospitalName = "";
 		selectedDepartmentName = "";
 		searchText = "";
+		selectedPreset = AllPreset;
 		UpdateUrl();
 		hasSearched = true;
 		isLoading = true;
 		StateHasChanged();
 
 		await LoadItemsAsync(null, null);
+		isLoading = false;
+	}
+
+	private async Task ApplyPresetAsync(string preset)
+	{
+		selectedPreset = preset;
+		selectedHospitalName = preset switch
+		{
+			SharedHospitalPreset => DisplayNames.For(Hospital.Sjukrahusverkid),
+			NationalHospitalPreset => DisplayNames.For(Hospital.Landssjukrahusid),
+			KlaksvikPreset => DisplayNames.For(Hospital.Klaksvikar),
+			SuduroyPreset => DisplayNames.For(Hospital.Suduroyar),
+			_ => ""
+		};
+		selectedDepartmentName = "";
+		UpdateUrl();
+		hasSearched = true;
+		isLoading = true;
+		StateHasChanged();
+
+		await LoadItemsAsync(DisplayNames.TryHospitalFrom(selectedHospitalName), null);
 		isLoading = false;
 	}
 
@@ -222,11 +255,20 @@
 		var department = DisplayNames.TryDepartmentFrom(selectedDepartmentName);
 		NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
 		{
-			["hospital"] = hospital is null or Hospital.Sjukrahusverkid ? null : hospital.ToString(),
+			["hospital"] = hospital?.ToString(),
 			["department"] = department?.ToString(),
 			["q"] = string.IsNullOrWhiteSpace(searchText) ? null : searchText.Trim()
 		}), replace: true);
 	}
+
+	private static string PresetFor(Hospital? hospital) => hospital switch
+	{
+		Hospital.Sjukrahusverkid => SharedHospitalPreset,
+		Hospital.Landssjukrahusid => NationalHospitalPreset,
+		Hospital.Klaksvikar => KlaksvikPreset,
+		Hospital.Suduroyar => SuduroyPreset,
+		_ => AllPreset
+	};
 
 	private string TrendUri(int id)
 	{

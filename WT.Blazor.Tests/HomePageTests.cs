@@ -34,6 +34,30 @@ public class HomePageTests : BunitContext
         Assert.Null(request.Department);
     }
 
+    [Fact]
+    public void PublicPageShowsShortcutsAndFiltersBySelectedHospital()
+    {
+        var catalog = new RecordingCatalogService();
+        Services.AddSingleton<IWaitingTimeCatalogService>(catalog);
+        Services.AddSingleton<ITrendReadService>(new EmptyTrendReadService());
+        Services.AddSingleton<IPortalSettingsService>(new DefaultPortalSettingsService());
+        Services.AddSingleton<PortalSettingsChangeNotifier>();
+        Services.AddSingleton(TimeProvider.System);
+
+        var cut = Render<Home>();
+
+        Assert.Equal(5, cut.FindAll(".filter-presets button").Count);
+        Assert.DoesNotContain(cut.FindAll(".filter-presets button"),
+            button => button.TextContent == "Krevur eftirlit");
+        cut.FindAll(".filter-presets button")
+            .Single(button => button.TextContent == DisplayNames.For(Hospital.Klaksvikar))
+            .Click();
+
+        var request = catalog.Requests[^1];
+        Assert.Equal(Hospital.Klaksvikar, request.Hospital);
+        Assert.Null(request.Department);
+    }
+
     private sealed class RecordingCatalogService : IWaitingTimeCatalogService
     {
         public List<(Hospital? Hospital, Department? Department)> Requests { get; } = [];

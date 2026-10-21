@@ -335,6 +335,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible
 .filter-presets button.btn-secondary:hover { background: var(--wt-mist); border-color: var(--wt-turquoise); color: var(--wt-teal); }
 .filter-presets button.btn-secondary.active { background: var(--wt-teal); border-color: var(--wt-teal); box-shadow: none; color: white; }
 .filter-presets button.btn-secondary.active:hover { background: #00545b; border-color: #00545b; color: white; }
+.home-filter-presets { margin-bottom: 1rem; }
 .change-preview { background: #f0f7f6; border: 1px solid #b9dcd7; border-radius: .5rem; display: grid; gap: .6rem; margin-top: 1rem; padding: .8rem; }
 .change-preview ul { margin: 0; padding-left: 1.25rem; }
 .create-box { background: white; border: 1px solid var(--wt-line); border-radius: .75rem; margin-top: 1.5rem; padding: 1.25rem; }
@@ -361,10 +362,10 @@ input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible
 .icon-button:disabled { cursor: default; opacity: .45; }
 .admin-actions button:disabled { cursor: default; opacity: .45; }
 .create-toggle { border: 1px solid var(--wt-line); cursor: pointer; font: inherit; font-size: .85rem; font-weight: 700; padding: .65rem .85rem; }
-button.btn-secondary, button.btn-teal { appearance: none; border-radius: .5rem; cursor: pointer; font: inherit; font-size: .85rem; font-weight: 700; min-height: 2.5rem; padding: .6rem .9rem; }
-button.btn-teal { background: var(--wt-teal); border: 1px solid var(--wt-teal); box-shadow: 0 1px 2px rgba(0, 100, 109, .2); color: white; }
-button.btn-teal:not(:disabled):hover { background: #003f45; border-color: #003f45; box-shadow: 0 6px 14px rgba(0, 100, 109, .38); filter: none; transform: translateY(-1px); }
-button.btn-teal:not(:disabled):active { background: #002f34; border-color: #002f34; box-shadow: inset 0 2px 4px rgba(0, 0, 0, .28); transform: translateY(0); }
+button.btn-secondary, button.btn-teal, a.btn-teal { appearance: none; border-radius: .5rem; cursor: pointer; font: inherit; font-size: .85rem; font-weight: 700; min-height: 2.5rem; padding: .6rem .9rem; }
+button.btn-teal, a.btn-teal { background: var(--wt-teal); border: 1px solid var(--wt-teal); box-shadow: 0 1px 2px rgba(0, 100, 109, .2); color: white; }
+button.btn-teal:not(:disabled):hover, a.btn-teal:hover { background: #003f45; border-color: #003f45; box-shadow: 0 6px 14px rgba(0, 100, 109, .38); filter: none; transform: translateY(-1px); }
+button.btn-teal:not(:disabled):active, a.btn-teal:active { background: #002f34; border-color: #002f34; box-shadow: inset 0 2px 4px rgba(0, 0, 0, .28); transform: translateY(0); }
 button.btn-secondary { background: white; border: 1px solid var(--wt-line); box-shadow: 0 1px 2px rgba(30, 52, 84, .08); color: var(--wt-ink); }
 button.btn-secondary:hover { background: var(--wt-mist); border-color: var(--wt-turquoise); box-shadow: 0 4px 10px rgba(0, 100, 109, .18); color: var(--wt-teal); filter: none; transform: translateY(-1px); }
 button.btn-secondary:active { box-shadow: inset 0 2px 4px rgba(30, 52, 84, .16); transform: translateY(0); }
