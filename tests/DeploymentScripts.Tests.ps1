@@ -5,9 +5,34 @@ $taskDefinitions = Join-Path $deployPath 'RecoveryDrillTaskDefinitions.ps1'
 . $alertDefinitions
 . $taskDefinitions
 
+function Assert-DoesNotThrow([scriptblock]$Action) {
+    try {
+        & $Action
+    }
+    catch {
+        throw "Expected the action not to throw, but it failed with: $($_.Exception.Message)"
+    }
+}
+
+function Assert-Throws([scriptblock]$Action) {
+    try {
+        & $Action
+    }
+    catch {
+        return
+    }
+    throw 'Expected the action to throw, but it completed successfully.'
+}
+
+function Assert-SequenceEqual([string[]]$Actual, [string[]]$Expected) {
+    if ($Actual.Count -ne $Expected.Count -or ($Actual -join "`0") -ne ($Expected -join "`0")) {
+        throw "Expected '$($Expected -join ', ')', but received '$($Actual -join ', ')'."
+    }
+}
+
 Describe 'Send-OperationsAlert' {
     It 'does not create a mail client when SMTP is not configured' {
-        { Send-OperationsAlert -Subject 'Test' -Body 'Test' } | Should Not Throw
+        Assert-DoesNotThrow { Send-OperationsAlert -Subject 'Test' -Body 'Test' }
     }
 }
 
@@ -21,7 +46,7 @@ Describe 'Monitor-RecoveryDrill' {
             }
         }
 
-        { & $monitorScript -TaskName 'Test recovery drill' } | Should Throw
+        Assert-Throws { & $monitorScript -TaskName 'Test recovery drill' }
     }
 
     It 'succeeds for a recent successful recovery drill' {
@@ -33,7 +58,7 @@ Describe 'Monitor-RecoveryDrill' {
             }
         }
 
-        { & $monitorScript -TaskName 'Test recovery drill' } | Should Not Throw
+        Assert-DoesNotThrow { & $monitorScript -TaskName 'Test recovery drill' }
     }
 }
 
@@ -52,6 +77,6 @@ Describe 'Install-RecoveryDrillTask' {
 
         Install-RecoveryDrillScheduledTasks -TaskName 'Test recovery drill' -MonitorTaskName 'Test recovery monitor' -OperationsPath 'C:\operations\WT.Blazor.Operations.dll' -RegisterTask $registerTask
 
-        $registeredTaskNames | Should Be @('Test recovery drill', 'Test recovery monitor')
+        Assert-SequenceEqual $registeredTaskNames @('Test recovery drill', 'Test recovery monitor')
     }
 }

@@ -22,7 +22,7 @@ jobs:
       - run: dotnet restore .\tools\WT.Blazor.Operations\WT.Blazor.Operations.csproj -p:NuGetAudit=true -p:NuGetAuditLevel=low -warnaserror:NU1901 -warnaserror:NU1902 -warnaserror:NU1903 -warnaserror:NU1904
       - run: dotnet format .\tools\WT.Blazor.Operations\WT.Blazor.Operations.csproj --verify-no-changes --no-restore
       - run: dotnet build .\tools\WT.Blazor.Operations\WT.Blazor.Operations.csproj --no-restore
-      - run: Invoke-Pester .\tests\DeploymentScripts.Tests.ps1 -EnableExit
+      - run: Invoke-Pester -Path .\tests\DeploymentScripts.Tests.ps1 -CI
       - run: .\tests\Install-PlaywrightBrowsers.ps1
       - run: .\tests\Run-LocalBrowserSmoke.ps1 -WorkPath "${{ runner.temp }}\wt-browser"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
