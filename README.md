@@ -53,7 +53,9 @@ dotnet format .\WT.Blazor.Tests\WT.Blazor.Tests.csproj --verify-no-changes
 ```
 
 CI validates pull requests and pushes to master, audits NuGet dependencies,
-checks formatting, and requires 80% line and 52% branch coverage.
+checks formatting, runs deployment-script tests, and requires 80% line and
+52% branch coverage. CodeQL scans C# and GitHub Actions on pull requests,
+pushes, and weekly.
 Browser smoke tests require Playwright installation; see `tests/`.
 
 ## Deployment
@@ -147,6 +149,16 @@ The recovery-drill installation script schedules an isolated verification every
 four weeks and a paired monitor. Provide SMTP arguments to receive an alert for
 an overdue or failed drill. It runs under `SYSTEM`; make sure that identity can
 read the backup, matching key archive, and configured drill directory.
+
+## Operational telemetry and response
+
+Set `OpenTelemetry__OtlpEndpoint` to the absolute URI of the OTLP collector to
+export public-refresh and Blazor circuit metrics. The standard
+`OTEL_EXPORTER_OTLP_ENDPOINT` environment variable is supported as a fallback.
+Leave both unset to disable metric export. See the
+[operations playbook](docs/OPERATIONS-PLAYBOOK.md) for alert thresholds and
+response procedures for telemetry, staging verification, recovery drills, and
+release-acceptance failures.
 
 ## Refreshing public results and resolving settings conflicts
 

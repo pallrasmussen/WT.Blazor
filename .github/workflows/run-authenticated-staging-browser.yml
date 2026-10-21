@@ -1,0 +1,32 @@
+name: Run authenticated staging browser check
+
+on:
+  workflow_call:
+    inputs:
+      role:
+        required: true
+        type: string
+      runner_label:
+        required: true
+        type: string
+      base_url:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ${{ inputs.runner_label }}
+    environment: staging
+    env:
+      BROWSER_BASE_URL: ${{ inputs.base_url }}
+      RUN_AUTH_BROWSER_TESTS: "1"
+      STAGING_BROWSER_ROLE: ${{ inputs.role }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: ./.github/actions/setup-dotnet
+      - run: dotnet restore .\WT.Blazor.Tests\WT.Blazor.Tests.csproj
+      - run: .\tests\Install-PlaywrightBrowsers.ps1
+      - run: dotnet test .\WT.Blazor.Tests\WT.Blazor.Tests.csproj --no-restore --filter "FullyQualifiedName~AuthenticatedStagingBrowserSmokeTests"

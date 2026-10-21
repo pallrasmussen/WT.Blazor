@@ -7,6 +7,8 @@ param(
     [string[]]$To
 )
 
+. (Join-Path $PSScriptRoot "OperationsAlert.ps1")
+
 if ($MaximumAgeDays -lt 1) {
     throw "MaximumAgeDays must be at least 1."
 }
@@ -25,23 +27,7 @@ elseif ($info.LastTaskResult -ne 0) {
 }
 
 if ($failure) {
-    if ($SmtpServer -and $From -and $To -and $To.Count -gt 0) {
-        $mail = [System.Net.Mail.MailMessage]::new($From, $To[0])
-        foreach ($recipient in $To | Select-Object -Skip 1) {
-            $mail.To.Add($recipient)
-        }
-        $mail.Subject = "WT.Blazor database recovery drill failed or is overdue"
-        $mail.Body = $failure
-        $client = [System.Net.Mail.SmtpClient]::new($SmtpServer, $SmtpPort)
-        $client.UseDefaultCredentials = $true
-        try {
-            $client.Send($mail)
-        }
-        finally {
-            $client.Dispose()
-            $mail.Dispose()
-        }
-    }
+    Send-OperationsAlert -Subject "WT.Blazor database recovery drill failed or is overdue" -Body $failure -SmtpServer $SmtpServer -SmtpPort $SmtpPort -From $From -To $To
     throw $failure
 }
 

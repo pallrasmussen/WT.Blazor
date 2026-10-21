@@ -7,6 +7,8 @@ param(
     [string[]]$To
 )
 
+. (Join-Path $PSScriptRoot "OperationsAlert.ps1")
+
 if ($MaximumAgeHours -lt 1) {
     throw "MaximumAgeHours must be at least 1."
 }
@@ -37,23 +39,7 @@ else {
 }
 
 if ($failure) {
-    if ($SmtpServer -and $From -and $To -and $To.Count -gt 0) {
-        $mail = [System.Net.Mail.MailMessage]::new($From, $To[0])
-        foreach ($recipient in $To | Select-Object -Skip 1) {
-            $mail.To.Add($recipient)
-        }
-        $mail.Subject = "WT.Blazor database backup is stale or missing"
-        $mail.Body = $failure
-        $client = [System.Net.Mail.SmtpClient]::new($SmtpServer, $SmtpPort)
-        $client.UseDefaultCredentials = $true
-        try {
-            $client.Send($mail)
-        }
-        finally {
-            $client.Dispose()
-            $mail.Dispose()
-        }
-    }
+    Send-OperationsAlert -Subject "WT.Blazor database backup is stale or missing" -Body $failure -SmtpServer $SmtpServer -SmtpPort $SmtpPort -From $From -To $To
     throw $failure
 }
 

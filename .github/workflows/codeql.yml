@@ -1,0 +1,36 @@
+name: CodeQL
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  analyze:
+    name: Analyze ${{ matrix.language }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: csharp
+            build: true
+          - language: actions
+            build: false
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: ./.github/actions/setup-dotnet
+      - uses: github/codeql-action/init@d0bae162f31f17dd92c46ccdc4dfee5710f8dc67 # v3
+        with:
+          languages: ${{ matrix.language }}
+      - uses: github/codeql-action/autobuild@d0bae162f31f17dd92c46ccdc4dfee5710f8dc67 # v3
+        if: matrix.build
+      - uses: github/codeql-action/analyze@d0bae162f31f17dd92c46ccdc4dfee5710f8dc67 # v3

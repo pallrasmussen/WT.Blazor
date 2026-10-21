@@ -159,6 +159,22 @@ Install the daily backup and freshness-monitor scheduled tasks from an elevated 
 
 Without SMTP parameters, a stale or missing backup fails the scheduled monitor task and is visible in Task Scheduler's task history/last-run result. Verify both scheduled tasks are enabled and their most recent runs succeeded.
 
+Install the four-week offline recovery drill and its monitor from the same
+verified release bundle. The task runs as `SYSTEM`, so grant that identity
+read access to the backup, matching key archive, and drill directory:
+
+```powershell
+.\deploy\Install-RecoveryDrillTask.ps1 `
+  -BackupPath 'C:\inetpub\backups\WT.Blazor' `
+  -OperationsPath 'C:\Releases\operations\WT.Blazor.Operations.dll' `
+  -SmtpServer 'smtp.example.org' `
+  -From 'wt-blazor-monitor@example.org' `
+  -To 'operations@example.org','on-call@example.org'
+```
+
+See [the operations playbook](OPERATIONS-PLAYBOOK.md) for response steps if a
+recovery drill fails or is overdue.
+
 To restore, stop the IIS application pool, preserve the current `App_Data`, copy the selected `.db` file to `App_Data\wt-blazor.db`, and copy the contents of its matching `.keys` directory into `App_Data\keys` (do not leave the timestamped archive directory nested there). Reapply the application-pool Modify permissions on `App_Data`, then start the pool and verify `/health` and sign-in. If the matching key archive is unavailable, users will need to authenticate again; never substitute a different installation's key ring.
 
 ## Verification

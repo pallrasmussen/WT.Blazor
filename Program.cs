@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Metrics;
 using QuestPDF.Infrastructure;
 using Serilog;
 using System.Globalization;
@@ -119,6 +120,21 @@ builder.Services.AddScoped<ITrendReportService, TrendReportService>();
 builder.Services.AddHostedService<ExportTemporaryFileCleanupService>();
 var deploymentManifest = DeploymentManifest.Load(Path.Combine(builder.Environment.ContentRootPath, "deployment-manifest.json"));
 builder.Services.AddSingleton(deploymentManifest);
+var otlpEndpointText = builder.Configuration["OpenTelemetry:OtlpEndpoint"]
+    ?? Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT");
+Uri? otlpEndpoint = null;
+if (!string.IsNullOrWhiteSpace(otlpEndpointText)
+    && !Uri.TryCreate(otlpEndpointText, UriKind.Absolute, out otlpEndpoint))
+{
+    throw new InvalidOperationException("OpenTelemetry:OtlpEndpoint must be an absolute URI.");
+}
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(metrics =>
+    {
+        metrics.AddMeter("WT.Blazor");
+        if (otlpEndpoint is not null)
+            metrics.AddOtlpExporter(options => options.Endpoint = otlpEndpoint);
+    });
 
 var app = builder.Build();
 
@@ -126,6 +142,7 @@ ExportTemporaryStorage.EnsureAvailable(app.Services.GetRequiredService<IOptions<
 var configuredGroups = app.Services.GetRequiredService<IOptions<AdGroupsOptions>>().Value;
 app.Logger.LogInformation("Configured Windows security groups: Viewer={ViewerGroup}, Contributor={ContributorGroup}, Admin={AdminGroup}", configuredGroups.Viewer, configuredGroups.Contributor, configuredGroups.Admin);
 app.Logger.LogInformation("Deployment manifest: BuildVersion={BuildVersion}, CommitSha={CommitSha}, PublishedAtUtc={PublishedAtUtc}", deploymentManifest.BuildVersion, deploymentManifest.CommitSha, deploymentManifest.PublishedAtUtc);
+app.Logger.LogInformation("OTLP metrics exporter {ExporterState}.", otlpEndpoint is null ? "is not configured" : $"is configured for {otlpEndpoint}");
 
 using (var scope = app.Services.CreateScope())
 {
