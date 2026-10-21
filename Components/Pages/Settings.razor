@@ -56,6 +56,11 @@ else
         @if (errorMessage is not null)
         {
             <p class="login-error" role="alert">@errorMessage</p>
+            @if (hasConflict)
+            {
+                <p>@AppText.Get("ReloadLatestHint")</p>
+                <button type="button" class="btn-secondary reload-settings" @onclick="ReloadAsync" disabled="@isSaving">@AppText.Get("ReloadLatest")</button>
+            }
         }
         @if (statusMessage is not null)
         {
@@ -101,6 +106,7 @@ else
     private PortalSettings savedSettings = new();
     private bool isLoading = true;
     private bool isSaving;
+    private bool hasConflict;
     private string? errorMessage;
     private string? statusMessage;
     private string username = "";
@@ -129,6 +135,7 @@ else
         if (errorMessage is not null) return;
 
         isSaving = true;
+        hasConflict = false;
         try
         {
             await PortalSettingsManager.SaveAsync(settings, username);
@@ -138,12 +145,38 @@ else
         }
         catch (PortalSettingsConcurrencyException)
         {
+            hasConflict = true;
             errorMessage = AppText.Get("SettingsConcurrencyConflict");
         }
         catch (Exception exception)
         {
             Logger.LogError(exception, "Could not save portal settings for {Username}.", username);
             errorMessage = AppText.Get("SettingsSaveFailed");
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private async Task ReloadAsync()
+    {
+        isSaving = true;
+        try
+        {
+            var latest = await PortalSettingsManager.GetAsync();
+            var changes = await PortalSettingsManager.GetRecentChangesAsync();
+            settings = latest;
+            savedSettings = Copy(latest);
+            recentChanges = changes;
+            errorMessage = null;
+            statusMessage = null;
+            hasConflict = false;
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Could not reload portal settings for {Username}.", username);
+            errorMessage = AppText.Get("SettingsReloadFailed");
         }
         finally
         {

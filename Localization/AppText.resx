@@ -192,7 +192,7 @@
   <data name="SaveSettings" xml:space="preserve"><value>Goym stillingar</value></data>
   <data name="SettingsSaved" xml:space="preserve"><value>Stillingarnar eru goymdar.</value></data>
   <data name="SettingsSaveFailed" xml:space="preserve"><value>Stillingarnar kundu ikki goymast. Royn aftur.</value></data>
-  <data name="SettingsConcurrencyConflict" xml:space="preserve"><value>Ein annar umsitingarmaður hevur broytt hesar stillingar. Endurles síðuna, áðrenn tú goymir aftur.</value></data>
+  <data name="SettingsConcurrencyConflict" xml:space="preserve"><value>Ein annar umsitingarmaður hevur broytt hesar stillingar. Heinta nýggjastu virðini, áðrenn tú goymir aftur.</value></data>
   <data name="GreenThresholdValidation" xml:space="preserve"><value>Grøna markið skal vera millum 1 og 24 mánaðir.</value></data>
   <data name="YellowThresholdValidation" xml:space="preserve"><value>Gula markið skal vera størri enn grøna markið og í mesta lagi 36 mánaðir.</value></data>
   <data name="LongWaitThresholdValidation" xml:space="preserve"><value>Markið fyri langa bíðitíð skal vera millum 1 og 60 mánaðir.</value></data>
@@ -245,4 +245,8 @@
   <data name="ShowInactive" xml:space="preserve"><value>Vís óvirknar ({0})</value></data>
   <data name="ReloadLatest" xml:space="preserve"><value>Heinta nýggjastu virðini</value></data>
   <data name="ReloadLatestHint" xml:space="preserve"><value>Tá ið tú heintar nýggjastu virðini, verða tínar óvistaðu broytingar skiftar út.</value></data>
+  <data name="RefreshResults" xml:space="preserve"><value>Dagfør úrslit</value></data>
+  <data name="LastRefreshed" xml:space="preserve"><value>Seinast heintað</value></data>
+  <data name="RefreshFailed" xml:space="preserve"><value>Tað bar ikki til at heinta nýggjastu úrslitini. Royn aftur.</value></data>
+  <data name="SettingsReloadFailed" xml:space="preserve"><value>Tað bar ikki til at heinta stillingarnar. Tínar óvistaðu broytingar eru varðveittar; royn aftur.</value></data>
 </root>

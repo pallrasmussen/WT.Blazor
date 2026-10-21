@@ -215,13 +215,13 @@ public class WaitingTimeReadService(
     private static IOrderedQueryable<WaitingTimeHistoryEntry> SortHistory(IQueryable<WaitingTimeHistoryEntry> query, string? sortBy, bool descending) =>
         (sortBy?.ToLowerInvariant(), descending) switch
         {
-            ("name", true) => query.OrderByDescending(entry => entry.Name).ThenByDescending(entry => entry.Timestamp),
-            ("name", false) => query.OrderBy(entry => entry.Name).ThenByDescending(entry => entry.Timestamp),
-            ("action", true) => query.OrderByDescending(entry => entry.Action).ThenByDescending(entry => entry.Timestamp),
-            ("action", false) => query.OrderBy(entry => entry.Action).ThenByDescending(entry => entry.Timestamp),
-            ("username", true) => query.OrderByDescending(entry => entry.Username).ThenByDescending(entry => entry.Timestamp),
-            ("username", false) => query.OrderBy(entry => entry.Username).ThenByDescending(entry => entry.Timestamp),
-            (_, false) => query.OrderBy(entry => entry.Timestamp),
-            _ => query.OrderByDescending(entry => entry.Timestamp)
+            ("name", true) => query.OrderByDescending(entry => entry.Name).ThenByDescending(entry => entry.Timestamp).ThenByDescending(entry => entry.Id),
+            ("name", false) => query.OrderBy(entry => entry.Name).ThenByDescending(entry => entry.Timestamp).ThenByDescending(entry => entry.Id),
+            ("action", true) => query.OrderByDescending(entry => entry.Action).ThenByDescending(entry => entry.Timestamp).ThenByDescending(entry => entry.Id),
+            ("action", false) => query.OrderBy(entry => entry.Action).ThenByDescending(entry => entry.Timestamp).ThenByDescending(entry => entry.Id),
+            ("username", true) => query.OrderByDescending(entry => entry.Username).ThenByDescending(entry => entry.Timestamp).ThenByDescending(entry => entry.Id),
+            ("username", false) => query.OrderBy(entry => entry.Username).ThenByDescending(entry => entry.Timestamp).ThenByDescending(entry => entry.Id),
+            (_, false) => query.OrderBy(entry => entry.Timestamp).ThenBy(entry => entry.Id),
+            _ => query.OrderByDescending(entry => entry.Timestamp).ThenByDescending(entry => entry.Id)
         };
 }
