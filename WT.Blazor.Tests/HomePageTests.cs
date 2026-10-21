@@ -60,6 +60,25 @@ public class HomePageTests : BunitContext
         Assert.Null(request.Department);
     }
 
+    [Fact]
+    public void PublicPageProvidesAnOverlayIndicatorLegend()
+    {
+        Services.AddSingleton<IWaitingTimeCatalogService>(new PopulatedCatalogService());
+        Services.AddSingleton<ITrendReadService>(new EmptyTrendReadService());
+        Services.AddSingleton<IPortalSettingsService>(new DefaultPortalSettingsService());
+        Services.AddSingleton<PortalSettingsChangeNotifier>();
+        Services.AddSingleton<PortalTelemetry>();
+        Services.AddSingleton(TimeProvider.System);
+
+        var cut = Render<Home>();
+
+        Assert.Equal("0", cut.Find(".public-legend").GetAttribute("tabindex"));
+        Assert.Equal("public-indicator-legend", cut.Find(".public-legend").GetAttribute("aria-describedby"));
+        Assert.Equal("tooltip", cut.Find(".public-legend-tooltip").GetAttribute("role"));
+        Assert.Single(cut.FindAll(".public-legend-tooltip .trend-legend"));
+        Assert.Single(cut.FindAll(".public-legend-tooltip .freshness-legend"));
+    }
+
     private sealed class RecordingCatalogService : IWaitingTimeCatalogService
     {
         public List<(Hospital? Hospital, Department? Department)> Requests { get; } = [];
@@ -72,6 +91,24 @@ public class HomePageTests : BunitContext
 
         public Task<List<WaitingTime>> GetAllAsync(Hospital? hospital, Department? department) =>
             Task.FromResult(new List<WaitingTime>());
+    }
+
+    private sealed class PopulatedCatalogService : IWaitingTimeCatalogService
+    {
+        private static readonly List<WaitingTime> WaitingTimes =
+        [
+            new()
+            {
+                Id = 1,
+                Name = "Test waiting time",
+                Hospital = Hospital.Klaksvikar,
+                WaitValue = 2,
+                Unit = WaitUnit.Vikur
+            }
+        ];
+
+        public Task<List<WaitingTime>> GetActiveAsync(Hospital? hospital, Department? department) => Task.FromResult(WaitingTimes);
+        public Task<List<WaitingTime>> GetAllAsync(Hospital? hospital, Department? department) => Task.FromResult(WaitingTimes);
     }
 
     private sealed class EmptyTrendReadService : ITrendReadService

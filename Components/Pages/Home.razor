@@ -39,30 +39,31 @@
 			}
 		</div>
 		<div class="utility-actions">
-            <button type="button" class="btn-secondary refresh-results" @onclick="() => RefreshAsync()" disabled="@isLoading">@AppText.Get("RefreshResults")</button>
+			@if (!isLoading && visibleItems.Count > 0)
+			{
+				<div class="public-legend" tabindex="0" aria-describedby="public-indicator-legend">
+					<span class="public-legend-trigger">@AppText.Get("ExplainIndicators")</span>
+					<div id="public-indicator-legend" class="public-legend-tooltip" role="tooltip">
+						<div class="trend-legend" aria-label="@AppText.Get("TrendLegend")">
+							<span><i class="trend-arrow trend-up" aria-hidden="true"></i> @AppText.Get("Growing")</span>
+							<span><i class="trend-arrow trend-down" aria-hidden="true"></i> @AppText.Get("Declining")</span>
+							<span><i class="trend-arrow trend-flat" aria-hidden="true"></i> @AppText.Get("Unchanged")</span>
+						</div>
+						<div class="freshness-legend" aria-label="@AppText.Get("FreshnessLegend")">
+							<span><i class="status-dot status-fresh" aria-hidden="true"></i>@AppText.Get("FreshnessCurrent")</span>
+							<span><i class="status-dot status-warning" aria-hidden="true"></i>@AppText.Get("FreshnessReview")</span>
+							<span><i class="status-dot status-old" aria-hidden="true"></i>@AppText.Get("FreshnessOverdue")</span>
+						</div>
+					</div>
+				</div>
+			}
+			<button type="button" class="btn-secondary refresh-results" @onclick="() => RefreshAsync()" disabled="@isLoading">@AppText.Get("RefreshResults")</button>
 			@if (!isLoading && visibleItems.Count > 0)
 			{
 				<button type="button" class="print-results" onclick="window.print()" title="@AppText.Get("PrintResults")"><span class="print-icon" aria-hidden="true">&#128424;</span><span>@AppText.Get("Print")</span></button>
-				<details class="public-legend">
-					<summary>@AppText.Get("ExplainIndicators")</summary>
-					<div class="trend-legend" aria-label="@AppText.Get("TrendLegend")">
-						<span><i class="trend-arrow trend-up" aria-hidden="true"></i> @AppText.Get("Growing")</span>
-						<span><i class="trend-arrow trend-down" aria-hidden="true"></i> @AppText.Get("Declining")</span>
-						<span><i class="trend-arrow trend-flat" aria-hidden="true"></i> @AppText.Get("Unchanged")</span>
-					</div>
-					<div class="freshness-legend" aria-label="@AppText.Get("FreshnessLegend")">
-						<span><i class="status-dot status-fresh" aria-hidden="true"></i>@AppText.Get("FreshnessCurrent")</span>
-						<span><i class="status-dot status-warning" aria-hidden="true"></i>@AppText.Get("FreshnessReview")</span>
-						<span><i class="status-dot status-old" aria-hidden="true"></i>@AppText.Get("FreshnessOverdue")</span>
-					</div>
-				</details>
 			}
 		</div>
 	</div>
-    @if (lastRefreshed is not null)
-    {
-        <p class="last-refreshed" role="status">@AppText.Get("LastRefreshed"): <time datetime="@lastRefreshed.Value.ToString("O")">@lastRefreshed.Value.ToString("g")</time></p>
-    }
     @if (loadFailed)
     {
         <p class="login-error" role="alert">@AppText.Get("RefreshFailed")</p>
@@ -164,7 +165,6 @@
     private bool loadFailed;
     private bool disposed;
     private long loadVersion;
-    private DateTimeOffset? lastRefreshed;
 	private List<WaitingTime> items = [];
 	private Dictionary<int, int> trendChanges = [];
 	private PortalSettings portalSettings = new();
@@ -266,7 +266,6 @@
         {
             items = [];
             trendChanges = [];
-            lastRefreshed = null;
         }
         try
         {
@@ -295,7 +294,6 @@
             items = loadedItems;
             trendChanges = loadedTrends;
             portalSettings = loadedSettings;
-            lastRefreshed = TimeProvider.GetLocalNow();
             Telemetry.RecordPublicRefreshSucceeded(source);
             Logger.LogDebug("Completed public waiting-time refresh from {Source} with {ItemCount} items.", source, loadedItems.Count);
         }

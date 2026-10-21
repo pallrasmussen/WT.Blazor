@@ -27,11 +27,8 @@ public class PublicBrowserSmokeTests : IAsyncLifetime
         var searchBox = page.GetByLabel(searchLabel);
         await searchBox.FillAsync("__browser-smoke-no-match__");
         await Assertions.Expect(page.Locator(".empty-state")).ToBeVisibleAsync();
-        var refreshedTime = page.Locator(".last-refreshed time");
-        var previousTime = await refreshedTime.GetAttributeAsync("datetime");
         await page.Locator(".refresh-results").ClickAsync();
         await Assertions.Expect(page.Locator(".refresh-results")).ToBeEnabledAsync();
-        await Assertions.Expect(refreshedTime).Not.ToHaveAttributeAsync("datetime", previousTime!);
         await Assertions.Expect(searchBox).ToHaveValueAsync("__browser-smoke-no-match__");
         await Assertions.Expect(page.Locator(".empty-state")).ToBeVisibleAsync();
 

@@ -173,7 +173,8 @@ input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible
 .section-heading { align-items: end; border-top: 1px solid var(--wt-line); display: flex; justify-content: space-between; margin-top: 2rem; padding-top: 1.5rem; }
 .results-toolbar { align-items: start; border-top: 1px solid var(--wt-line); display: flex; justify-content: space-between; margin-top: 2rem; padding-top: 1rem; }
 .public-utilities { align-items: center; border-top: 0; gap: 1rem; margin-top: 0; padding-top: 0; }
-.utility-actions { align-items: center; display: flex; flex: 0 0 auto; flex-wrap: wrap; gap: 1rem; }
+.utility-actions { align-items: flex-start; display: flex; flex: 0 0 auto; flex-wrap: wrap; gap: 1rem; }
+.utility-actions .print-results { align-self: start; }
 .section-heading h2, .internal-card h2 { margin: 0; }
 .result-count, .role-badge { color: var(--wt-muted); font-size: .85rem; }
 .result-summary, .updated-today { color: var(--wt-muted); font-size: .78rem; }
@@ -181,12 +182,12 @@ input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible
 .result-meta { align-items: end; display: flex; flex-direction: column; gap: .55rem; }
 .trend-legend { color: var(--wt-muted); display: flex; flex-wrap: wrap; font-size: .75rem; gap: .65rem; justify-content: flex-end; }
 .trend-legend span { align-items: center; display: inline-flex; gap: .2rem; }
-.public-legend { color: var(--wt-muted); font-size: .78rem; }
-.public-legend summary { color: var(--wt-teal); cursor: pointer; font-weight: 700; list-style: none; }
-.public-legend summary::-webkit-details-marker { display: none; }
-.public-legend summary::after { content: ' +'; }
-.public-legend[open] summary::after { content: ' -'; }
-.public-legend[open] > div { margin-top: .5rem; }
+.public-legend { color: var(--wt-muted); font-size: .78rem; padding-top: .55rem; position: relative; }
+.public-legend-trigger { color: var(--wt-teal); cursor: help; font-weight: 700; }
+.public-legend:focus-visible { outline: 2px solid var(--wt-teal); outline-offset: 2px; }
+.public-legend-tooltip { background: white; border: 1px solid var(--wt-line); border-radius: .5rem; box-shadow: 0 .75rem 1.5rem rgba(30, 52, 84, .16); display: none; gap: .75rem; max-width: min(30rem, calc(100vw - 2.5rem)); padding: .85rem 1rem; position: absolute; right: 0; top: calc(100% + .5rem); width: max-content; z-index: 10; }
+.public-legend:hover .public-legend-tooltip, .public-legend:focus .public-legend-tooltip { display: grid; }
+.public-legend-tooltip .trend-legend, .public-legend-tooltip .freshness-legend { justify-content: flex-start; }
 .freshness-legend { color: var(--wt-muted); display: flex; flex-wrap: wrap; font-size: .75rem; gap: .65rem; justify-content: flex-end; }
 .freshness-legend span { align-items: center; display: inline-flex; gap: .35rem; }
 .freshness-legend .status-dot::before { height: .55rem; min-width: .55rem; width: .55rem; }

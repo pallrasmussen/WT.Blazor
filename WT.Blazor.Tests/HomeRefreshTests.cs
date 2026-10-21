@@ -57,20 +57,16 @@ public class HomeRefreshTests : BunitContext
     }
 
     [Fact]
-    public void RefreshPreservesFiltersAndSearchAndOnlyAdvancesTimeAfterSuccess()
+    public void RefreshPreservesFiltersAndSearchAndRetainsResultsAfterFailure()
     {
-        var clock = new MutableClock();
         var catalog = new MutableCatalog();
-        Configure(catalog, new EmptyTrends(), clock);
+        Configure(catalog, new EmptyTrends(), TimeProvider.System);
         Services.GetRequiredService<NavigationManager>().NavigateTo("/?hospital=Klaksvikar&q=Matching");
         var cut = Render<Home>();
-        var firstTime = cut.Find(".last-refreshed time").GetAttribute("datetime");
         catalog.Fail = true;
-        clock.Now = clock.Now.AddMinutes(1);
         cut.Find(".refresh-results").Click();
         cut.WaitForAssertion(() => Assert.Single(cut.FindAll("[role='alert']")));
         Assert.Contains("Matching before", cut.Markup);
-        Assert.Equal(firstTime, cut.Find(".last-refreshed time").GetAttribute("datetime"));
         catalog.Fail = false;
         catalog.Name = "Matching after";
         cut.Find(".refresh-results").Click();
@@ -78,7 +74,6 @@ public class HomeRefreshTests : BunitContext
         Assert.DoesNotContain("Matching before", cut.Markup);
         Assert.Equal("Matching", cut.Find("#search").GetAttribute("value"));
         Assert.All(catalog.Requests, hospital => Assert.Equal(Hospital.Klaksvikar, hospital));
-        Assert.NotEqual(firstTime, cut.Find(".last-refreshed time").GetAttribute("datetime"));
         Assert.Empty(cut.FindAll("[role='alert']"));
         catalog.Name = "Matching notified";
         Services.GetRequiredService<PortalSettingsChangeNotifier>().NotifyChanged();
