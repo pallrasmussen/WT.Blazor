@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @layout Layout.PublicLayout
 @rendermode InteractiveServer
 @implements IDisposable
@@ -9,6 +9,7 @@
 @inject PortalSettingsChangeNotifier PortalSettingsNotifier
 @inject TimeProvider TimeProvider
 @inject NavigationManager NavigationManager
+@inject ILogger<Home> Logger
 
 <PageTitle>Bíðitíðir | Sjúkrahúsverkið</PageTitle>
 
@@ -37,6 +38,7 @@
 			}
 		</div>
 		<div class="utility-actions">
+            <button type="button" class="btn-secondary refresh-results" @onclick="RefreshAsync" disabled="@isLoading">@AppText.Get("RefreshResults")</button>
 			@if (!isLoading && visibleItems.Count > 0)
 			{
 				<button type="button" class="print-results" onclick="window.print()" title="@AppText.Get("PrintResults")"><span class="print-icon" aria-hidden="true">&#128424;</span><span>@AppText.Get("Print")</span></button>
@@ -56,6 +58,14 @@
 			}
 		</div>
 	</div>
+    @if (lastRefreshed is not null)
+    {
+        <p class="last-refreshed" role="status">@AppText.Get("LastRefreshed"): <time datetime="@lastRefreshed.Value.ToString("O")">@lastRefreshed.Value.ToString("g")</time></p>
+    }
+    @if (loadFailed)
+    {
+        <p class="login-error" role="alert">@AppText.Get("RefreshFailed")</p>
+    }
 	<p class="print-summary">@string.Format(AppText.Get("PrintContext"), ScopeText, visibleItems.Count, TimeProvider.GetLocalNow())</p>
 
 	@if (isLoading && items.Count == 0)
@@ -150,6 +160,10 @@
 	[SupplyParameterFromQuery(Name = "q")] public string? QuerySearch { get; set; }
 	private bool hasSearched;
 	private bool isLoading;
+    private bool loadFailed;
+    private bool disposed;
+    private long loadVersion;
+    private DateTimeOffset? lastRefreshed;
 	private List<WaitingTime> items = [];
 	private Dictionary<int, int> trendChanges = [];
 	private PortalSettings portalSettings = new();
@@ -179,7 +193,6 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		portalSettings = await PortalSettingsReader.GetAsync();
 		Hospital? hospital = Enum.TryParse<Hospital>(QueryHospital, out var parsedHospital)
 			? parsedHospital
 			: null;
@@ -192,20 +205,23 @@
 		selectedPreset = PresetFor(hospital);
 		searchText = QuerySearch ?? "";
 		hasSearched = true;
-		isLoading = true;
 		await LoadItemsAsync(hospital, department);
-		isLoading = false;
 	}
 
 	protected override void OnInitialized() => PortalSettingsNotifier.Changed += HandleSettingsChanged;
 
-	private void HandleSettingsChanged(object? sender, EventArgs args) => _ = InvokeAsync(async () =>
-	{
-		portalSettings = await PortalSettingsReader.GetAsync();
-		StateHasChanged();
-	});
+    private void HandleSettingsChanged(object? sender, EventArgs args) => _ = InvokeAsync(async () =>
+    {
+        await RefreshAsync();
+        if (!disposed) StateHasChanged();
+    });
 
-	public void Dispose() => PortalSettingsNotifier.Changed -= HandleSettingsChanged;
+    public void Dispose()
+    {
+        disposed = true;
+        loadVersion++;
+        PortalSettingsNotifier.Changed -= HandleSettingsChanged;
+    }
 
 	private async Task ClearFilters()
 	{
@@ -215,11 +231,7 @@
 		selectedPreset = AllPreset;
 		UpdateUrl();
 		hasSearched = true;
-		isLoading = true;
-		StateHasChanged();
-
-		await LoadItemsAsync(null, null);
-		isLoading = false;
+		await LoadItemsAsync(null, null, clearResults: true);
 	}
 
 	private async Task ApplyPresetAsync(string preset)
@@ -236,18 +248,51 @@
 		selectedDepartmentName = "";
 		UpdateUrl();
 		hasSearched = true;
-		isLoading = true;
-		StateHasChanged();
-
-		await LoadItemsAsync(DisplayNames.TryHospitalFrom(selectedHospitalName), null);
-		isLoading = false;
+		await LoadItemsAsync(DisplayNames.TryHospitalFrom(selectedHospitalName), null, clearResults: true);
 	}
 
-	private async Task LoadItemsAsync(Hospital? hospital, Department? department)
-	{
-		items = await WaitingTimeCatalog.GetActiveAsync(hospital, department);
-		trendChanges = await TrendReader.GetTrendChangesAsync(items.Select(item => item.Id));
-	}
+    private Task RefreshAsync() => LoadItemsAsync(
+        DisplayNames.TryHospitalFrom(selectedHospitalName), DisplayNames.TryDepartmentFrom(selectedDepartmentName));
+
+    private async Task LoadItemsAsync(Hospital? hospital, Department? department, bool clearResults = false)
+    {
+        if (disposed) return;
+        var request = ++loadVersion;
+        isLoading = true;
+        loadFailed = false;
+        if (clearResults)
+        {
+            items = [];
+            trendChanges = [];
+            lastRefreshed = null;
+        }
+        try
+        {
+            var loadedItems = await WaitingTimeCatalog.GetActiveAsync(hospital, department);
+            if (disposed || request != loadVersion) return;
+            var loadedTrends = await TrendReader.GetTrendChangesAsync(loadedItems.Select(item => item.Id));
+            if (disposed || request != loadVersion) return;
+            var loadedSettings = await PortalSettingsReader.GetAsync();
+            if (disposed || request != loadVersion) return;
+            // Publish a complete result only if this is still the latest request.
+            items = loadedItems;
+            trendChanges = loadedTrends;
+            portalSettings = loadedSettings;
+            lastRefreshed = TimeProvider.GetLocalNow();
+        }
+        catch (Exception exception)
+        {
+            if (!disposed && request == loadVersion)
+            {
+                Logger.LogError(exception, "Could not load public waiting times.");
+                loadFailed = true;
+            }
+        }
+        finally
+        {
+            if (!disposed && request == loadVersion) isLoading = false;
+        }
+    }
 
 	private void UpdateUrl()
 	{

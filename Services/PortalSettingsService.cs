@@ -25,6 +25,10 @@ public sealed class PortalSettingsService(ApplicationDbContext db, PortalSetting
         using var operation = await DatabaseOperation.EnterAsync(db, cancellationToken);
         Validate(settings);
 
+        // A Blazor circuit can outlive changes saved by other administrators.
+        // Load a fresh tracked row for each operation, preserving unrelated entities.
+        foreach (var entry in db.ChangeTracker.Entries<PortalSettings>().ToList())
+            entry.State = EntityState.Detached;
         var current = await db.PortalSettings.SingleOrDefaultAsync(item => item.Id == 1, cancellationToken);
         if (current is null)
         {
@@ -32,11 +36,16 @@ public sealed class PortalSettingsService(ApplicationDbContext db, PortalSetting
             db.PortalSettings.Add(current);
         }
 
+        if (current.Version != settings.Version)
+        {
+            db.Entry(current).State = EntityState.Detached;
+            throw new PortalSettingsConcurrencyException();
+        }
+
         var changed = current.GreenMaximumAgeMonths != settings.GreenMaximumAgeMonths
             || current.YellowMaximumAgeMonths != settings.YellowMaximumAgeMonths
             || current.LongWaitMonths != settings.LongWaitMonths;
         if (!changed) return;
-        if (current.Version != settings.Version) throw new PortalSettingsConcurrencyException();
 
         db.PortalSettingsAuditEntries.Add(new PortalSettingsAuditEntry
         {

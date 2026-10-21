@@ -123,7 +123,7 @@
   <data name="SaveSettings" xml:space="preserve"><value>Save settings</value></data>
   <data name="SettingsSaved" xml:space="preserve"><value>Settings saved.</value></data>
   <data name="SettingsSaveFailed" xml:space="preserve"><value>Settings could not be saved. Try again.</value></data>
-  <data name="SettingsConcurrencyConflict" xml:space="preserve"><value>Another administrator changed these settings. Reload the page before saving again.</value></data>
+  <data name="SettingsConcurrencyConflict" xml:space="preserve"><value>Another administrator changed these settings. Reload the latest values before saving again.</value></data>
   <data name="GreenThresholdValidation" xml:space="preserve"><value>The green threshold must be between 1 and 24 months.</value></data>
   <data name="YellowThresholdValidation" xml:space="preserve"><value>The yellow threshold must be later than the green threshold and at most 36 months.</value></data>
   <data name="LongWaitThresholdValidation" xml:space="preserve"><value>The long-wait threshold must be between 1 and 60 months.</value></data>
@@ -187,4 +187,8 @@
   <data name="ShowInactive" xml:space="preserve"><value>Show inactive ({0})</value></data>
   <data name="ReloadLatest" xml:space="preserve"><value>Reload latest values</value></data>
   <data name="ReloadLatestHint" xml:space="preserve"><value>Reloading replaces your unsaved edits with the latest saved values.</value></data>
+  <data name="RefreshResults" xml:space="preserve"><value>Refresh results</value></data>
+  <data name="LastRefreshed" xml:space="preserve"><value>Last refreshed</value></data>
+  <data name="RefreshFailed" xml:space="preserve"><value>Could not load the latest results. Try refreshing again.</value></data>
+  <data name="SettingsReloadFailed" xml:space="preserve"><value>Could not reload settings. Your unsaved changes are preserved; try again.</value></data>
 </root>

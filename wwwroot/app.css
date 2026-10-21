@@ -172,7 +172,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible
 .section-heading { align-items: end; border-top: 1px solid var(--wt-line); display: flex; justify-content: space-between; margin-top: 2rem; padding-top: 1.5rem; }
 .results-toolbar { align-items: start; border-top: 1px solid var(--wt-line); display: flex; justify-content: space-between; margin-top: 2rem; padding-top: 1rem; }
 .public-utilities { align-items: center; border-top: 0; gap: 1rem; margin-top: 0; padding-top: 0; }
-.utility-actions { align-items: center; display: flex; flex: 0 0 auto; gap: 1rem; }
+.utility-actions { align-items: center; display: flex; flex: 0 0 auto; flex-wrap: wrap; gap: 1rem; }
 .section-heading h2, .internal-card h2 { margin: 0; }
 .result-count, .role-badge { color: var(--wt-muted); font-size: .85rem; }
 .result-summary, .updated-today { color: var(--wt-muted); font-size: .78rem; }
@@ -467,3 +467,4 @@ button.btn-secondary:disabled, button.btn-teal:disabled { cursor: default; opaci
     .waiting-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .waiting-card { break-inside: avoid; min-height: 0; }
 }
+.last-refreshed { color: var(--wt-muted); font-size: .85rem; margin: .5rem 0; }

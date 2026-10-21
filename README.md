@@ -138,3 +138,21 @@ they contain restored data and keys. Run under an identity able to decrypt the
 archived keys if keys are protected by Windows or a certificate. The tool does not
 test live AD membership, IIS bindings, or real users' sessions; complete those checks
 on isolated IIS staging with the existing authenticated browser scripts.
+
+## Refreshing public results and resolving settings conflicts
+
+Use **Refresh results** to reload waiting times, trend indicators and freshness
+settings while preserving the selected hospital, department and search text.
+The last-refreshed timestamp advances only after a successful load. Failed
+refreshes retain the previous results and show an error. Filter changes clear
+results from the old scope, and superseded requests cannot replace the latest
+selection. Results are refreshed on demand; there is no background polling.
+
+If another administrator changes portal settings, your unsaved input remains
+visible. **Reload latest values** replaces it with the latest saved settings;
+review those values before editing and saving again. Settings saves reload the
+database row so a long-lived circuit does not remain stuck on an old version.
+
+Audit sorts use the entry ID as a final tie-breaker when other values are equal.
+This stabilizes ordering for tied timestamps; pages are not a frozen snapshot
+when new entries are inserted between requests.
