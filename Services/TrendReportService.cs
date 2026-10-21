@@ -21,7 +21,7 @@ public sealed class TrendReportService(ITrendReadService trendReader) : ITrendRe
     public async Task<TrendReport?> GetAsync(int waitingTimeId, CancellationToken cancellationToken = default, int? periodDays = null)
     {
         var item = await trendReader.GetByIdAsync(waitingTimeId, cancellationToken);
-        if (item is null) return null;
+        if (item is null || !item.IsActive) return null;
 
         var points = await trendReader.GetTrendPointsAsync(waitingTimeId, cancellationToken, periodDays);
         return new TrendReport(
