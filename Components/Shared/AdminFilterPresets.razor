@@ -1,14 +1,14 @@
 <div class="filter-presets" role="group" aria-label="@AppText.Get("FilterPresets")">
     <span>@AppText.Get("FilterPresets")</span>
-    <button class="btn-secondary @(SelectedPreset == All ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(All)">@AppText.Get("PresetAll")</button>
+    <button class="btn-secondary @(IsSelected(All) ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(All)">@AppText.Get("PresetAll")</button>
     @if (IncludeReview)
     {
-        <button class="btn-secondary @(SelectedPreset == Review ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(Review)">@AppText.Get("PresetNeedsReview")</button>
+        <button class="btn-secondary @(IsSelected(Review) ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(Review)">@AppText.Get("PresetNeedsReview")</button>
     }
-    <button class="btn-secondary @(SelectedPreset == Shared ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(Shared)">@AppText.Get("SharedWaitingLists")</button>
-    <button class="btn-secondary @(SelectedPreset == National ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(National)">@DisplayNames.For(Hospital.Landssjukrahusid)</button>
-    <button class="btn-secondary @(SelectedPreset == Klaksvik ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(Klaksvik)">@DisplayNames.For(Hospital.Klaksvikar)</button>
-    <button class="btn-secondary @(SelectedPreset == Suduroy ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(Suduroy)">@DisplayNames.For(Hospital.Suduroyar)</button>
+    <button class="btn-secondary @(IsSelected(Shared) ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(Shared)">@AppText.Get("SharedWaitingLists")</button>
+    <button class="btn-secondary @(IsSelected(National) ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(National)">@DisplayNames.For(Hospital.Landssjukrahusid)</button>
+    <button class="btn-secondary @(IsSelected(Klaksvik) ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(Klaksvik)">@DisplayNames.For(Hospital.Klaksvikar)</button>
+    <button class="btn-secondary @(IsSelected(Suduroy) ? "active" : "")" @onclick="() => PresetSelected.InvokeAsync(Suduroy)">@DisplayNames.For(Hospital.Suduroyar)</button>
 </div>
 
 @code {
@@ -22,4 +22,9 @@
     private const string National = "national";
     private const string Klaksvik = "klaksvik";
     private const string Suduroy = "suduroy";
+
+    private bool IsSelected(string preset) =>
+        string.IsNullOrEmpty(SelectedPreset)
+            ? preset == All
+            : SelectedPreset == preset;
 }

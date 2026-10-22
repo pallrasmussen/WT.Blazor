@@ -11,11 +11,8 @@ public partial class Internal
 {
     private static readonly string LandssjukrahusidName = DisplayNames.For(Hospital.Landssjukrahusid);
     private static readonly Hospital[] FilterHospitals = Enum.GetValues<Hospital>();
-    private static readonly Hospital[] EditableHospitals = FilterHospitals
-        .Where(hospital => hospital != Hospital.Sjukrahusverkid)
-        .ToArray();
+    private static readonly Hospital[] EditableHospitals = FilterHospitals;
     private static readonly Department[] AllDepartments = Enum.GetValues<Department>();
-    private static readonly string[] FormHospitals = EditableHospitals.Select(DisplayNames.For).ToArray();
     private static readonly string[] FormDepartments = AllDepartments.Select(DisplayNames.For).ToArray();
 
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }

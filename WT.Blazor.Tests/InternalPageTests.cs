@@ -64,6 +64,16 @@ public class InternalPageTests : BunitContext
     }
 
     [Fact]
+    public void CreateFormIncludesSharedWaitingListsOption()
+    {
+        var cut = RenderInternal(new WaitingTimeManager(), openCreateForm: true);
+
+        Assert.Contains(cut.FindAll("#new-hospital option"), option =>
+            option.GetAttribute("value") == DisplayNames.For(Hospital.Sjukrahusverkid)
+            && option.TextContent == AppText.Get("SharedWaitingLists"));
+    }
+
+    [Fact]
     public void SharedWaitingListsShortcutSelectsTheSharedFilter()
     {
         var cut = RenderInternal(new WaitingTimeManager());

@@ -340,8 +340,8 @@ input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible
 .filter-presets > span { color: var(--wt-muted); font-size: .8rem; font-weight: 700; }
 .filter-presets button.btn-secondary { appearance: none; background: white; border: 1px solid var(--wt-line); border-radius: .4rem; box-shadow: 0 1px 2px rgba(30, 52, 84, .08); color: var(--wt-ink); cursor: pointer; font: inherit; font-size: .82rem; font-weight: 700; min-height: 2.25rem; padding: .45rem .7rem; }
 .filter-presets button.btn-secondary:hover { background: var(--wt-mist); border-color: var(--wt-turquoise); color: var(--wt-teal); }
-.filter-presets button.btn-secondary.active { background: var(--wt-teal); border-color: var(--wt-teal); box-shadow: none; color: white; }
-.filter-presets button.btn-secondary.active:hover { background: #00545b; border-color: #00545b; color: white; }
+.filter-presets button.btn-secondary.active { background: #1d4ed8; border-color: #1d4ed8; box-shadow: none; color: white; }
+.filter-presets button.btn-secondary.active:hover { background: #1e40af; border-color: #1e40af; color: white; }
 .home-filter-presets { margin-bottom: 1rem; }
 .change-preview { background: #f0f7f6; border: 1px solid #b9dcd7; border-radius: .5rem; display: grid; gap: .6rem; margin-top: 1rem; padding: .8rem; }
 .change-preview ul { margin: 0; padding-left: 1.25rem; }

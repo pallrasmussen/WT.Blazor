@@ -28,7 +28,7 @@
 {
 <section class="public-panel">
         <div class="admin-toolbar">
-            <AdminFilterPresets SelectedPreset="selectedPreset" PresetSelected="ApplyPresetAsync" />
+            <AdminFilterPresets SelectedPreset="@selectedPreset" PresetSelected="ApplyPresetAsync" />
             <div>
                 <label for="admin-hospital">@AppText.Get("Hospital")</label>
                 <select id="admin-hospital" @bind="filterHospital" @bind:after="FilterChangedAsync">
@@ -95,9 +95,9 @@
                     <label for="new-hospital">@AppText.Get("HistoryColumnHospital")</label>
                     <select id="new-hospital" @bind="createForm.HospitalName">
                         <option value="">@AppText.Get("ChooseHospital")</option>
-                        @foreach (var h in FormHospitals)
+                        @foreach (var h in EditableHospitals)
                         {
-                            <option value="@h">@h</option>
+                            <option value="@DisplayNames.For(h)">@(h == Hospital.Sjukrahusverkid ? AppText.Get("SharedWaitingLists") : DisplayNames.For(h))</option>
                         }
                     </select>
                 </div>
@@ -291,9 +291,9 @@
                     <div class="edit-form-field">
                         <label for="edit-hospital">@AppText.Get("HistoryColumnHospital")</label>
                         <select id="edit-hospital" @bind="editForm.HospitalName">
-                            @foreach (var h in FormHospitals)
+                            @foreach (var h in EditableHospitals)
                             {
-                                <option value="@h">@h</option>
+                                <option value="@DisplayNames.For(h)">@(h == Hospital.Sjukrahusverkid ? AppText.Get("SharedWaitingLists") : DisplayNames.For(h))</option>
                             }
                         </select>
                     </div>

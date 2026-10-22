@@ -198,7 +198,7 @@ public class WaitingTimeManagementService(
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("A waiting time must have a name.", nameof(name));
         if (name.Length > 200) throw new ArgumentException("A waiting time name cannot exceed 200 characters.", nameof(name));
         if (wait < 0) throw new ArgumentOutOfRangeException(nameof(wait), "A waiting time cannot be negative.");
-        if (!Enum.IsDefined(hospital) || hospital == Hospital.Sjukrahusverkid) throw new ArgumentOutOfRangeException(nameof(hospital));
+        if (!Enum.IsDefined(hospital)) throw new ArgumentOutOfRangeException(nameof(hospital));
         if (hospital == Hospital.Landssjukrahusid && department is null) throw new ArgumentException("Landssjúkrahúsið requires a department.", nameof(department));
         if (department is not null && !Enum.IsDefined(department.Value)) throw new ArgumentOutOfRangeException(nameof(department));
         if (!Enum.IsDefined(unit)) throw new ArgumentOutOfRangeException(nameof(unit));

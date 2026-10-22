@@ -323,6 +323,12 @@ public class AuditLogTests
                 Assert.Equal("Viðgerð", waitingTime.Name);
                 Assert.Equal("Viðmerking", waitingTime.Note);
                 Assert.Null(waitingTime.Department);
+
+                var sharedWaitingTime = await managementService.CreateAsync(new WaitingTimeCreate(
+                    "Felags viðgerð", Hospital.Sjukrahusverkid, Department.Medisinskidepilin, 3, WaitUnit.Vikur, null, "heilsunet\\test-user"));
+
+                Assert.Equal(Hospital.Sjukrahusverkid, sharedWaitingTime.Hospital);
+                Assert.Null(sharedWaitingTime.Department);
             }
         }
         finally
