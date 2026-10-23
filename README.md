@@ -10,7 +10,7 @@ The interface supports Faroese and English.
 Install the .NET 10 SDK, then run:
 
 ```powershell
-dotnet restore .\WT.Blazor.Tests\WT.Blazor.Tests.csproj
+dotnet restore .\WT.Blazor.sln
 dotnet run --project .\WT.Blazor.csproj
 ```
 
@@ -43,12 +43,18 @@ Inactive records are excluded from public trend pages and PDF reports.
 temporary export storage, HTTPS redirection and logging. Database operations
 sharing a Blazor circuit's scoped context are serialized across services.
 
+The application currently uses SQLite and is intended for a single application
+instance with its database on durable local storage. If deployment requires
+multiple application instances, higher write concurrency, or database-level
+high availability, plan a move to a server database such as SQL Server or
+PostgreSQL. This requires provider and migration work; changing only the
+connection string is not sufficient.
+
 ## Verification
 
 ```powershell
-dotnet test .\WT.Blazor.Tests\WT.Blazor.Tests.csproj
-dotnet format .\WT.Blazor.csproj --verify-no-changes
-dotnet format .\WT.Blazor.Tests\WT.Blazor.Tests.csproj --verify-no-changes
+dotnet test .\WT.Blazor.sln
+dotnet format .\WT.Blazor.sln --verify-no-changes
 .\tests\Test-WithCoverage.ps1
 ```
 
