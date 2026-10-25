@@ -32,6 +32,12 @@ public static class TrendPointReducer
         return points.Count == 0 ? 0 : CanonicalDays(points[^1]) - CanonicalDays(points[0]);
     }
 
+    public static int LatestChange(IEnumerable<TrendHistoryPoint> history)
+    {
+        var points = Reduce(history, WaitUnit.Dagar);
+        return points.Count < 2 ? 0 : points[^1].Value - points[^2].Value;
+    }
+
     private static int CanonicalDays(TrendHistoryPoint point) =>
         point.WaitDays ?? WaitDuration.ToDays(point.Value, point.Unit ?? throw new InvalidOperationException("A trend point requires a unit or canonical days."));
 }

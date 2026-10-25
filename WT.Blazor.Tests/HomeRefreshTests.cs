@@ -30,7 +30,6 @@ public class HomeRefreshTests : BunitContext
         Assert.Contains("Latest result", cut.Markup);
         Assert.DoesNotContain("Obsolete result", cut.Markup);
         Assert.Empty(cut.FindAll("[role='alert']"));
-        Assert.False(cut.Find(".refresh-results").HasAttribute("disabled"));
     }
 
     [Fact]
@@ -46,30 +45,28 @@ public class HomeRefreshTests : BunitContext
         var newer = Preset(cut, Hospital.Suduroyar).ClickAsync(new MouseEventArgs());
         trends.Release.SetResult(new Dictionary<int, int> { [1] = 99 });
         await older;
-        var stillLoading = cut.Find(".refresh-results").HasAttribute("disabled");
         var obsoleteWasShown = cut.Markup.Contains("Obsolete result", StringComparison.Ordinal);
         catalog.Suduroy.SetResult([Item(2, "Latest result")]);
         await newer;
-        Assert.True(stillLoading);
         Assert.False(obsoleteWasShown);
         cut.WaitForAssertion(() => Assert.Contains("Latest result", cut.Markup));
         Assert.Empty(cut.FindAll(".waiting-card .trend-arrow"));
     }
 
     [Fact]
-    public void RefreshPreservesFiltersAndSearchAndRetainsResultsAfterFailure()
+    public void SettingsRefreshPreservesFiltersAndSearchAndRetainsResultsAfterFailure()
     {
         var catalog = new MutableCatalog();
         Configure(catalog, new EmptyTrends(), TimeProvider.System);
         Services.GetRequiredService<NavigationManager>().NavigateTo("/?hospital=Klaksvikar&q=Matching");
         var cut = Render<Home>();
         catalog.Fail = true;
-        cut.Find(".refresh-results").Click();
+        Services.GetRequiredService<PortalSettingsChangeNotifier>().NotifyChanged();
         cut.WaitForAssertion(() => Assert.Single(cut.FindAll("[role='alert']")));
         Assert.Contains("Matching before", cut.Markup);
         catalog.Fail = false;
         catalog.Name = "Matching after";
-        cut.Find(".refresh-results").Click();
+        Services.GetRequiredService<PortalSettingsChangeNotifier>().NotifyChanged();
         cut.WaitForAssertion(() => Assert.Contains("Matching after", cut.Markup));
         Assert.DoesNotContain("Matching before", cut.Markup);
         Assert.Equal("Matching", cut.Find("#search").GetAttribute("value"));

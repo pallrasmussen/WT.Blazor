@@ -144,6 +144,6 @@ public class ReviewRegressionTests
         var reader = new WaitingTimeReadService(db, TimeProvider.System);
         Assert.Null(await new TrendReportService(reader).GetAsync(item.Id));
         var changes = await reader.GetTrendChangesAsync([item.Id]);
-        Assert.Equal(99 * 7, changes[item.Id]);
+        Assert.Equal(7, changes[item.Id]);
     }
 }

@@ -35,10 +35,14 @@ else
     private static readonly (int L, int R, int T, int B) Pad = (62, 28, 20, 60);
 
     private double MinTicks => Points.Min(p => p.Timestamp.Ticks);
-    private double MaxTicks => Points.Max(p => p.Timestamp.Ticks) is var max && max == MinTicks ? max + TimeSpan.FromDays(1).Ticks : max;
-    private double MinValue => Math.Max(0, Points.Min(p => p.Value) - Spread * 0.25);
-    private double MaxValue => Points.Max(p => p.Value) + Spread * 0.25;
-    private double Spread => Math.Max(1, Points.Max(p => p.Value) - Points.Min(p => p.Value));
+    private DateTime ChartEnd => DateTime.UtcNow.Date > Points[^1].Timestamp.Date
+        ? DateTime.UtcNow.Date
+        : Points[^1].Timestamp;
+    private double MaxTicks => ChartEnd.Ticks == MinTicks ? ChartEnd.AddDays(1).Ticks : ChartEnd.Ticks;
+    private double MinValue => 0;
+    private double YAxisTickStep => Math.Max(1, Math.Ceiling((Points.Max(p => p.Value) + 1) / 4d));
+    private double MaxValue => Math.Ceiling((Points.Max(p => p.Value) + YAxisTickStep) / YAxisTickStep) * YAxisTickStep;
+    private int YAxisTickCount => (int)(MaxValue / YAxisTickStep);
 
     private double X(DateTime t)
     {
@@ -58,13 +62,12 @@ else
     {
         var sb = new System.Text.StringBuilder();
 
-        const int ticks = 4;
-        for (var i = 0; i <= ticks; i++)
+        for (var i = 0; i <= YAxisTickCount; i++)
         {
-            var value = MinValue + (MaxValue - MinValue) * i / ticks;
+            var value = i * YAxisTickStep;
             var y = Y(value);
             sb.Append($"""<line x1="{Pad.L}" y1="{F(y)}" x2="{Width - Pad.R}" y2="{F(y)}" stroke="#e3e8eb" stroke-width="1"/>""");
-            sb.Append($"""<text x="{Pad.L - 10}" y="{F(y + 4)}" text-anchor="end" font-size="11" fill="#667085">{Math.Round(value)}</text>""");
+            sb.Append($"""<text x="{Pad.L - 10}" y="{F(y + 4)}" text-anchor="end" font-size="11" fill="#667085">{F(value)}</text>""");
         }
 
         var d = new System.Text.StringBuilder($"M {F(X(Points[0].Timestamp))} {F(Y(Points[0].Value))}");
@@ -73,6 +76,14 @@ else
             d.Append($" L {F(X(Points[i].Timestamp))} {F(Y(Points[i].Value))}");
         }
         sb.Append($"""<path d="{d}" fill="none" stroke="#006b73" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>""");
+
+        if (ChartEnd > Points[^1].Timestamp)
+        {
+            var lastPoint = Points[^1];
+            var y = Y(lastPoint.Value);
+            sb.Append($"""<path class="chart-current-estimate" d="M {F(X(lastPoint.Timestamp))} {F(y)} H {F(X(ChartEnd))}" fill="none" stroke="#006b73" stroke-width="4" stroke-dasharray="6 5" stroke-linecap="round"/>""");
+            sb.Append($"""<text class="chart-date-label" x="{F(X(ChartEnd))}" y="{Height - Pad.B + 24}" text-anchor="end" font-size="10.5" fill="#667085">{System.Net.WebUtility.HtmlEncode(AppText.Get("Current"))}</text>""");
+        }
 
         var dateLabelIndices = DateLabelIndices();
         for (var index = 0; index < Points.Count; index++)
@@ -106,7 +117,11 @@ else
             labelIndices.RemoveAt(labelIndices.Count - 1);
         }
 
-        labelIndices.Add(lastIndex);
+        var currentLabelWouldOverlap = ChartEnd > Points[lastIndex].Timestamp &&
+                                       X(ChartEnd) - X(Points[lastIndex].Timestamp) < MinimumDateLabelSpacing;
+        if (!currentLabelWouldOverlap)
+            labelIndices.Add(lastIndex);
+
         return labelIndices.ToHashSet();
     }
 }

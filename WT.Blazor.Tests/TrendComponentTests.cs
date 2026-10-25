@@ -41,24 +41,77 @@ public class TrendComponentTests : BunitContext
     }
 
     [Fact]
+    public void ChartUsesStraightSegmentsAndExtendsTheLatestEstimateToToday()
+    {
+        var cut = Render<WaitTrendChart>(parameters => parameters
+            .Add(component => component.Points,
+            [
+                new TrendPoint(new DateTime(2020, 1, 1), 3),
+                new TrendPoint(new DateTime(2020, 2, 1), 4)
+            ])
+            .Add(component => component.UnitLabel, "weeks"));
+
+        var paths = cut.FindAll("path");
+
+        Assert.Contains(paths, path => path.GetAttribute("d")!.Contains(" L "));
+        Assert.Single(cut.FindAll("path.chart-current-estimate"));
+    }
+
+    [Fact]
+    public void ChartHidesLatestRecordedDateWhenItWouldOverlapTheCurrentLabel()
+    {
+        var latestDate = DateTime.UtcNow.Date.AddDays(-1);
+        var cut = Render<WaitTrendChart>(parameters => parameters
+            .Add(component => component.Points,
+            [
+                new TrendPoint(latestDate.AddMonths(-3), 3),
+                new TrendPoint(latestDate, 4)
+            ])
+            .Add(component => component.UnitLabel, "weeks"));
+
+        Assert.DoesNotContain(
+            cut.FindAll("text.chart-date-label"),
+            label => label.TextContent == latestDate.ToString("dd.MM.yy"));
+    }
+
+    [Fact]
+    public void ChartAlignsWholeMonthValuesWithTheirYAxisGridLine()
+    {
+        var cut = Render<WaitTrendChart>(parameters => parameters
+            .Add(component => component.Points,
+            [
+                new TrendPoint(new DateTime(2020, 1, 1), 3),
+                new TrendPoint(new DateTime(2020, 2, 1), 1)
+            ])
+            .Add(component => component.UnitLabel, "mánaðir"));
+
+        var valueLabel = cut.FindAll("text").Single(text => text.TextContent == "3");
+        var point = cut.FindAll("circle.chart-point").First();
+        var valueLabelY = double.Parse(valueLabel.GetAttribute("y")!, System.Globalization.CultureInfo.InvariantCulture);
+        var pointY = double.Parse(point.GetAttribute("cy")!, System.Globalization.CultureInfo.InvariantCulture);
+
+        Assert.Equal(valueLabelY - 4, pointY, precision: 8);
+    }
+
+    [Fact]
     public void ChartHidesDateLabelsThatWouldOverlapTheLatestDate()
     {
         var cut = Render<WaitTrendChart>(parameters => parameters
             .Add(component => component.Points,
             [
-                new TrendPoint(new DateTime(2026, 5, 15), 35),
-                new TrendPoint(new DateTime(2026, 6, 15), 34),
-                new TrendPoint(new DateTime(2026, 8, 15), 32),
-                new TrendPoint(new DateTime(2026, 9, 15), 31),
-                new TrendPoint(new DateTime(2026, 10, 15), 36),
-                new TrendPoint(new DateTime(2026, 10, 16), 38)
+                new TrendPoint(new DateTime(2030, 5, 15), 35),
+                new TrendPoint(new DateTime(2030, 6, 15), 34),
+                new TrendPoint(new DateTime(2030, 8, 15), 32),
+                new TrendPoint(new DateTime(2030, 9, 15), 31),
+                new TrendPoint(new DateTime(2030, 10, 15), 36),
+                new TrendPoint(new DateTime(2030, 10, 16), 38)
             ])
             .Add(component => component.UnitLabel, "vikur"));
 
         var dateLabels = cut.FindAll("text.chart-date-label");
 
-        Assert.DoesNotContain(dateLabels, label => label.TextContent == "15.10.26");
-        Assert.Contains(dateLabels, label => label.TextContent == "16.10.26");
+        Assert.DoesNotContain(dateLabels, label => label.TextContent == "15.10.30");
+        Assert.Contains(dateLabels, label => label.TextContent == "16.10.30");
     }
 
     [Fact]

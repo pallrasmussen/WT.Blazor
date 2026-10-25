@@ -172,24 +172,13 @@ public class WaitingTimeReadService(
 
         var history = db.WaitingTimeHistoryEntries.AsNoTracking()
             .Where(entry => ids.Contains(entry.WaitingTimeId) && (entry.Action == HistoryAction.Created || entry.Action == HistoryAction.Updated) && entry.NewWaitValue != null);
-        // Only the first and last update determine the indicator. Keep historical
-        // rows in SQLite rather than materializing the entire audit trail.
-        var first = await history.Where(entry => entry.Id == history
-                .Where(candidate => candidate.WaitingTimeId == entry.WaitingTimeId)
-                .OrderBy(candidate => candidate.Timestamp).ThenBy(candidate => candidate.Id)
-                .Select(candidate => candidate.Id).First())
-            .Select(entry => new { entry.WaitingTimeId, Point = new TrendHistoryPoint(entry.Timestamp, entry.NewWaitValue!.Value, entry.NewUnit, entry.NewWaitDays) })
-            .ToListAsync();
-        var last = await history.Where(entry => entry.Id == history
-                .Where(candidate => candidate.WaitingTimeId == entry.WaitingTimeId)
-                .OrderByDescending(candidate => candidate.Timestamp).ThenByDescending(candidate => candidate.Id)
-                .Select(candidate => candidate.Id).First())
+        var points = await history
+            .OrderBy(entry => entry.Timestamp).ThenBy(entry => entry.Id)
             .Select(entry => new { entry.WaitingTimeId, Point = new TrendHistoryPoint(entry.Timestamp, entry.NewWaitValue!.Value, entry.NewUnit, entry.NewWaitDays) })
             .ToListAsync();
 
-        var latest = last.ToDictionary(entry => entry.WaitingTimeId, entry => entry.Point);
-        return first.ToDictionary(entry => entry.WaitingTimeId,
-            entry => TrendPointReducer.Change([entry.Point, latest[entry.WaitingTimeId]]));
+        return points.GroupBy(entry => entry.WaitingTimeId)
+            .ToDictionary(group => group.Key, group => TrendPointReducer.LatestChange(group.Select(entry => entry.Point)));
     }
 
     private IQueryable<WaitingTimeHistoryEntry> FilterHistory(HistoryQuery historyQuery)

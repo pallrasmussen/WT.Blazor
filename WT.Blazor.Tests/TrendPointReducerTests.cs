@@ -31,4 +31,17 @@ public class TrendPointReducerTests
 
         Assert.Equal(16, change);
     }
+
+    [Fact]
+    public void LatestChangeUsesTheLatestTwoDistinctValues()
+    {
+        var change = TrendPointReducer.LatestChange(
+        [
+            new TrendHistoryPoint(new DateTime(2026, 9, 1), 1, WaitUnit.Vikur, null),
+            new TrendHistoryPoint(new DateTime(2026, 9, 2), 2, WaitUnit.Vikur, null),
+            new TrendHistoryPoint(new DateTime(2026, 9, 3), 2, WaitUnit.Vikur, null)
+        ]);
+
+        Assert.Equal(7, change);
+    }
 }

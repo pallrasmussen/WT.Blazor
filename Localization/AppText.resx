@@ -23,12 +23,16 @@
   <data name="Growing" xml:space="preserve"><value>Veksur</value></data>
   <data name="Declining" xml:space="preserve"><value>Minkar</value></data>
   <data name="Unchanged" xml:space="preserve"><value>Óbroytt</value></data>
+  <data name="TrendIncreasingSincePrevious" xml:space="preserve"><value>Veksur frá næstseinastu til seinastu skrásettu bíðitíð</value></data>
+  <data name="TrendDecreasingSincePrevious" xml:space="preserve"><value>Minkar frá næstseinastu til seinastu skrásettu bíðitíð</value></data>
+  <data name="TrendUnchangedSincePrevious" xml:space="preserve"><value>Óbroytt frá næstseinastu til seinastu skrásettu bíðitíð</value></data>
   <data name="Loading" xml:space="preserve"><value>Leitar...</value></data>
   <data name="NoResults" xml:space="preserve"><value>Ongar bíðitíðir funnar.</value></data>
   <data name="ChangeFilters" xml:space="preserve"><value>Royn at broyta filtreringina ella leitiorðið.</value></data>
   <data name="Trend" xml:space="preserve"><value>Sí gongdina</value></data>
   <data name="TrendHeading" xml:space="preserve"><value>Gongd í bíðitíð</value></data>
   <data name="TrendDescription" xml:space="preserve"><value>Grafurin byggir á skrásettu byrjanarbíðitíðina og dagføringar. Tíðarskeið enda í dag; seinasta skrásetta virðið hvønn dag verður víst. Eingin virði verða gjørd fyri dagar uttan skráseting.</value></data>
+  <data name="TrendCurrentEstimate" xml:space="preserve"><value>Hvørt punkt vísir ta væntaðu bíðitíðina hjá einum nýggjum sjúklingi á skrásetingardegnum. Tann stiplaða linjan vísir, at seinasta skrásetta bíðitíðin framvegis er galdandi í dag.</value></data>
   <data name="Current" xml:space="preserve"><value>Nú</value></data>
   <data name="NotFound" xml:space="preserve"><value>Bíðitíðin varð ikki funnin.</value></data>
   <data name="Back" xml:space="preserve"><value>Aftur til bíðitíðir</value></data>
@@ -251,7 +255,6 @@
   <data name="ShowInactive" xml:space="preserve"><value>Vís óvirknar ({0})</value></data>
   <data name="ReloadLatest" xml:space="preserve"><value>Heinta nýggjastu virðini</value></data>
   <data name="ReloadLatestHint" xml:space="preserve"><value>Tá ið tú heintar nýggjastu virðini, verða tínar óvistaðu broytingar skiftar út.</value></data>
-  <data name="RefreshResults" xml:space="preserve"><value>Dagfør úrslit</value></data>
   <data name="LastRefreshed" xml:space="preserve"><value>Seinast heintað</value></data>
   <data name="RefreshFailed" xml:space="preserve"><value>Tað bar ikki til at heinta nýggjastu úrslitini. Royn aftur.</value></data>
   <data name="SettingsReloadFailed" xml:space="preserve"><value>Tað bar ikki til at heinta stillingarnar. Tínar óvistaðu broytingar eru varðveittar; royn aftur.</value></data>

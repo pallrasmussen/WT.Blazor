@@ -28,6 +28,7 @@
             <span class="result-count">@AppText.Get("Current"): @report.CurrentWait</span>
         </div>
         <p class="result-count">@AppText.Get("TrendDescription")</p>
+        <p class="result-count">@AppText.Get("TrendCurrentEstimate")</p>
         <div class="trend-period-control">
             <label for="trend-period">@AppText.Get("TrendPeriod")</label>
             <select id="trend-period" @bind="selectedPeriodDays" @bind:after="LoadReportAsync">

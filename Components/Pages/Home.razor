@@ -41,25 +41,6 @@
 		<div class="utility-actions">
 			@if (!isLoading && visibleItems.Count > 0)
 			{
-				<div class="public-legend" tabindex="0" aria-describedby="public-indicator-legend">
-					<span class="public-legend-trigger">@AppText.Get("ExplainIndicators")</span>
-					<div id="public-indicator-legend" class="public-legend-tooltip" role="tooltip">
-						<div class="trend-legend" aria-label="@AppText.Get("TrendLegend")">
-							<span><i class="trend-arrow trend-up" aria-hidden="true"></i> @AppText.Get("Growing")</span>
-							<span><i class="trend-arrow trend-down" aria-hidden="true"></i> @AppText.Get("Declining")</span>
-							<span><i class="trend-arrow trend-flat" aria-hidden="true"></i> @AppText.Get("Unchanged")</span>
-						</div>
-						<div class="freshness-legend" aria-label="@AppText.Get("FreshnessLegend")">
-							<span><i class="status-dot status-fresh" aria-hidden="true"></i>@AppText.Get("FreshnessCurrent")</span>
-							<span><i class="status-dot status-warning" aria-hidden="true"></i>@AppText.Get("FreshnessReview")</span>
-							<span><i class="status-dot status-old" aria-hidden="true"></i>@AppText.Get("FreshnessOverdue")</span>
-						</div>
-					</div>
-				</div>
-			}
-			<button type="button" class="btn-secondary refresh-results" @onclick="() => RefreshAsync()" disabled="@isLoading">@AppText.Get("RefreshResults")</button>
-			@if (!isLoading && visibleItems.Count > 0)
-			{
 				<button type="button" class="print-results" onclick="window.print()" title="@AppText.Get("PrintResults")"><span class="print-icon" aria-hidden="true">&#128424;</span><span>@AppText.Get("Print")</span></button>
 			}
 		</div>
@@ -97,6 +78,21 @@
 	}
 	else
 	{
+		<div class="card-indicator-help public-legend" tabindex="0" aria-describedby="public-indicator-legend">
+			<span class="public-legend-trigger">@AppText.Get("ExplainIndicators")</span>
+			<div id="public-indicator-legend" class="public-legend-tooltip" role="tooltip">
+				<div class="trend-legend" aria-label="@AppText.Get("TrendLegend")">
+					<span><i class="trend-arrow trend-up" aria-hidden="true"></i> @AppText.Get("TrendIncreasingSincePrevious")</span>
+					<span><i class="trend-arrow trend-down" aria-hidden="true"></i> @AppText.Get("TrendDecreasingSincePrevious")</span>
+					<span><i class="trend-arrow trend-flat" aria-hidden="true"></i> @AppText.Get("TrendUnchangedSincePrevious")</span>
+				</div>
+				<div class="freshness-legend" aria-label="@AppText.Get("FreshnessLegend")">
+					<span><i class="status-dot status-fresh" aria-hidden="true"></i>@AppText.Get("FreshnessCurrent")</span>
+					<span><i class="status-dot status-warning" aria-hidden="true"></i>@AppText.Get("FreshnessReview")</span>
+					<span><i class="status-dot status-old" aria-hidden="true"></i>@AppText.Get("FreshnessOverdue")</span>
+				</div>
+			</div>
+		</div>
 		<div class="waiting-grid">
 			@foreach (var item in visibleItems)
 			{
@@ -190,7 +186,12 @@
 
 	private static string CountText(int n) => n == 1 ? $"1 {AppText.Get("WaitingTime").ToLowerInvariant()}" : $"{n} {AppText.Get("Results")}";
 	private static string TrendCssClass(int change) => change switch { > 0 => "trend-up", < 0 => "trend-down", _ => "trend-flat" };
-	private static string TrendLabel(int change) => change switch { > 0 => AppText.Get("Growing"), < 0 => AppText.Get("Declining"), _ => AppText.Get("Unchanged") };
+	private static string TrendLabel(int change) => change switch
+	{
+		> 0 => AppText.Get("TrendIncreasingSincePrevious"),
+		< 0 => AppText.Get("TrendDecreasingSincePrevious"),
+		_ => AppText.Get("TrendUnchangedSincePrevious")
+	};
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -213,7 +214,7 @@
 
     private void HandleSettingsChanged(object? sender, EventArgs args) => _ = InvokeAsync(async () =>
     {
-        await RefreshAsync("settings-change");
+        await RefreshForSettingsChangeAsync();
         if (!disposed) StateHasChanged();
     });
 
@@ -252,8 +253,8 @@
 		await LoadItemsAsync(DisplayNames.TryHospitalFrom(selectedHospitalName), null, clearResults: true, source: "preset");
 	}
 
-    private Task RefreshAsync(string source = "manual") => LoadItemsAsync(
-        DisplayNames.TryHospitalFrom(selectedHospitalName), DisplayNames.TryDepartmentFrom(selectedDepartmentName), source: source);
+    private Task RefreshForSettingsChangeAsync() => LoadItemsAsync(
+        DisplayNames.TryHospitalFrom(selectedHospitalName), DisplayNames.TryDepartmentFrom(selectedDepartmentName), source: "settings-change");
 
     private async Task LoadItemsAsync(Hospital? hospital, Department? department, bool clearResults = false, string source = "unknown")
     {
