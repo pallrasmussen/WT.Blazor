@@ -244,7 +244,7 @@
   <data name="ChangeHospital" xml:space="preserve"><value>Sjúkrahús: {0} → {1}</value></data>
   <data name="WaitingTimeGuidanceHeading" xml:space="preserve"><value>Væntað bíðitíð</value></data>
   <data name="WaitingTimeMeaningHeading" xml:space="preserve"><value>Hvat er væntað bíðitíð?</value></data>
-  <data name="WaitingTimeMeaningText" xml:space="preserve"><value>Bíðitíð er eitt vegleiðandi mát fyri, hvussu leingi ein nýggjur sjúklingur kann vænta at bíða. Tín bíðitíð kann vera øðrvísi.</value></data>
+  <data name="WaitingTimeMeaningText" xml:space="preserve"><value>Væntað bíðitíð er eitt vegleiðandi mát fyri, hvussu leingi ein nýggjur sjúklingur kann vænta at bíða. Tín bíðitíð kann vera øðrvísi.</value></data>
   <data name="WaitingTimeUpdateHeading" xml:space="preserve"><value>Nær verður hon dagførd?</value></data>
   <data name="WaitingTimeUpdateText" xml:space="preserve"><value>Hvør deild hevur ábyrgd av at dagføra sína væntaðu bíðitíð. Dagfestingin verður víst saman við bíðitíðini.</value></data>
   <data name="Activate" xml:space="preserve"><value>Virkja</value></data>

@@ -38,12 +38,6 @@
 				<button type="button" class="filter-reset" @onclick="ClearFilters">@AppText.Get("ClearFilters")</button>
 			}
 		</div>
-		<div class="utility-actions">
-			@if (!isLoading && visibleItems.Count > 0)
-			{
-				<button type="button" class="print-results" onclick="window.print()" title="@AppText.Get("PrintResults")"><span class="print-icon" aria-hidden="true">&#128424;</span><span>@AppText.Get("Print")</span></button>
-			}
-		</div>
 	</div>
     @if (loadFailed)
     {
@@ -78,20 +72,26 @@
 	}
 	else
 	{
-		<div class="card-indicator-help public-legend" tabindex="0" aria-describedby="public-indicator-legend">
-			<span class="public-legend-trigger">@AppText.Get("ExplainIndicators")</span>
-			<div id="public-indicator-legend" class="public-legend-tooltip" role="tooltip">
-				<div class="trend-legend" aria-label="@AppText.Get("TrendLegend")">
-					<span><i class="trend-arrow trend-up" aria-hidden="true"></i> @AppText.Get("TrendIncreasingSincePrevious")</span>
-					<span><i class="trend-arrow trend-down" aria-hidden="true"></i> @AppText.Get("TrendDecreasingSincePrevious")</span>
-					<span><i class="trend-arrow trend-flat" aria-hidden="true"></i> @AppText.Get("TrendUnchangedSincePrevious")</span>
-				</div>
-				<div class="freshness-legend" aria-label="@AppText.Get("FreshnessLegend")">
-					<span><i class="status-dot status-fresh" aria-hidden="true"></i>@AppText.Get("FreshnessCurrent")</span>
-					<span><i class="status-dot status-warning" aria-hidden="true"></i>@AppText.Get("FreshnessReview")</span>
-					<span><i class="status-dot status-old" aria-hidden="true"></i>@AppText.Get("FreshnessOverdue")</span>
+		<div class="card-list-actions">
+			<div class="card-indicator-help public-legend" tabindex="0" aria-describedby="public-indicator-legend">
+				<span class="public-legend-trigger">@AppText.Get("ExplainIndicators")</span>
+				<div id="public-indicator-legend" class="public-legend-tooltip" role="tooltip">
+					<div class="trend-legend" aria-label="@AppText.Get("TrendLegend")">
+						<span><i class="trend-arrow trend-up" aria-hidden="true"></i> @AppText.Get("TrendIncreasingSincePrevious")</span>
+						<span><i class="trend-arrow trend-down" aria-hidden="true"></i> @AppText.Get("TrendDecreasingSincePrevious")</span>
+						<span><i class="trend-arrow trend-flat" aria-hidden="true"></i> @AppText.Get("TrendUnchangedSincePrevious")</span>
+					</div>
+					<div class="freshness-legend" aria-label="@AppText.Get("FreshnessLegend")">
+						<span><i class="status-dot status-fresh" aria-hidden="true"></i>@AppText.Get("FreshnessCurrent")</span>
+						<span><i class="status-dot status-warning" aria-hidden="true"></i>@AppText.Get("FreshnessReview")</span>
+						<span><i class="status-dot status-old" aria-hidden="true"></i>@AppText.Get("FreshnessOverdue")</span>
+					</div>
 				</div>
 			</div>
+			@if (!isLoading)
+			{
+				<button type="button" class="print-results" onclick="window.print()" title="@AppText.Get("PrintResults")"><span class="print-icon" aria-hidden="true">&#128424;</span><span>@AppText.Get("Print")</span></button>
+			}
 		</div>
 		<div class="waiting-grid">
 			@foreach (var item in visibleItems)
