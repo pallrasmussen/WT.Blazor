@@ -50,7 +50,7 @@ public partial class Internal
     private DateTime CurrentUtc => TimeProvider.GetUtcNow().UtcDateTime;
     private EstimateReviewReason reviewReason;
     private string reviewOwner = "";
-    private EstimateReviewReason ReviewReasons(WaitingTime item) => EstimateReview.Reasons(item, portalSettings.GreenMaximumAgeMonths, CurrentUtc);
+    private EstimateReviewReason ReviewReasons(WaitingTime item) => EstimateReview.Reasons(item, Math.Min(portalSettings.GreenMaximumAgeMonths, portalSettings.EstimateExpiryMonths), CurrentUtc);
     private List<WaitingTime> visibleItems => items
         .Where(item => showInactive ? !item.IsActive : item.IsActive)
         .Where(item => !showNeedsReview || ReviewReasons(item) != EstimateReviewReason.None)

@@ -315,7 +315,9 @@ publication remains disabled; clinical staff must deliberately configure them.
 ### Estimate expiry and optional ranges
 
 Administrators can set **Estimate expiry (months)** in Settings (1–60 months,
-default 12). This is independent of the earlier freshness/review indicators.
+default 12). This is independent of the earlier freshness indicators. The review queue and
+operations count use the earlier of review age and expiry, so a stricter expiry
+policy still sends affected estimates for review.
 At the exact calendar-month boundary after `VerifiedAt`, the public card and
 current-value text in trend/PDF reports show an expired message and direct the
 patient to the relevant department. Available estimates with no verification,

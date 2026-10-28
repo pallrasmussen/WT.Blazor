@@ -75,13 +75,16 @@ public class EstimatePublicationTests
         await db.Database.EnsureCreatedAsync();
         var settings = new PortalSettingsService(db, new PortalSettingsChangeNotifier(), TimeProvider.System);
         await settings.SaveAsync(new PortalSettings { EstimateExpiryMonths = 1 }, "admin");
-        var item = new WaitingTime { Name = "Direct report", Hospital = Hospital.Klaksvikar, WaitValue = 6, WaitUpperValue = 10, Unit = WaitUnit.Vikur, VerifiedAt = DateTime.UtcNow.AddMonths(-2) };
+        var item = new WaitingTime { Name = "Direct report", Hospital = Hospital.Klaksvikar, ResponsibleDepartment = "Imaging", ReferralEndpoint = ReferralEndpoint.Investigation, WaitValue = 6, WaitUpperValue = 10, Unit = WaitUnit.Vikur, VerifiedAt = DateTime.UtcNow.AddMonths(-2) };
         db.WaitingTimes.Add(item);
         await db.SaveChangesAsync();
         var service = new TrendReportService(new WaitingTimeReadService(db, TimeProvider.System), settings, TimeProvider.System);
         var expired = await service.GetAsync(item.Id);
         Assert.NotNull(expired);
         Assert.True(expired.IsExpired);
+        Assert.True(EstimateReview.Reasons(item, 1, DateTime.UtcNow).HasFlag(EstimateReviewReason.Overdue));
+        Assert.Equal(0, (await new WaitingTimeReadService(db, TimeProvider.System).GetOperationsSummaryAsync(30, 3, 12)).NeedsReview);
+        Assert.Equal(1, (await new WaitingTimeReadService(db, TimeProvider.System).GetOperationsSummaryAsync(30, 3, 12, estimateExpiryMonths: 1)).NeedsReview);
         Assert.DoesNotContain("6–10", expired.CurrentWait);
         item.VerifiedAt = DateTime.UtcNow;
         await db.SaveChangesAsync();

@@ -67,11 +67,11 @@ public class WaitingTimeReadService(
             .ToListAsync();
     }
 
-    public async Task<OperationsSummary> GetOperationsSummaryAsync(int retentionDays, int greenMaximumAgeMonths, int longWaitMonths)
+    public async Task<OperationsSummary> GetOperationsSummaryAsync(int retentionDays, int greenMaximumAgeMonths, int longWaitMonths, int estimateExpiryMonths = 12)
     {
         using var operation = await DatabaseOperation.EnterAsync(db);
         var now = timeProvider.GetUtcNow().UtcDateTime;
-        var reviewCutoff = UpdatedStatus.ReviewCutoff(now, greenMaximumAgeMonths);
+        var reviewCutoff = UpdatedStatus.ReviewCutoff(now, Math.Min(greenMaximumAgeMonths, estimateExpiryMonths));
         var longWaitDays = WaitDuration.ToDays(longWaitMonths, WaitUnit.Manadir);
         var maxDays = WaitDuration.MaximumValueAtOrBelowDays(longWaitDays, WaitUnit.Dagar);
         var maxWeeks = WaitDuration.MaximumValueAtOrBelowDays(longWaitDays, WaitUnit.Vikur);
@@ -90,6 +90,7 @@ public class WaitingTimeReadService(
             .Select(group => new
             {
                 NeedsReview = group.Count(waitingTime => (waitingTime.VerifiedAt ?? (waitingTime.EstimateStatus == EstimateStatus.Available ? DateTime.MinValue : waitingTime.UpdatedAt)) <= reviewCutoff
+                    || waitingTime.EstimateStatus == EstimateStatus.Available && waitingTime.VerifiedAt > now
                     || waitingTime.ResponsibleDepartment == null || waitingTime.ResponsibleDepartment.Trim() == ""
                     || waitingTime.ReferralEndpoint == ReferralEndpoint.Unspecified),
                 LongWaits = group.Count(waitingTime => waitingTime.EstimateStatus == EstimateStatus.Available && (

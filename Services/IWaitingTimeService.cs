@@ -66,7 +66,7 @@ public interface IHistoryReadService
 
 public interface IOperationsReadService
 {
-    Task<OperationsSummary> GetOperationsSummaryAsync(int retentionDays, int greenMaximumAgeMonths, int longWaitMonths);
+    Task<OperationsSummary> GetOperationsSummaryAsync(int retentionDays, int greenMaximumAgeMonths, int longWaitMonths, int estimateExpiryMonths = 12);
 }
 
 public interface ITrendReadService

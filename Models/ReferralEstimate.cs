@@ -13,7 +13,7 @@ public static class ReferralEstimate
     public static string StatusLabel(EstimateStatus status) => AppText.Get($"EstimateStatus{status}");
     public static bool IsExpired(WaitingTime item, PortalSettings settings, DateTime now) =>
         item.EstimateStatus == EstimateStatus.Available
-        && (item.VerifiedAt is not { } verified || verified > now || verified.AddMonths(settings.EstimateExpiryMonths) <= now);
+        && (item.VerifiedAt is not { } verified || verified > now || verified <= UpdatedStatus.ReviewCutoff(now, settings.EstimateExpiryMonths));
 
     public static string NumericText(WaitingTime item, bool canonicalDays = false)
     {

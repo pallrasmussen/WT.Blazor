@@ -73,13 +73,13 @@
             latestBackup = new DirectoryInfo(backupPath).GetFiles("wt-blazor-*.db").OrderByDescending(file => file.LastWriteTime).FirstOrDefault();
         }
 
-        summary = await OperationsReader.GetOperationsSummaryAsync(retentionDays, portalSettings.GreenMaximumAgeMonths, portalSettings.LongWaitMonths);
+        summary = await OperationsReader.GetOperationsSummaryAsync(retentionDays, portalSettings.GreenMaximumAgeMonths, portalSettings.LongWaitMonths, portalSettings.EstimateExpiryMonths);
     }
 
     private void HandleSettingsChanged(object? sender, EventArgs args) => _ = InvokeAsync(async () =>
     {
         portalSettings = await PortalSettingsReader.GetAsync();
-        summary = await OperationsReader.GetOperationsSummaryAsync(retentionDays, portalSettings.GreenMaximumAgeMonths, portalSettings.LongWaitMonths);
+        summary = await OperationsReader.GetOperationsSummaryAsync(retentionDays, portalSettings.GreenMaximumAgeMonths, portalSettings.LongWaitMonths, portalSettings.EstimateExpiryMonths);
         StateHasChanged();
     });
 
