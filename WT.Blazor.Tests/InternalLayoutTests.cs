@@ -1,3 +1,4 @@
+using WT.Blazor.Tests.TestInfrastructure;
 using Bunit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -39,6 +40,7 @@ public class InternalLayoutTests : BunitContext
     [Fact]
     public void MarksTheCurrentPageWithinALabelledNavigationLandmark()
     {
+        using var culture = new TestCulture("en");
         Services.Configure<AdGroupsOptions>(_ => { });
         Services.AddSingleton<HealthCheckService>(new HealthyHealthChecks());
         Services.AddSingleton(DeploymentManifest.Unknown);
@@ -56,6 +58,7 @@ public class InternalLayoutTests : BunitContext
     [Fact]
     public void OpensTheMobileNavigationMenuOnDemand()
     {
+        using var culture = new TestCulture("en");
         Services.Configure<AdGroupsOptions>(_ => { });
         Services.AddSingleton<HealthCheckService>(new HealthyHealthChecks());
         Services.AddSingleton(DeploymentManifest.Unknown);

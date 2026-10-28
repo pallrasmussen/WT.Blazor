@@ -154,14 +154,15 @@ public class WaitingTimeReadService(
         var ids = waitingTimeIds.Distinct().ToList();
         if (ids.Count == 0) return [];
 
-        var reviews = await db.WaitingTimeHistoryEntries.AsNoTracking()
-            .Where(entry => ids.Contains(entry.WaitingTimeId) && entry.Action == HistoryAction.Reviewed)
-            .OrderByDescending(entry => entry.Timestamp)
+        var reviews = db.WaitingTimeHistoryEntries.AsNoTracking()
+            .Where(entry => ids.Contains(entry.WaitingTimeId) && entry.Action == HistoryAction.Reviewed);
+        var latest = await reviews.Where(entry => !reviews.Any(other =>
+                other.WaitingTimeId == entry.WaitingTimeId &&
+                (other.Timestamp > entry.Timestamp || other.Timestamp == entry.Timestamp && other.Id > entry.Id)))
             .Select(entry => new { entry.WaitingTimeId, entry.Timestamp, entry.Username })
             .ToListAsync();
 
-        return reviews.GroupBy(review => review.WaitingTimeId)
-            .ToDictionary(group => group.Key, group => new ReviewInfo(group.First().Timestamp, group.First().Username));
+        return latest.ToDictionary(review => review.WaitingTimeId, review => new ReviewInfo(review.Timestamp, review.Username));
     }
 
     public async Task<Dictionary<int, int>> GetTrendChangesAsync(IEnumerable<int> waitingTimeIds)
@@ -172,13 +173,32 @@ public class WaitingTimeReadService(
 
         var history = db.WaitingTimeHistoryEntries.AsNoTracking()
             .Where(entry => ids.Contains(entry.WaitingTimeId) && (entry.Action == HistoryAction.Created || entry.Action == HistoryAction.Updated) && entry.NewWaitValue != null);
-        var points = await history
-            .OrderBy(entry => entry.Timestamp).ThenBy(entry => entry.Id)
-            .Select(entry => new { entry.WaitingTimeId, Point = new TrendHistoryPoint(entry.Timestamp, entry.NewWaitValue!.Value, entry.NewUnit, entry.NewWaitDays) })
-            .ToListAsync();
+        // Keep the last entry on each UTC day, including the ID tie-breaker.
+        var daily = history.Where(entry => !history.Any(other =>
+                other.WaitingTimeId == entry.WaitingTimeId && other.Timestamp.Date == entry.Timestamp.Date &&
+                (other.Timestamp > entry.Timestamp || other.Timestamp == entry.Timestamp && other.Id > entry.Id)))
+            .Select(entry => new
+            {
+                entry.WaitingTimeId,
+                entry.Timestamp,
+                Days = entry.NewWaitDays ?? entry.NewWaitValue!.Value *
+                    (entry.NewUnit == WaitUnit.Vikur ? 7 : entry.NewUnit == WaitUnit.Manadir ? 30 : 1)
+            });
+        // Equal consecutive daily values collapse. The previous *different* daily
+        // value gives the same direction as TrendPointReducer.LatestChange without
+        // transferring the entire audit history to every public Blazor circuit.
+        var changes = await daily.Where(point => !daily.Any(other =>
+                other.WaitingTimeId == point.WaitingTimeId && other.Timestamp > point.Timestamp))
+            .Select(point => new
+            {
+                point.WaitingTimeId,
+                Change = point.Days - (daily.Where(previous => previous.WaitingTimeId == point.WaitingTimeId
+                        && previous.Timestamp < point.Timestamp && previous.Days != point.Days)
+                    .OrderByDescending(previous => previous.Timestamp)
+                    .Select(previous => (int?)previous.Days).FirstOrDefault() ?? point.Days)
+            }).ToListAsync();
 
-        return points.GroupBy(entry => entry.WaitingTimeId)
-            .ToDictionary(group => group.Key, group => TrendPointReducer.LatestChange(group.Select(entry => entry.Point)));
+        return changes.ToDictionary(point => point.WaitingTimeId, point => point.Change);
     }
 
     private IQueryable<WaitingTimeHistoryEntry> FilterHistory(HistoryQuery historyQuery)

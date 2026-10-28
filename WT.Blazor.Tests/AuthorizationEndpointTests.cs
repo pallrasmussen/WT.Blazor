@@ -61,6 +61,19 @@ public class AuthorizationEndpointTests : IAsyncLifetime
         Assert.Contains(valid.Headers.TryGetValues("Set-Cookie", out var cookies) ? cookies : [], cookie => cookie.Contains(".AspNetCore.Culture", StringComparison.Ordinal));
     }
 
+    [Theory]
+    [InlineData("en", "Expected waiting time", "Hospital Service")]
+    [InlineData("fo", "Væntað bíðitíð", "Sjúkrahúsverkið")]
+    public async Task PublicDocumentUsesTheSelectedLanguageForHtmlTitleAndAccessibleNames(string culture, string waitingTime, string hospital)
+    {
+        await client.GetAsync($"/culture/{culture}?returnUrl=/");
+        var html = WebUtility.HtmlDecode(await client.GetStringAsync("/"));
+        Assert.Contains($"<html lang=\"{culture}\">", html);
+        Assert.Contains($"<title>{waitingTime} | {hospital}</title>", html);
+        Assert.Contains($"aria-label=\"{waitingTime}\"", html);
+        Assert.Contains($"aria-label=\"{hospital}\"", html);
+    }
+
     public Task InitializeAsync() => Task.CompletedTask;
 
     public async Task DisposeAsync()

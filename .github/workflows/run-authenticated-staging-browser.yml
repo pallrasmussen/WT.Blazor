@@ -18,7 +18,8 @@ permissions:
 
 jobs:
   check:
-    runs-on: ${{ inputs.runner_label }}
+    runs-on: [self-hosted, Windows, "${{ inputs.runner_label }}"]
+    timeout-minutes: 20
     environment: staging
     env:
       BROWSER_BASE_URL: ${{ inputs.base_url }}
@@ -29,4 +30,9 @@ jobs:
       - uses: ./.github/actions/setup-dotnet
       - run: dotnet restore .\WT.Blazor.Tests\WT.Blazor.Tests.csproj
       - run: .\tests\Install-PlaywrightBrowsers.ps1
-      - run: dotnet test .\WT.Blazor.Tests\WT.Blazor.Tests.csproj --no-restore --filter "FullyQualifiedName~AuthenticatedStagingBrowserSmokeTests"
+      - run: dotnet test .\WT.Blazor.Tests\WT.Blazor.Tests.csproj --no-restore --filter "FullyQualifiedName~AuthenticatedStagingBrowserSmokeTests" --logger "trx;LogFileName=staging.trx" --results-directory "${{ runner.temp }}/wt-staging-results"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: staging-browser-${{ inputs.role }}
+          path: ${{ runner.temp }}/wt-staging-results/*.trx

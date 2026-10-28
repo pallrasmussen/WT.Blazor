@@ -12,14 +12,14 @@
 @inject ILogger<Home> Logger
 @inject PortalTelemetry Telemetry
 
-<PageTitle>Bíðitíðir | Sjúkrahúsverkið</PageTitle>
+<PageTitle>@AppText.Get("WaitingTime") | @AppText.Get("HospitalService")</PageTitle>
 
 <section class="public-hero">
 	<h1>@AppText.Get("WaitingTime")</h1>
 	<p>@AppText.Get("Intro")</p>
 </section>
 
-<section class="public-panel public-large-text" aria-label="Bíðitíðir" aria-busy="@isLoading">
+<section class="public-panel public-large-text" aria-label="@AppText.Get("WaitingTime")" aria-busy="@isLoading">
 	<div class="home-filter-presets">
 		<AdminFilterPresets SelectedPreset="@selectedPreset" PresetSelected="ApplyPresetAsync" IncludeReview="false" />
 	</div>

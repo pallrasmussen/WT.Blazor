@@ -78,7 +78,8 @@ public class WaitingTimeManagementService(
         entity.WaitValue = input.WaitValue;
         entity.Unit = input.Unit;
         entity.Note = newNote;
-        entity.UpdatedAt = now;
+        // Metadata edits do not verify the waiting-time estimate.
+        if (waitChanged) entity.UpdatedAt = now;
         entity.Version++;
 
         var action = waitChanged ? HistoryAction.Updated : HistoryAction.Edited;
@@ -133,7 +134,6 @@ public class WaitingTimeManagementService(
         db.Entry(entity).Property(waitingTime => waitingTime.Version).OriginalValue = expectedVersion;
 
         entity.IsActive = true;
-        entity.UpdatedAt = now;
         entity.Version++;
 
         var historyEntry = CreateHistoryEntry(entity, requestId, now, HistoryAction.Reactivated, "Bíðitíð løgd aftur á almennu síðuna", username);

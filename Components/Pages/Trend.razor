@@ -6,7 +6,7 @@
 @inject ITrendReportService TrendReportService
 @inject ILogger<Trend> Logger
 
-<PageTitle>@(report is null ? $"{AppText.Get("TrendHeading")} | Sjúkrahúsverkið" : $"{report.Name} | Sjúkrahúsverkið")</PageTitle>
+<PageTitle>@(report is null ? $"{AppText.Get("TrendHeading")} | {AppText.Get("HospitalService")}" : $"{report.Name} | {AppText.Get("HospitalService")}")</PageTitle>
 
 <section class="public-hero">
     <nav class="trend-navigation" aria-label="@AppText.Get("Breadcrumb")">

@@ -13,10 +13,17 @@ public class AuthenticatedStagingBrowserSmokeTests : IAsyncLifetime
     public async Task ViewerCannotUseInternalAdministrationControls()
     {
         var page = await NewPageAsync();
-        await page.GotoAsync($"{baseUrl}/internal", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+        var response = await page.GotoAsync($"{baseUrl}/internal", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+        Assert.NotNull(response);
+        Assert.Equal(403, response.Status);
+        // Missing controls alone would also pass for a failed sign-in or error page.
+        await Assertions.Expect(page.Locator(".access-message")).ToBeVisibleAsync();
 
         Assert.Equal(0, await page.Locator("#show-inactive").CountAsync());
         Assert.Equal(0, await page.Locator(".admin-actions").CountAsync());
+        var export = await page.GotoAsync($"{baseUrl}/api/history/export/csv");
+        Assert.NotNull(export);
+        Assert.Equal(403, export.Status);
     }
 
     [StagingRoleBrowserFact("Contributor")]
@@ -43,7 +50,12 @@ public class AuthenticatedStagingBrowserSmokeTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         playwright = await Playwright.CreateAsync();
-        browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions { Headless = true });
+        browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+        {
+            Headless = true,
+            // Chromium must be allowed to negotiate as the runner's Windows identity.
+            Args = [$"--auth-server-allowlist={new Uri(baseUrl).Host}"]
+        });
     }
 
     public async Task DisposeAsync()
