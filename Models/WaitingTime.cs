@@ -6,7 +6,7 @@ public class WaitingTime
 {
     public int Id { get; set; }
 
-    [Required, StringLength(200)]
+    [Required, StringLength(FieldLimits.WaitingTimeName)]
     public string Name { get; set; } = string.Empty;
 
     public Hospital Hospital { get; set; }
@@ -26,16 +26,16 @@ public class WaitingTime
     public EstimateStatus EstimateStatus { get; set; }
     public ReferralEndpoint ReferralEndpoint { get; set; }
 
-    [StringLength(200)]
+    [StringLength(FieldLimits.ResponsibleDepartment)]
     public string? ResponsibleDepartment { get; set; }
 
-    [StringLength(100)]
+    [StringLength(FieldLimits.ComparisonCode)]
     public string? ComparisonCode { get; set; }
 
     // Start a new comparable trend when its definition changes or an estimate resumes.
     public int EstimateSeries { get; set; } = 1;
 
-    [StringLength(500)]
+    [StringLength(FieldLimits.Note)]
     public string? Note { get; set; }
 
     // Last estimate/status/definition change or explicit review; edit times live in History.

@@ -1,3 +1,4 @@
+using WT.Blazor.Services.Exports;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.DataProtection;
@@ -104,16 +105,18 @@ builder.Services.AddOptions<ExportOptions>()
     .Bind(builder.Configuration.GetSection("Exports"))
     .ValidateDataAnnotations()
     .ValidateOnStart();
-builder.Services.AddScoped<WaitingTimeReadService>();
-builder.Services.AddScoped<IWaitingTimeCatalogService>(services => services.GetRequiredService<WaitingTimeReadService>());
-builder.Services.AddScoped<IHistoryReadService>(services => services.GetRequiredService<WaitingTimeReadService>());
-builder.Services.AddScoped<IOperationsReadService>(services => services.GetRequiredService<WaitingTimeReadService>());
-builder.Services.AddScoped<ITrendReadService>(services => services.GetRequiredService<WaitingTimeReadService>());
+builder.Services.AddScoped<IWaitingTimeCatalogService, WaitingTimeCatalogService>();
+builder.Services.AddScoped<IHistoryReadService, HistoryReadService>();
+builder.Services.AddScoped<IOperationsReadService, OperationsReadService>();
+builder.Services.AddScoped<ITrendReadService, TrendReadService>();
 builder.Services.AddScoped<IWaitingTimeManagementService, WaitingTimeManagementService>();
 builder.Services.AddSingleton<PortalSettingsChangeNotifier>();
 builder.Services.AddSingleton<PortalTelemetry>();
 builder.Services.AddScoped<CircuitHandler, CircuitTelemetryHandler>();
 builder.Services.AddScoped<IPortalSettingsService, PortalSettingsService>();
+builder.Services.AddScoped<IHistoryExportReportReader, HistoryExportReportReader>();
+builder.Services.AddSingleton<HistoryExportRenderer>();
+builder.Services.AddSingleton<TrendPdfRenderer>();
 builder.Services.AddScoped<IHistoryExportService, HistoryExportService>();
 builder.Services.AddScoped<ITrendExportService, TrendExportService>();
 builder.Services.AddScoped<ITrendReportService, TrendReportService>();

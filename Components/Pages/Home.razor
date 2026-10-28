@@ -98,51 +98,8 @@
         <div class="waiting-grid">
 			@foreach (var item in visibleItems)
 			{
-				<article id="waiting-time-@item.Id" class="waiting-card">
-					<div class="card-main">
-						<span class="chip">@(item.Department is not null ? DisplayNames.For(item.Department.Value) : DisplayNames.For(item.Hospital))</span>
-						<span class="card-hospital">@DisplayNames.For(item.Hospital)</span>
-						<h3>@item.Name</h3>
-                        <p class="referral-definition">@AppText.Get("ReferralEndpoint"): @ReferralEstimateText.EndpointLabel(item.ReferralEndpoint)</p>
-						<div class="wait-value @(item.EstimateStatus == EstimateStatus.Available && !ReferralEstimate.IsExpired(item, portalSettings, CurrentUtc) ? "" : "estimate-unavailable")">
-                            @if (item.EstimateStatus == EstimateStatus.Available && !ReferralEstimate.IsExpired(item, portalSettings, CurrentUtc))
-                            {
-                                @(item.WaitUpperValue is { } upper ? $"{item.WaitValue}–{upper}" : item.WaitValue.ToString())
-                                <span>@($" {DisplayNames.For(item.Unit, item.WaitUpperValue ?? item.WaitValue)}")</span>
-                            }
-                            else
-                            {
-                                @ReferralEstimateText.PublicWaitText(item, portalSettings, CurrentUtc)
-                            }
-							@if (item.EstimateStatus == EstimateStatus.Available && !ReferralEstimate.IsExpired(item, portalSettings, CurrentUtc) && item.WaitUpperValue is null && trendChanges.TryGetValue(item.Id, out var change))
-							{
-								<span class="trend-arrow @TrendCssClass(change)" role="img" aria-label="@TrendLabel(change)" title="@TrendLabel(change)"></span>
-							}
-						</div>
-					</div>
-					@if (string.IsNullOrWhiteSpace(item.Note))
-					{
-						<p class="note note-empty" aria-hidden="true"></p>
-					}
-					else
-					{
-						<p class="note"><strong>@AppText.Get("ReferralConditions"):</strong> @item.Note</p>
-					}
-                    @if (ReferralEstimate.IsExpired(item, portalSettings, CurrentUtc))
-                    { <p class="estimate-expired">@AppText.Get("EstimateExpiredContact")</p> }
-                    @if (item.EstimateStatus == EstimateStatus.Available)
-                    {
-                        <a class="graph-link" href="@TrendUri(item.Id)">@AppText.Get("Trend")</a>
-                        @if (item.VerifiedAt is { } verified)
-                        {
-                            <div class="updated-note @UpdatedStatus.CssClass(verified, portalSettings.GreenMaximumAgeMonths, portalSettings.YellowMaximumAgeMonths, CurrentUtc)">@AppText.Get("LastVerified"): @verified.ToLocalTime().ToString("dd. MMMM yyyy")</div>
-                        }
-                        else
-                        {
-                            <div class="updated-note">@AppText.Get("VerificationNotRecorded")</div>
-                        }
-                    }
-				</article>
+                <PublicWaitingTimeCard @key="item.Id" Item="item" Settings="portalSettings" Now="CurrentUtc"
+                                       TrendChange="@(trendChanges.TryGetValue(item.Id, out var change) ? change : (int?)null)" TrendUrl="@TrendUri(item.Id)" />
 			}
 		</div>
 	}
@@ -211,13 +168,6 @@
 	}
 
 	private static string CountText(int n) => n == 1 ? $"1 {AppText.Get("WaitingTime").ToLowerInvariant()}" : $"{n} {AppText.Get("Results")}";
-	private static string TrendCssClass(int change) => change switch { > 0 => "trend-up", < 0 => "trend-down", _ => "trend-flat" };
-	private static string TrendLabel(int change) => change switch
-	{
-		> 0 => AppText.Get("TrendIncreasingSincePrevious"),
-		< 0 => AppText.Get("TrendDecreasingSincePrevious"),
-		_ => AppText.Get("TrendUnchangedSincePrevious")
-	};
 
 	protected override async Task OnInitializedAsync()
 	{

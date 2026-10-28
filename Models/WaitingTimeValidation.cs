@@ -43,7 +43,7 @@ public static class WaitingTimeValidation
             return new(WaitingTimeInputError.InvalidDepartment, nameof(input.Department));
         input = Normalize(input);
         if (input.Name.Length == 0) return new(WaitingTimeInputError.NameRequired, nameof(input.Name));
-        if (input.Name.Length > 200) return new(WaitingTimeInputError.NameTooLong, nameof(input.Name), 200);
+        if (input.Name.Length > FieldLimits.WaitingTimeName) return new(WaitingTimeInputError.NameTooLong, nameof(input.Name), FieldLimits.WaitingTimeName);
         if (!Enum.IsDefined(input.EstimateStatus)) return new(WaitingTimeInputError.InvalidStatus, nameof(input.EstimateStatus));
         if (!Enum.IsDefined(input.ReferralEndpoint)) return new(WaitingTimeInputError.InvalidEndpoint, nameof(input.ReferralEndpoint));
         if (!Enum.IsDefined(input.Unit)) return new(WaitingTimeInputError.InvalidUnit, nameof(input.Unit));
@@ -52,9 +52,9 @@ public static class WaitingTimeValidation
             return new(WaitingTimeInputError.MaximumWait, nameof(input.WaitValue), WaitDuration.MaximumValue(input.Unit));
         if (input.WaitUpperValue is { } upper && (upper < input.WaitValue || upper > WaitDuration.MaximumValue(input.Unit)))
             return new(WaitingTimeInputError.InvalidUpperBound, nameof(input.WaitUpperValue));
-        if (input.ResponsibleDepartment?.Length > 200) return new(WaitingTimeInputError.OwnerTooLong, nameof(input.ResponsibleDepartment), 200);
-        if (input.ComparisonCode?.Length > 100) return new(WaitingTimeInputError.ComparisonCodeTooLong, nameof(input.ComparisonCode), 100);
-        if (input.Note?.Length > 500) return new(WaitingTimeInputError.NoteTooLong, nameof(input.Note), 500);
+        if (input.ResponsibleDepartment?.Length > FieldLimits.ResponsibleDepartment) return new(WaitingTimeInputError.OwnerTooLong, nameof(input.ResponsibleDepartment), FieldLimits.ResponsibleDepartment);
+        if (input.ComparisonCode?.Length > FieldLimits.ComparisonCode) return new(WaitingTimeInputError.ComparisonCodeTooLong, nameof(input.ComparisonCode), FieldLimits.ComparisonCode);
+        if (input.Note?.Length > FieldLimits.Note) return new(WaitingTimeInputError.NoteTooLong, nameof(input.Note), FieldLimits.Note);
         return null;
     }
 

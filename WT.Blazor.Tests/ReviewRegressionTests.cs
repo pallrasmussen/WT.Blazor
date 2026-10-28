@@ -14,8 +14,12 @@ namespace WT.Blazor.Tests;
 
 public class ReviewRegressionTests
 {
-    [Fact]
-    public async Task ServicesSharingAContextSerializeOverlappingOperations()
+    [Theory]
+    [InlineData("settings")]
+    [InlineData("history")]
+    [InlineData("trend")]
+    [InlineData("operations")]
+    public async Task ServicesSharingAContextSerializeOverlappingOperations(string responsibility)
     {
         await using var connection = new SqliteConnection("Data Source=:memory:");
         await connection.OpenAsync();
@@ -25,18 +29,24 @@ public class ReviewRegressionTests
         await using var db = new ApplicationDbContext(options);
         await db.Database.EnsureCreatedAsync();
         blocker.Enabled = true;
-        var read = new WaitingTimeReadService(db, TimeProvider.System).GetActiveAsync(null, null);
+        var read = new WaitingTimeCatalogService(db).GetActiveAsync(null, null);
         await blocker.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        var settings = new PortalSettingsService(db, new PortalSettingsChangeNotifier(), TimeProvider.System).GetAsync();
+        Task other = responsibility switch
+        {
+            "history" => new HistoryReadService(db).GetHistoryPageAsync(new HistoryQuery()),
+            "trend" => new TrendReadService(db, TimeProvider.System).GetByIdAsync(1),
+            "operations" => new OperationsReadService(db, TimeProvider.System).GetOperationsSummaryAsync(30, 3, 12),
+            _ => new PortalSettingsService(db, new PortalSettingsChangeNotifier(), TimeProvider.System).GetAsync()
+        };
         try
         {
-            Assert.False(settings.IsCompleted);
+            Assert.False(other.IsCompleted);
         }
         finally
         {
             blocker.Release.TrySetResult();
         }
-        await Task.WhenAll(read, settings).WaitAsync(TimeSpan.FromSeconds(5));
+        await Task.WhenAll(read, other).WaitAsync(TimeSpan.FromSeconds(5));
     }
 
     private sealed class BlockingReader : DbCommandInterceptor
@@ -152,7 +162,7 @@ public class ReviewRegressionTests
                 NewUnit = WaitUnit.Vikur
             });
         await db.SaveChangesAsync();
-        var reader = new WaitingTimeReadService(db, TimeProvider.System);
+        var reader = new TrendReadService(db, TimeProvider.System);
         Assert.Null(await new TrendReportService(reader, new WT.Blazor.Tests.TestInfrastructure.DefaultSettingsService(), TimeProvider.System).GetAsync(item.Id));
         var changes = await reader.GetTrendChangesAsync([item.Id]);
         Assert.Equal(7, changes[item.Id]);

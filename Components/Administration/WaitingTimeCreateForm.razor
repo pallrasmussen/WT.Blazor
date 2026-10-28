@@ -32,7 +32,7 @@
         }
         <div>
             <label for="new-name">@AppText.Get("SpecialtyTreatment")</label>
-            <input maxlength="200" id="new-name" @bind="Form.Name" placeholder="@AppText.Get("SearchPlaceholder")" />
+            <input maxlength="@FieldLimits.WaitingTimeName" id="new-name" @bind="Form.Name" placeholder="@AppText.Get("SearchPlaceholder")" />
         </div>
         <div>
             <label for="new-wait">@AppText.Get("Wait")</label>
@@ -53,7 +53,7 @@
     }
     <div style="margin-top:.8rem">
         <label for="new-note">@AppText.Get("ReferralConditions")</label>
-        <input maxlength="500" id="new-note" @bind="Form.Note" placeholder="@AppText.Get("Optional")" />
+        <input maxlength="@FieldLimits.Note" id="new-note" @bind="Form.Note" placeholder="@AppText.Get("Optional")" />
     </div>
     <button class="btn-teal" style="margin-top:.9rem" @onclick="SaveAsync" disabled="@Busy">@AppText.Get("SaveNew")</button>
     <button type="button" class="btn-secondary" style="margin-top:.9rem" @onclick="Close">@AppText.Get("Cancel")</button>

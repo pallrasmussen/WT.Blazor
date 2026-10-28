@@ -9,8 +9,8 @@ public sealed class WaitingTimeHistoryEntryConfiguration : IEntityTypeConfigurat
     public void Configure(EntityTypeBuilder<WaitingTimeHistoryEntry> builder)
     {
         builder.Property(entry => entry.EstimateSeries).HasDefaultValue(1);
-        builder.Property(entry => entry.ResponsibleDepartment).HasMaxLength(200);
-        builder.Property(entry => entry.ComparisonCode).HasMaxLength(100);
+        builder.Property(entry => entry.ResponsibleDepartment).HasMaxLength(FieldLimits.ResponsibleDepartment);
+        builder.Property(entry => entry.ComparisonCode).HasMaxLength(FieldLimits.ComparisonCode);
         builder.HasOne(entry => entry.WaitingTime)
             .WithMany(waitingTime => waitingTime.History)
             .HasForeignKey(entry => entry.WaitingTimeId)

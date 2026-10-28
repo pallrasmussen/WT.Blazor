@@ -38,7 +38,7 @@ public class HistoryPaginationTests
                 Timestamp = new DateTime(2026, 10, 1)
             });
         await db.SaveChangesAsync();
-        var reader = new WaitingTimeReadService(db, TimeProvider.System);
+        var reader = new HistoryReadService(db);
         var ids = new List<int>();
         for (var page = 1; page <= 4; page++)
         {

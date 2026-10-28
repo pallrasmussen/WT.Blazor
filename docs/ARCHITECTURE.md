@@ -61,3 +61,47 @@ Application tests cover server-owned values and versions, range confirmation,
 validation, conflicts and history; browser checks cover real form submission,
 keyboard interaction and accessibility. This refactoring requires no database
 migration.
+
+# Reading and public presentation
+
+Catalog, audit history, operations summaries and trend queries have separate
+implementations: `WaitingTimeCatalogService`, `HistoryReadService`,
+`OperationsReadService` and `TrendReadService`. Each implements its existing
+interface and uses the same scoped `ApplicationDbContext`. All query entry points
+retain `DatabaseOperation.EnterAsync`; separate service instances must still
+serialize work when they share one context. Queries keep their existing database
+filtering, paging, ordering, tie-breakers and aggregation behavior.
+
+`Home` owns loading and filtering public results and building return URLs.
+`PublicWaitingTimeCard` owns the card markup, expiry/verification display and
+trend indicator. It takes the current record, settings, clock value, optional
+trend change and link. It makes no data requests and preserves the existing DOM
+structure and accessibility labels.
+
+# Audit snapshots, limits and exports
+
+`WaitingTimeHistorySnapshot` is the single mapper for immutable audit metadata
+and before/after duration values. The management service captures the previous
+duration before updating a record and supplies request/user/time context. The
+mapper retains ranges, display units and canonical days, including the
+distinction between an unavailable estimate and an available zero. Lifecycle
+actions use the same mapper without rewriting prior history.
+
+`FieldLimits` provides the existing string limits for model attributes, EF
+configuration, shared validation and HTML inputs. Values and schema metadata are
+unchanged. A future limit change must still be reviewed as a potential schema
+migration, even though its code references are centralized.
+
+History export preparation lives in `HistoryExportReportReader`: it performs a
+bounded, filtered history read, enforces the row limit and projects display rows
+with a generation timestamp. `HistoryExportRenderer` consumes that prepared
+report to produce CSV, Excel-compatible HTML or a streamed PDF without querying
+the database. CSV formula protection, text escaping, column order and filenames
+remain part of the renderer's contract.
+
+`TrendExportService` retrieves the existing trend report, validates its period
+and point limit, and records export timing. `TrendPdfRenderer` owns PDF layout.
+Both PDF paths check cancellation before and after generation and keep
+`ExportFile` streaming; they do not allocate a complete PDF byte array in the
+request service. Renderers are stateless singleton services; database readers
+remain scoped.

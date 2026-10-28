@@ -8,15 +8,15 @@ public sealed class PortalSettingsAuditEntryConfiguration : IEntityTypeConfigura
 {
     public void Configure(EntityTypeBuilder<PortalSettingsAuditEntry> builder)
     {
-        builder.Property(entry => entry.Username).HasMaxLength(256);
-        builder.Property(entry => entry.OldReferralInstructionsFo).HasMaxLength(2000);
-        builder.Property(entry => entry.OldReferralInstructionsEn).HasMaxLength(2000);
-        builder.Property(entry => entry.OldContactGuidanceFo).HasMaxLength(2000);
-        builder.Property(entry => entry.OldContactGuidanceEn).HasMaxLength(2000);
-        builder.Property(entry => entry.NewReferralInstructionsFo).HasMaxLength(2000);
-        builder.Property(entry => entry.NewReferralInstructionsEn).HasMaxLength(2000);
-        builder.Property(entry => entry.NewContactGuidanceFo).HasMaxLength(2000);
-        builder.Property(entry => entry.NewContactGuidanceEn).HasMaxLength(2000);
+        builder.Property(entry => entry.Username).HasMaxLength(FieldLimits.AuditUsername);
+        builder.Property(entry => entry.OldReferralInstructionsFo).HasMaxLength(FieldLimits.PatientGuidance);
+        builder.Property(entry => entry.OldReferralInstructionsEn).HasMaxLength(FieldLimits.PatientGuidance);
+        builder.Property(entry => entry.OldContactGuidanceFo).HasMaxLength(FieldLimits.PatientGuidance);
+        builder.Property(entry => entry.OldContactGuidanceEn).HasMaxLength(FieldLimits.PatientGuidance);
+        builder.Property(entry => entry.NewReferralInstructionsFo).HasMaxLength(FieldLimits.PatientGuidance);
+        builder.Property(entry => entry.NewReferralInstructionsEn).HasMaxLength(FieldLimits.PatientGuidance);
+        builder.Property(entry => entry.NewContactGuidanceFo).HasMaxLength(FieldLimits.PatientGuidance);
+        builder.Property(entry => entry.NewContactGuidanceEn).HasMaxLength(FieldLimits.PatientGuidance);
         builder.HasIndex(entry => entry.Timestamp);
     }
 }

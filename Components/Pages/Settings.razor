@@ -52,10 +52,10 @@ else
         <h2>@AppText.Get("PatientGuidanceSettings")</h2>
         <p>@AppText.Get("PatientGuidanceApprovalHelp")</p>
         <div class="settings-grid">
-            <div><label for="referral-fo">@AppText.Get("ReferralInstructionsFo")</label><textarea id="referral-fo" maxlength="2000" rows="5" @bind="settings.ReferralInstructionsFo"></textarea></div>
-            <div><label for="referral-en">@AppText.Get("ReferralInstructionsEn")</label><textarea id="referral-en" maxlength="2000" rows="5" @bind="settings.ReferralInstructionsEn"></textarea></div>
-            <div><label for="contact-fo">@AppText.Get("ContactGuidanceFo")</label><textarea id="contact-fo" maxlength="2000" rows="5" @bind="settings.ContactGuidanceFo"></textarea></div>
-            <div><label for="contact-en">@AppText.Get("ContactGuidanceEn")</label><textarea id="contact-en" maxlength="2000" rows="5" @bind="settings.ContactGuidanceEn"></textarea></div>
+            <div><label for="referral-fo">@AppText.Get("ReferralInstructionsFo")</label><textarea id="referral-fo" maxlength="@FieldLimits.PatientGuidance" rows="5" @bind="settings.ReferralInstructionsFo"></textarea></div>
+            <div><label for="referral-en">@AppText.Get("ReferralInstructionsEn")</label><textarea id="referral-en" maxlength="@FieldLimits.PatientGuidance" rows="5" @bind="settings.ReferralInstructionsEn"></textarea></div>
+            <div><label for="contact-fo">@AppText.Get("ContactGuidanceFo")</label><textarea id="contact-fo" maxlength="@FieldLimits.PatientGuidance" rows="5" @bind="settings.ContactGuidanceFo"></textarea></div>
+            <div><label for="contact-en">@AppText.Get("ContactGuidanceEn")</label><textarea id="contact-en" maxlength="@FieldLimits.PatientGuidance" rows="5" @bind="settings.ContactGuidanceEn"></textarea></div>
         </div>
         <label for="publish-guidance"><input id="publish-guidance" type="checkbox" @bind="settings.PublishPatientGuidance" /> @AppText.Get("PublishApprovedGuidance")</label>
     </section>

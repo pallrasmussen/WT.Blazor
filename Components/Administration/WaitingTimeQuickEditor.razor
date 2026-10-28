@@ -17,7 +17,7 @@
     </div>
     <div>
         <label for="quick-note-@Item.Id">@AppText.Get("ReferralConditions")</label>
-        <input maxlength="500" id="quick-note-@Item.Id" @bind="Form.Note" placeholder="@AppText.Get("Optional")" />
+        <input maxlength="@FieldLimits.Note" id="quick-note-@Item.Id" @bind="Form.Note" placeholder="@AppText.Get("Optional")" />
     </div>
     <div class="admin-quick-edit-actions">
         <button class="btn-teal" @onclick="BeginPreview" disabled="@Busy">@AppText.Get("SaveChanges")</button>

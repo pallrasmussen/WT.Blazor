@@ -59,7 +59,7 @@
                 </div>
                 <div class="edit-form-field edit-form-field-wide">
                     <label for="edit-note">@AppText.Get("ReferralConditions")</label>
-                    <input maxlength="500" id="edit-note" @bind="Form.Note" placeholder="@AppText.Get("Optional")" />
+                    <input maxlength="@FieldLimits.Note" id="edit-note" @bind="Form.Note" placeholder="@AppText.Get("Optional")" />
                 </div>
             </div>
             @if (ShowPreview)
