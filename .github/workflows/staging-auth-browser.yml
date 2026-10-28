@@ -23,7 +23,39 @@ permissions:
   contents: read
 
 jobs:
+  configuration:
+    runs-on: windows-latest
+    steps:
+      - name: Validate staging configuration
+        shell: pwsh
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          ENABLED: ${{ vars.STAGING_BROWSER_ENABLED }}
+          BASE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.base_url || vars.STAGING_BROWSER_BASE_URL }}
+          MANUAL_RUNNER: ${{ inputs.runner_label }}
+          VIEWER_RUNNER: ${{ vars.STAGING_VIEWER_RUNNER_LABEL }}
+          CONTRIBUTOR_RUNNER: ${{ vars.STAGING_CONTRIBUTOR_RUNNER_LABEL }}
+          ADMIN_RUNNER: ${{ vars.STAGING_ADMIN_RUNNER_LABEL }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:EVENT_NAME -eq 'schedule' -and $env:ENABLED -ne 'true') {
+            throw 'Scheduled staging checks are not enabled. Configure STAGING_BROWSER_ENABLED=true and the URL/role runner variables documented in docs/STAGING-BROWSER-CHECKS.md.'
+          }
+          $url = $null
+          if (-not [Uri]::TryCreate($env:BASE_URL, [UriKind]::Absolute, [ref]$url) -or $url.Scheme -ne 'https' -or $url.UserInfo) {
+            throw 'Staging requires an absolute HTTPS URL without embedded credentials.'
+          }
+          $labels = if ($env:EVENT_NAME -eq 'workflow_dispatch') { @($env:MANUAL_RUNNER) } else { @($env:VIEWER_RUNNER, $env:CONTRIBUTOR_RUNNER, $env:ADMIN_RUNNER) }
+          foreach ($label in $labels) {
+            if ([string]::IsNullOrWhiteSpace($label) -or $label -in @('self-hosted', 'windows', 'linux', 'macOS', 'x64', 'ARM64')) {
+              throw 'Configure a dedicated role-specific runner label for each selected role.'
+            }
+          }
+          if ($env:EVENT_NAME -eq 'schedule' -and @($labels | Sort-Object -Unique).Count -ne 3) {
+            throw 'Viewer, Contributor and Admin must use distinct role-specific runner labels.'
+          }
   viewer:
+    needs: configuration
     if: >-
       (github.event_name == 'workflow_dispatch' && inputs.role == 'Viewer') ||
       (github.event_name == 'schedule' && vars.STAGING_BROWSER_ENABLED == 'true')
@@ -34,6 +66,7 @@ jobs:
       base_url: ${{ github.event_name == 'workflow_dispatch' && inputs.base_url || vars.STAGING_BROWSER_BASE_URL }}
 
   contributor:
+    needs: configuration
     if: >-
       (github.event_name == 'workflow_dispatch' && inputs.role == 'Contributor') ||
       (github.event_name == 'schedule' && vars.STAGING_BROWSER_ENABLED == 'true')
@@ -44,6 +77,7 @@ jobs:
       base_url: ${{ github.event_name == 'workflow_dispatch' && inputs.base_url || vars.STAGING_BROWSER_BASE_URL }}
 
   admin:
+    needs: configuration
     if: >-
       (github.event_name == 'workflow_dispatch' && inputs.role == 'Admin') ||
       (github.event_name == 'schedule' && vars.STAGING_BROWSER_ENABLED == 'true')

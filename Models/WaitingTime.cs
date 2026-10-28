@@ -22,6 +22,7 @@ public class WaitingTime
     [StringLength(500)]
     public string? Note { get; set; }
 
+    // Last creation, waiting-time change, or explicit review; edit times live in History.
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public bool IsActive { get; set; } = true;

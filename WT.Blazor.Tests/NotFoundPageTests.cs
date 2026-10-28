@@ -1,3 +1,4 @@
+using WT.Blazor.Tests.TestInfrastructure;
 using Bunit;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
@@ -12,6 +13,7 @@ public class NotFoundPageTests : BunitContext
     [Fact]
     public void AuthenticationFailureShowsAnInformativeAccessMessage()
     {
+        using var culture = new TestCulture("en");
         var httpContext = new DefaultHttpContext();
         httpContext.Features.Set<IStatusCodeReExecuteFeature>(new AuthenticationFailureFeature());
         Services.AddSingleton<IHttpContextAccessor>(new HttpContextAccessor { HttpContext = httpContext });
@@ -27,6 +29,7 @@ public class NotFoundPageTests : BunitContext
     [Fact]
     public void ErrorPageProvidesALocalizedRecoveryAction()
     {
+        using var culture = new TestCulture("en");
         var cut = Render<Error>();
 
         Assert.Contains("Something went wrong", cut.Markup);

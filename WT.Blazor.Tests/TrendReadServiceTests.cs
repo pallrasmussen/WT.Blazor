@@ -10,6 +10,80 @@ namespace WT.Blazor.Tests;
 public class TrendReadServiceTests
 {
     [Fact]
+    public async Task DatabaseTrendSummariesMatchDailyReductionWithTiesUnitsAndEqualRuns()
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connection).Options;
+        await using var db = new ApplicationDbContext(options);
+        await db.Database.EnsureCreatedAsync();
+        var items = Enumerable.Range(0, 4).Select(index => new WaitingTime { Name = $"Record {index}" }).ToList();
+        db.WaitingTimes.AddRange(items);
+        await db.SaveChangesAsync();
+        var timestamp = new DateTime(2025, 1, 1);
+        for (var index = 0; index < 500; index++)
+        {
+            var entry = History(items[0], timestamp.AddDays(index / 2), index < 400 ? index % 17 : 42);
+            entry.Action = index == 0 ? HistoryAction.Created : HistoryAction.Updated;
+            db.WaitingTimeHistoryEntries.Add(entry);
+        }
+        // Same timestamp: the final inserted row wins. Legacy unit-only values
+        // and canonical days take precedence exactly as in the chart reducer.
+        var week = History(items[1], timestamp, 2);
+        week.NewUnit = WaitUnit.Vikur;
+        week.NewWaitDays = null;
+        var month = History(items[1], timestamp.AddDays(1), 1);
+        month.NewUnit = WaitUnit.Manadir;
+        month.NewWaitDays = null;
+        var tie = History(items[1], timestamp.AddDays(1), 10);
+        tie.NewWaitDays = 7;
+        db.WaitingTimeHistoryEntries.AddRange(week, month, tie, History(items[2], timestamp, 5));
+        var ignored = History(items[1], timestamp.AddDays(2), 999);
+        ignored.Action = HistoryAction.Reviewed;
+        db.WaitingTimeHistoryEntries.Add(ignored);
+        await db.SaveChangesAsync();
+        var reader = new WaitingTimeReadService(db, TimeProvider.System);
+        var changes = await reader.GetTrendChangesAsync(items.Select(item => item.Id).Append(items[0].Id));
+        foreach (var item in items.Take(3))
+        {
+            var history = await db.WaitingTimeHistoryEntries.Where(entry => entry.WaitingTimeId == item.Id
+                    && (entry.Action == HistoryAction.Created || entry.Action == HistoryAction.Updated))
+                .OrderBy(entry => entry.Timestamp).ThenBy(entry => entry.Id)
+                .Select(entry => new TrendHistoryPoint(entry.Timestamp, entry.NewWaitValue!.Value, entry.NewUnit, entry.NewWaitDays)).ToListAsync();
+            Assert.Equal(TrendPointReducer.LatestChange(history), changes[item.Id]);
+        }
+        Assert.Equal(-7, changes[items[1].Id]);
+        Assert.Equal(0, changes[items[2].Id]);
+        Assert.False(changes.ContainsKey(items[3].Id));
+        Assert.Empty(await reader.GetTrendChangesAsync([]));
+    }
+
+    [Fact]
+    public async Task LatestReviewUsesTheIdToBreakTimestampTies()
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connection).Options;
+        await using var db = new ApplicationDbContext(options);
+        await db.Database.EnsureCreatedAsync();
+        var item = new WaitingTime { Name = "Record" };
+        db.WaitingTimes.Add(item);
+        await db.SaveChangesAsync();
+        for (var index = 0; index < 100; index++)
+        {
+            var entry = History(item, new DateTime(2026, 1, 1), 5);
+            entry.Action = HistoryAction.Reviewed;
+            entry.Username = $"Reviewer {index}";
+            db.WaitingTimeHistoryEntries.Add(entry);
+        }
+        await db.SaveChangesAsync();
+        var reader = new WaitingTimeReadService(db, TimeProvider.System);
+        var review = Assert.Single(await reader.GetLatestReviewsAsync([item.Id, item.Id]));
+        Assert.Equal("Reviewer 99", review.Value.Username);
+        Assert.Empty(await reader.GetLatestReviewsAsync([]));
+    }
+
+    [Fact]
     public async Task TrendsIncludeCreationButRecentWindowsDoNotMoveBackToStaleUpdates()
     {
         await using var connection = new SqliteConnection("Data Source=:memory:");

@@ -198,3 +198,13 @@ Waiting times must fit in a signed 32-bit count of canonical days. Limits are
 Creation and both editing forms enforce the selected unit's limit; server-side
 validation rejects overflowing values before changing records or audit history.
 Existing stored values are not rewritten by this change.
+
+## Waiting-time freshness
+
+`WaitingTime.UpdatedAt` records creation, a change to the waiting-time value or
+unit, or an explicit **Mark reviewed** action. Editing names, hospital/department
+metadata or notes, and reactivating a record, do not refresh that timestamp.
+Their actual edit times remain in the immutable audit history. After reactivation,
+review the estimate explicitly if it has been verified. This change does not
+rewrite historical timestamps; review existing estimates through the normal
+staff workflow if metadata edits previously made them appear current.

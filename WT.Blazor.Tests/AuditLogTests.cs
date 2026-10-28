@@ -11,6 +11,41 @@ namespace WT.Blazor.Tests;
 
 public class AuditLogTests
 {
+    [Theory]
+    [InlineData("metadata")]
+    [InlineData("reactivate")]
+    [InlineData("wait")]
+    [InlineData("review")]
+    public async Task OnlyWaitChangesAndExplicitReviewsRefreshExistingEstimates(string action)
+    {
+        var databasePath = NewDatabasePath();
+        try
+        {
+            await using var db = await CreateMigratedContextAsync(databasePath);
+            var old = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            var now = old.AddYears(1);
+            var manager = new WaitingTimeManagementService(db, NullLogger<WaitingTimeManagementService>.Instance,
+                new HttpContextAccessor(), new FixedTimeProvider(old));
+            var item = await manager.CreateAsync(new WaitingTimeCreate("Original", Hospital.Klaksvikar, null, 3, WaitUnit.Vikur, null, "creator"));
+            if (action == "reactivate") await manager.DeactivateAsync(item.Id, item.Version, "tester");
+            manager = new WaitingTimeManagementService(db, NullLogger<WaitingTimeManagementService>.Instance,
+                new HttpContextAccessor(), new FixedTimeProvider(now));
+            if (action == "reactivate") await manager.ReactivateAsync(item.Id, item.Version, "tester");
+            else if (action == "review") await manager.MarkReviewedAsync(item.Id, item.Version, "tester");
+            else await manager.UpdateAsync(new WaitingTimeUpdate(item.Id, item.Version, "Renamed", item.Hospital, null,
+                action == "wait" ? 4 : 3, item.Unit, "New note", "tester"));
+
+            db.ChangeTracker.Clear();
+            var saved = await db.WaitingTimes.SingleAsync();
+            Assert.Equal(action is "wait" or "review" ? now.UtcDateTime : old.UtcDateTime, saved.UpdatedAt);
+            Assert.Equal(action is "metadata" or "reactivate", UpdatedStatus.RequiresReview(saved.UpdatedAt, now.UtcDateTime));
+            var latest = await db.WaitingTimeHistoryEntries.OrderByDescending(entry => entry.Id).FirstAsync();
+            Assert.Equal(now.UtcDateTime, latest.Timestamp);
+            Assert.Equal("tester", latest.Username);
+        }
+        finally { DeleteDatabase(databasePath); }
+    }
+
     [Fact]
     public async Task MarkReviewedRefreshesTheWaitingTimeAndWritesAuditEntry()
     {
