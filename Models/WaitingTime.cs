@@ -17,6 +17,10 @@ public class WaitingTime
     [Range(0, int.MaxValue)]
     public int WaitValue { get; set; }
 
+    // Optional upper bound; WaitValue is the lower bound when present.
+    [Range(0, int.MaxValue)]
+    public int? WaitUpperValue { get; set; }
+
     public WaitUnit Unit { get; set; }
 
     public EstimateStatus EstimateStatus { get; set; }

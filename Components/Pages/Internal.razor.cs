@@ -50,7 +50,7 @@ public partial class Internal
     private DateTime CurrentUtc => TimeProvider.GetUtcNow().UtcDateTime;
     private EstimateReviewReason reviewReason;
     private string reviewOwner = "";
-    private EstimateReviewReason ReviewReasons(WaitingTime item) => EstimateReview.Reasons(item, portalSettings.GreenMaximumAgeMonths, CurrentUtc);
+    private EstimateReviewReason ReviewReasons(WaitingTime item) => EstimateReview.Reasons(item, Math.Min(portalSettings.GreenMaximumAgeMonths, portalSettings.EstimateExpiryMonths), CurrentUtc);
     private List<WaitingTime> visibleItems => items
         .Where(item => showInactive ? !item.IsActive : item.IsActive)
         .Where(item => !showNeedsReview || ReviewReasons(item) != EstimateReviewReason.None)
@@ -248,7 +248,7 @@ public partial class Internal
             createForm.WaitValue,
             createForm.Unit,
             createForm.Note?.Trim(),
-            username, createForm.EstimateStatus, createForm.ReferralEndpoint, createForm.ResponsibleDepartment, createForm.ComparisonCode));
+            username, createForm.EstimateStatus, createForm.ReferralEndpoint, createForm.ResponsibleDepartment, createForm.ComparisonCode, createForm.WaitUpperValue));
         ShowStatus(string.Format(AppText.Get("CreatedMessage"), createForm.Name));
         createForm.Clear();
         showCreateForm = false;
@@ -340,6 +340,7 @@ public partial class Internal
         || editForm.HospitalName != DisplayNames.For(editItem.Hospital)
         || editForm.DepartmentName != (editItem.Department is null ? "" : DisplayNames.For(editItem.Department.Value))
         || editForm.WaitValue != editItem.WaitValue
+        || editForm.WaitUpperValue != editItem.WaitUpperValue
         || editForm.Unit != editItem.Unit
         || editForm.EstimateStatus != editItem.EstimateStatus
         || editForm.ReferralEndpoint != editItem.ReferralEndpoint
@@ -348,7 +349,7 @@ public partial class Internal
         || (editForm.Note ?? "") != (editItem.Note ?? ""));
 
     private bool QuickEditFormHasChanges() => quickEditItem is not null && (
-        quickEditForm.WaitValue != quickEditItem.WaitValue
+        quickEditForm.WaitValue != quickEditItem.WaitValue || quickEditForm.WaitUpperValue != quickEditItem.WaitUpperValue
         || quickEditForm.Unit != quickEditItem.Unit
         || quickEditForm.EstimateStatus != quickEditItem.EstimateStatus
         || (quickEditForm.Note ?? "") != (quickEditItem.Note ?? ""));
@@ -402,9 +403,9 @@ public partial class Internal
 
     private string? largeEditSignature;
     private string? largeQuickSignature;
-    private static string ChangeSignature(WaitingTime item, WaitingTimeFormState form) => $"{item.Id}/{item.Version}/{form.WaitValue}/{form.Unit}/{form.EstimateStatus}/{form.ReferralEndpoint}";
-    private bool EditRequiresConfirmation => editItem is not null && EstimateChange.RequiresConfirmation(editItem, editForm.EstimateStatus, editForm.ReferralEndpoint, editForm.WaitValue, editForm.Unit);
-    private bool QuickRequiresConfirmation => quickEditItem is not null && EstimateChange.RequiresConfirmation(quickEditItem, quickEditForm.EstimateStatus, quickEditForm.ReferralEndpoint, quickEditForm.WaitValue, quickEditForm.Unit);
+    private static string ChangeSignature(WaitingTime item, WaitingTimeFormState form) => $"{item.Id}/{item.Version}/{form.WaitValue}/{form.WaitUpperValue}/{form.Unit}/{form.EstimateStatus}/{form.ReferralEndpoint}";
+    private bool EditRequiresConfirmation => editItem is not null && EstimateChange.RequiresConfirmation(editItem, editForm.EstimateStatus, editForm.ReferralEndpoint, editForm.WaitValue, editForm.Unit, editForm.WaitUpperValue);
+    private bool QuickRequiresConfirmation => quickEditItem is not null && EstimateChange.RequiresConfirmation(quickEditItem, quickEditForm.EstimateStatus, quickEditForm.ReferralEndpoint, quickEditForm.WaitValue, quickEditForm.Unit, quickEditForm.WaitUpperValue);
     private bool LargeEditAcknowledged
     {
         get => editItem is not null && largeEditSignature == ChangeSignature(editItem, editForm);
@@ -447,7 +448,7 @@ public partial class Internal
                 editForm.WaitValue,
                 editForm.Unit,
                 editForm.Note,
-                username, editForm.EstimateStatus, editForm.ReferralEndpoint, editForm.ResponsibleDepartment, editForm.ComparisonCode, LargeEditAcknowledged));
+                username, editForm.EstimateStatus, editForm.ReferralEndpoint, editForm.ResponsibleDepartment, editForm.ComparisonCode, LargeEditAcknowledged, editForm.WaitUpperValue));
         }
         catch (WaitingTimeConcurrencyException)
         {
@@ -506,7 +507,7 @@ public partial class Internal
                 quickEditForm.WaitValue,
                 quickEditForm.Unit,
                 quickEditForm.Note?.Trim(),
-                username, quickEditForm.EstimateStatus, quickEditItem.ReferralEndpoint, quickEditItem.ResponsibleDepartment, quickEditItem.ComparisonCode, LargeQuickAcknowledged));
+                username, quickEditForm.EstimateStatus, quickEditItem.ReferralEndpoint, quickEditItem.ResponsibleDepartment, quickEditItem.ComparisonCode, LargeQuickAcknowledged, quickEditForm.WaitUpperValue));
 
             ApplyEstimateForm(quickEditItem, quickEditForm, TimeProvider.GetUtcNow().UtcDateTime);
             quickEditItem.Version++;
@@ -575,6 +576,8 @@ public partial class Internal
             yield return string.Format(AppText.Get("ChangeHospital"), DisplayNames.For(editItem.Hospital), editForm.HospitalName);
         if (isSuperAdmin && editForm.DepartmentName != (editItem.Department is null ? "" : DisplayNames.For(editItem.Department.Value)))
             yield return $"Depil: {(editItem.Department is null ? "-" : DisplayNames.For(editItem.Department.Value))} -> {editForm.DepartmentName}";
+        if (editForm.WaitUpperValue != editItem.WaitUpperValue)
+            yield return $"{AppText.Get("WaitUpperValue")}: {editItem.WaitUpperValue} → {editForm.WaitUpperValue}";
         if ((editForm.Note ?? "") != (editItem.Note ?? ""))
             yield return $"{AppText.Get("Note")}: {(string.IsNullOrWhiteSpace(editItem.Note) ? "-" : editItem.Note)} -> {(string.IsNullOrWhiteSpace(editForm.Note) ? "-" : editForm.Note)}";
     }
@@ -584,14 +587,18 @@ public partial class Internal
         if (quickEditItem is null) yield break;
         if (quickEditForm.EstimateStatus != quickEditItem.EstimateStatus)
             yield return $"{AppText.Get("EstimateStatus")}: {ReferralEstimate.StatusLabel(quickEditItem.EstimateStatus)} → {ReferralEstimate.StatusLabel(quickEditForm.EstimateStatus)}";
-        if (quickEditForm.EstimateStatus == EstimateStatus.Available && (quickEditForm.WaitValue != quickEditItem.WaitValue || quickEditForm.Unit != quickEditItem.Unit))
+        if (quickEditForm.EstimateStatus == EstimateStatus.Available && (quickEditForm.WaitValue != quickEditItem.WaitValue || quickEditForm.WaitUpperValue != quickEditItem.WaitUpperValue || quickEditForm.Unit != quickEditItem.Unit))
             yield return $"{AppText.Get("Wait")}: {WaitText(quickEditItem.WaitValue, quickEditItem.Unit)} -> {WaitText(quickEditForm.WaitValue, quickEditForm.Unit)}";
+        if (quickEditForm.WaitUpperValue != quickEditItem.WaitUpperValue)
+            yield return $"{AppText.Get("WaitUpperValue")}: {quickEditItem.WaitUpperValue} → {quickEditForm.WaitUpperValue}";
         if ((quickEditForm.Note ?? "") != (quickEditItem.Note ?? ""))
             yield return $"{AppText.Get("Note")}: {(string.IsNullOrWhiteSpace(quickEditItem.Note) ? "-" : quickEditItem.Note)} -> {(string.IsNullOrWhiteSpace(quickEditForm.Note) ? "-" : quickEditForm.Note)}";
     }
 
     private static string? WaitValidation(WaitingTimeFormState form) => form.EstimateStatus != EstimateStatus.Available ? null : form.WaitValue < 0
         ? AppText.Get("NegativeWaitValidation")
+        : form.WaitUpperValue is { } upper && (upper < form.WaitValue || upper > WaitDuration.MaximumValue(form.Unit))
+            ? AppText.Get("WaitRangeValidation")
         : form.WaitValue > WaitDuration.MaximumValue(form.Unit)
             ? string.Format(AppText.Get("MaximumWaitValidation"), WaitDuration.MaximumValue(form.Unit))
             : null;
@@ -743,7 +750,7 @@ public partial class Internal
             {
                 await WaitingTimeManager.UpdateAsync(new WaitingTimeUpdate(
                     undo.Id, undo.ExpectedVersion, undo.Snapshot.Name, undo.Snapshot.Hospital,
-                    undo.Snapshot.Department, undo.Snapshot.WaitValue, undo.Snapshot.Unit, undo.Snapshot.Note, username, undo.Snapshot.EstimateStatus, undo.Snapshot.ReferralEndpoint, undo.Snapshot.ResponsibleDepartment, undo.Snapshot.ComparisonCode, ConfirmLargeChange: true));
+                    undo.Snapshot.Department, undo.Snapshot.WaitValue, undo.Snapshot.Unit, undo.Snapshot.Note, username, undo.Snapshot.EstimateStatus, undo.Snapshot.ReferralEndpoint, undo.Snapshot.ResponsibleDepartment, undo.Snapshot.ComparisonCode, ConfirmLargeChange: true, WaitUpperValue: undo.Snapshot.WaitUpperValue));
                 var item = items.FirstOrDefault(candidate => candidate.Id == undo.Id);
                 if (item is not null)
                     undo.Snapshot.ApplyTo(item, undo.ExpectedVersion + 1);
@@ -764,14 +771,16 @@ public partial class Internal
 
     private static void ApplyEstimateForm(WaitingTime item, WaitingTimeFormState form, DateTime now)
     {
-        var seriesChanged = item.EstimateStatus != form.EstimateStatus || item.ReferralEndpoint != form.ReferralEndpoint;
+        var upper = form.EstimateStatus == EstimateStatus.Available ? form.WaitUpperValue : null;
+        var seriesChanged = item.EstimateStatus != form.EstimateStatus || item.ReferralEndpoint != form.ReferralEndpoint || (item.WaitUpperValue is not null) != (upper is not null);
         var value = form.EstimateStatus == EstimateStatus.Available ? form.WaitValue : 0;
-        if (seriesChanged || form.EstimateStatus == EstimateStatus.Available && (item.WaitValue != value || item.Unit != form.Unit))
+        if (seriesChanged || form.EstimateStatus == EstimateStatus.Available && (item.WaitValue != value || item.Unit != form.Unit || item.WaitUpperValue != upper))
             item.UpdatedAt = now;
         if (seriesChanged) item.EstimateSeries++;
         if (form.EstimateStatus != EstimateStatus.Available) item.VerifiedAt = null;
-        else if (item.EstimateStatus != form.EstimateStatus || item.WaitValue != value || item.Unit != form.Unit) item.VerifiedAt = now;
+        else if (item.EstimateStatus != form.EstimateStatus || item.WaitValue != value || item.Unit != form.Unit || item.WaitUpperValue != upper) item.VerifiedAt = now;
         item.WaitValue = value;
+        item.WaitUpperValue = upper;
         item.Unit = form.Unit;
         item.Note = form.Note?.Trim();
         item.EstimateStatus = form.EstimateStatus;
@@ -782,9 +791,9 @@ public partial class Internal
 
     private sealed record WaitingTimeUndo(int Id, int ExpectedVersion, WaitingTimeSnapshot Snapshot, bool Reactivate);
 
-    private sealed record WaitingTimeSnapshot(string Name, Hospital Hospital, Department? Department, int WaitValue, WaitUnit Unit, string? Note, EstimateStatus EstimateStatus, ReferralEndpoint ReferralEndpoint, string? ResponsibleDepartment, string? ComparisonCode)
+    private sealed record WaitingTimeSnapshot(string Name, Hospital Hospital, Department? Department, int WaitValue, WaitUnit Unit, string? Note, EstimateStatus EstimateStatus, ReferralEndpoint ReferralEndpoint, string? ResponsibleDepartment, string? ComparisonCode, int? WaitUpperValue)
     {
-        public static WaitingTimeSnapshot From(WaitingTime item) => new(item.Name, item.Hospital, item.Department, item.WaitValue, item.Unit, item.Note, item.EstimateStatus, item.ReferralEndpoint, item.ResponsibleDepartment, item.ComparisonCode);
+        public static WaitingTimeSnapshot From(WaitingTime item) => new(item.Name, item.Hospital, item.Department, item.WaitValue, item.Unit, item.Note, item.EstimateStatus, item.ReferralEndpoint, item.ResponsibleDepartment, item.ComparisonCode, item.WaitUpperValue);
 
         public void ApplyTo(WaitingTime item, int version)
         {
@@ -794,6 +803,8 @@ public partial class Internal
             ApplyEstimateForm(item, new WaitingTimeFormState
             {
                 WaitValue = WaitValue,
+                WaitUpperValue = WaitUpperValue,
+                ComparisonCode = ComparisonCode,
                 Unit = Unit,
                 Note = Note,
                 EstimateStatus = EstimateStatus,

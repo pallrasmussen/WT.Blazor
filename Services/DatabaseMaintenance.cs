@@ -7,11 +7,32 @@ using WT.Blazor.Data;
 namespace WT.Blazor.Services;
 
 public sealed record DemoHistoryReview(int WaitingTimeId, string Name, bool IsActive, int SuspectEntries, DateTime FirstTimestamp, DateTime LastTimestamp);
-public sealed record RecoveryVerification(string RestorePath, Dictionary<string, long> RowCounts, int KeyFiles, bool KeyContinuityVerified);
+public sealed record RecoveryVerification(string RestorePath, Dictionary<string, long> RowCounts, int KeyFiles, bool KeyContinuityVerified, bool ApplicationDataReadable);
 
 // Offline operations only: no web endpoints and no changes to the source database or key archive.
 public static class DatabaseMaintenance
 {
+    public static async Task<string> SnapshotDatabaseAsync(string databasePath, string destinationPath)
+    {
+        destinationPath = Path.GetFullPath(destinationPath);
+        // Never overwrite a database, especially if a live path was supplied by mistake.
+        using (new FileStream(destinationPath, FileMode.CreateNew, FileAccess.Write)) { }
+        try
+        {
+            await using var source = new SqliteConnection(ReadOnlyConnectionString(databasePath));
+            await using var target = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = destinationPath, Pooling = false }.ToString());
+            await source.OpenAsync();
+            await target.OpenAsync();
+            source.BackupDatabase(target); // Includes committed data still in a WAL file.
+            return destinationPath;
+        }
+        catch
+        {
+            File.Delete(destinationPath);
+            throw;
+        }
+    }
+
     private const string ProbeValue = "WT.Blazor backup recovery probe v1";
 
     public static string CreateRecoveryProbe(string keyRingPath) => Protector(keyRingPath).Protect(ProbeValue);
@@ -74,13 +95,24 @@ public static class DatabaseMaintenance
         if (counts["PortalSettings"] != 1 || counts["__EFMigrationsHistory"] == 0)
             throw new InvalidOperationException("The backup is missing initialized portal settings or migration history.");
 
+        // Exercise the application model against the restored copy, not just table
+        // counts: incompatible/missing columns must fail before declaring recovery.
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(ReadOnlyConnectionString(restoredDatabase)).Options;
+        await using (var db = new ApplicationDbContext(options))
+        {
+            await foreach (var _ in db.WaitingTimes.AsNoTracking().AsAsyncEnumerable()) { }
+            await foreach (var _ in db.WaitingTimeHistoryEntries.AsNoTracking().AsAsyncEnumerable()) { }
+            await db.PortalSettings.AsNoTracking().SingleAsync();
+            await foreach (var _ in db.PortalSettingsAuditEntries.AsNoTracking().AsAsyncEnumerable()) { }
+        }
+
         // The probe was encrypted by the live key ring at backup time. An unrelated
         // but otherwise valid key archive must fail this check.
         var protectedProbe = (await File.ReadAllTextAsync(probePath)).Trim();
         if (Protector(restoredKeys).Unprotect(protectedProbe) != ProbeValue)
             throw new InvalidOperationException("Restored Data Protection keys could not decrypt the recovery probe.");
 
-        return new RecoveryVerification(restorePath, counts, keys.Length, true);
+        return new RecoveryVerification(restorePath, counts, keys.Length, true, true);
     }
 
     private static IDataProtector Protector(string path) => DataProtectionProvider.Create(new DirectoryInfo(path), builder =>

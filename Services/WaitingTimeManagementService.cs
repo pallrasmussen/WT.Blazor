@@ -13,7 +13,7 @@ public class WaitingTimeManagementService(
     public async Task<WaitingTime> CreateAsync(WaitingTimeCreate create)
     {
         using var operation = await DatabaseOperation.EnterAsync(db);
-        var input = NormalizeInput(create.Name, create.Hospital, create.Department, create.WaitValue, create.Unit, create.Note, create.EstimateStatus, create.ReferralEndpoint, create.ResponsibleDepartment, create.ComparisonCode);
+        var input = NormalizeInput(create.Name, create.Hospital, create.Department, create.WaitValue, create.Unit, create.Note, create.EstimateStatus, create.ReferralEndpoint, create.ResponsibleDepartment, create.ComparisonCode, create.WaitUpperValue);
         var requestId = RequestId();
         var now = timeProvider.GetUtcNow().UtcDateTime;
         await using var transaction = await db.Database.BeginTransactionAsync();
@@ -23,6 +23,7 @@ public class WaitingTimeManagementService(
             Hospital = input.Hospital,
             Department = input.Department,
             WaitValue = input.WaitValue,
+            WaitUpperValue = input.UpperValue,
             Unit = input.Unit,
             Note = input.Note,
             EstimateStatus = input.Status,
@@ -51,7 +52,7 @@ public class WaitingTimeManagementService(
     public async Task UpdateAsync(WaitingTimeUpdate update)
     {
         using var operation = await DatabaseOperation.EnterAsync(db);
-        var input = NormalizeInput(update.Name, update.Hospital, update.Department, update.WaitValue, update.Unit, update.Note, update.EstimateStatus, update.ReferralEndpoint, update.ResponsibleDepartment, update.ComparisonCode);
+        var input = NormalizeInput(update.Name, update.Hospital, update.Department, update.WaitValue, update.Unit, update.Note, update.EstimateStatus, update.ReferralEndpoint, update.ResponsibleDepartment, update.ComparisonCode, update.WaitUpperValue);
         var requestId = RequestId();
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var entity = await db.WaitingTimes.FindAsync(update.Id) ?? throw new WaitingTimeNotFoundException(update.Id);
@@ -62,18 +63,19 @@ public class WaitingTimeManagementService(
         }
         db.Entry(entity).Property(waitingTime => waitingTime.Version).OriginalValue = update.ExpectedVersion;
 
-        var largeChange = EstimateChange.RequiresConfirmation(entity, input.Status, input.Endpoint, input.WaitValue, input.Unit);
+        var largeChange = EstimateChange.RequiresConfirmation(entity, input.Status, input.Endpoint, input.WaitValue, input.Unit, input.UpperValue);
         if (largeChange && !update.ConfirmLargeChange)
             throw new LargeEstimateChangeException();
 
         var oldStatus = entity.EstimateStatus;
         var oldWait = entity.WaitValue;
+        var oldUpper = entity.WaitUpperValue;
         var oldUnit = entity.Unit;
         var oldNote = entity.Note ?? string.Empty;
         var newNote = input.Note ?? string.Empty;
         var definitionChanged = entity.ReferralEndpoint != input.Endpoint;
         var statusChanged = oldStatus != input.Status;
-        var waitChanged = statusChanged || definitionChanged || input.Status == EstimateStatus.Available && (oldWait != input.WaitValue || oldUnit != input.Unit);
+        var waitChanged = statusChanged || definitionChanged || input.Status == EstimateStatus.Available && (oldWait != input.WaitValue || oldUnit != input.Unit || oldUpper != input.UpperValue);
         var noteChanged = oldNote != newNote;
         var changes = new List<string>();
         if (largeChange) changes.Add("Large estimate change confirmed");
@@ -89,7 +91,8 @@ public class WaitingTimeManagementService(
 
         if (changes.Count == 0) return;
 
-        if (definitionChanged || statusChanged) entity.EstimateSeries++;
+        if (definitionChanged || statusChanged || (oldUpper is not null) != (input.UpperValue is not null)) entity.EstimateSeries++;
+        if (oldUpper != input.UpperValue) changes.Add($"Estimate upper bound: {oldUpper} → {input.UpperValue}");
         entity.EstimateStatus = input.Status;
         entity.ReferralEndpoint = input.Endpoint;
         entity.ResponsibleDepartment = input.Owner;
@@ -98,16 +101,18 @@ public class WaitingTimeManagementService(
         entity.Hospital = input.Hospital;
         entity.Department = input.Department;
         entity.WaitValue = input.WaitValue;
+        entity.WaitUpperValue = input.UpperValue;
         entity.Unit = input.Unit;
         entity.Note = newNote;
         // Metadata edits do not verify the waiting-time estimate.
         if (waitChanged) entity.UpdatedAt = now;
         if (input.Status != EstimateStatus.Available) entity.VerifiedAt = null;
-        else if (statusChanged || oldWait != input.WaitValue || oldUnit != input.Unit) entity.VerifiedAt = now;
+        else if (statusChanged || oldWait != input.WaitValue || oldUnit != input.Unit || oldUpper != input.UpperValue) entity.VerifiedAt = now;
         entity.Version++;
 
         var action = waitChanged ? HistoryAction.Updated : HistoryAction.Edited;
         var historyEntry = CreateHistoryEntry(entity, requestId, now, action, string.Join(" | ", changes), update.Username);
+        historyEntry.OldWaitUpperValue = oldUpper;
         historyEntry.OldWaitValue = oldStatus == EstimateStatus.Available ? oldWait : null;
         historyEntry.OldUnit = oldUnit;
         historyEntry.OldWaitDays = oldStatus == EstimateStatus.Available ? WaitDuration.ToDays(oldWait, oldUnit) : null;
@@ -136,6 +141,7 @@ public class WaitingTimeManagementService(
 
         var historyEntry = CreateHistoryEntry(entity, requestId, now, HistoryAction.Deactivated,
             string.IsNullOrWhiteSpace(reason) ? "Bíðitíð tikin av almennu síðuni" : $"Bíðitíð tikin av almennu síðuni. Orsøk: {reason.Trim()}", username);
+        historyEntry.OldWaitUpperValue = entity.WaitUpperValue;
         historyEntry.OldWaitValue = entity.EstimateStatus == EstimateStatus.Available ? entity.WaitValue : null;
         historyEntry.OldUnit = entity.Unit;
         historyEntry.OldWaitDays = entity.EstimateStatus == EstimateStatus.Available ? WaitDuration.ToDays(entity.WaitValue, entity.Unit) : null;
@@ -161,6 +167,7 @@ public class WaitingTimeManagementService(
         entity.Version++;
 
         var historyEntry = CreateHistoryEntry(entity, requestId, now, HistoryAction.Reactivated, "Bíðitíð løgd aftur á almennu síðuna", username);
+        historyEntry.OldWaitUpperValue = entity.WaitUpperValue;
         historyEntry.OldWaitValue = entity.EstimateStatus == EstimateStatus.Available ? entity.WaitValue : null;
         historyEntry.OldUnit = entity.Unit;
         historyEntry.OldWaitDays = entity.EstimateStatus == EstimateStatus.Available ? WaitDuration.ToDays(entity.WaitValue, entity.Unit) : null;
@@ -190,6 +197,7 @@ public class WaitingTimeManagementService(
         entity.VerifiedAt = entity.EstimateStatus == EstimateStatus.Available ? now : null;
         entity.Version++;
         var historyEntry = CreateHistoryEntry(entity, requestId, now, HistoryAction.Reviewed, "Bíðitíð eftirkannað uttan broyting", username);
+        historyEntry.OldWaitUpperValue = entity.WaitUpperValue;
         historyEntry.OldWaitValue = entity.EstimateStatus == EstimateStatus.Available ? entity.WaitValue : null;
         historyEntry.OldUnit = entity.Unit;
         historyEntry.OldWaitDays = entity.EstimateStatus == EstimateStatus.Available ? WaitDuration.ToDays(entity.WaitValue, entity.Unit) : null;
@@ -216,7 +224,7 @@ public class WaitingTimeManagementService(
 
     private static string WaitText(int value, WaitUnit unit) => $"{value} {DisplayNames.For(unit, value)}";
 
-    private static WaitingTimeInput NormalizeInput(string name, Hospital hospital, Department? department, int wait, WaitUnit unit, string? note, EstimateStatus status, ReferralEndpoint endpoint, string? owner, string? comparisonCode)
+    private static WaitingTimeInput NormalizeInput(string name, Hospital hospital, Department? department, int wait, WaitUnit unit, string? note, EstimateStatus status, ReferralEndpoint endpoint, string? owner, string? comparisonCode, int? upperValue)
     {
         if (!Enum.IsDefined(status)) throw new ArgumentOutOfRangeException(nameof(status));
         if (!Enum.IsDefined(endpoint)) throw new ArgumentOutOfRangeException(nameof(endpoint));
@@ -225,7 +233,9 @@ public class WaitingTimeManagementService(
         owner = string.IsNullOrWhiteSpace(owner) ? null : owner.Trim();
         if (owner?.Length > 200) throw new ArgumentException("Responsible department cannot exceed 200 characters.", nameof(owner));
         // Unavailable values are stored as a placeholder but never represented as zero.
-        if (status != EstimateStatus.Available) wait = 0;
+        if (status != EstimateStatus.Available) { wait = 0; upperValue = null; }
+        if (upperValue is { } upper && (upper < wait || upper > WaitDuration.MaximumValue(unit)))
+            throw new ArgumentOutOfRangeException(nameof(upperValue), "The upper bound must be at least the lower bound and within the supported duration.");
         name = name?.Trim() ?? string.Empty;
         note = string.IsNullOrWhiteSpace(note) ? null : note.Trim();
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("A waiting time must have a name.", nameof(name));
@@ -237,10 +247,10 @@ public class WaitingTimeManagementService(
         if (!Enum.IsDefined(unit)) throw new ArgumentOutOfRangeException(nameof(unit));
         _ = WaitDuration.ToDays(wait, unit);
         if (note?.Length > 500) throw new ArgumentException("A note cannot exceed 500 characters.", nameof(note));
-        return new WaitingTimeInput(name, hospital, hospital == Hospital.Landssjukrahusid ? department : null, wait, unit, note, status, endpoint, owner, comparisonCode);
+        return new WaitingTimeInput(name, hospital, hospital == Hospital.Landssjukrahusid ? department : null, wait, unit, note, status, endpoint, owner, comparisonCode, upperValue);
     }
 
-    private sealed record WaitingTimeInput(string Name, Hospital Hospital, Department? Department, int WaitValue, WaitUnit Unit, string? Note, EstimateStatus Status, ReferralEndpoint Endpoint, string? Owner, string? ComparisonCode);
+    private sealed record WaitingTimeInput(string Name, Hospital Hospital, Department? Department, int WaitValue, WaitUnit Unit, string? Note, EstimateStatus Status, ReferralEndpoint Endpoint, string? Owner, string? ComparisonCode, int? UpperValue);
 
     private static WaitingTimeHistoryEntry CreateHistoryEntry(WaitingTime entity, string requestId, DateTime timestamp, HistoryAction action, string detail, string username) => new()
     {
@@ -255,6 +265,7 @@ public class WaitingTimeManagementService(
         ResponsibleDepartment = entity.ResponsibleDepartment,
         ComparisonCode = entity.ComparisonCode,
         EstimateSeries = entity.EstimateSeries,
+        NewWaitUpperValue = entity.WaitUpperValue,
         Action = action,
         Detail = detail,
         Username = username

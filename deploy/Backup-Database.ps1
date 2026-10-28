@@ -62,7 +62,15 @@ try {
     $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
     $destination = Join-Path $BackupPath "wt-blazor-$timestamp.db"
     $keyDestination = Join-Path $BackupPath "wt-blazor-$timestamp.keys"
-    Copy-Item -Path $DatabasePath -Destination $destination -ErrorAction Stop
+    if (Test-Path -LiteralPath $OperationsPath) {
+        dotnet $OperationsPath snapshot-database $DatabasePath $destination
+        if ($LASTEXITCODE -ne 0) { throw 'Creating a consistent SQLite backup failed.' }
+    }
+    else {
+        # Legacy file copying cannot safely omit committed WAL data.
+        if (Test-Path -LiteralPath "$DatabasePath-wal") { throw 'A SQLite WAL exists. Use the release operations tool to create a consistent backup.' }
+        Copy-Item -Path $DatabasePath -Destination $destination -ErrorAction Stop
+    }
     if (Test-Path $KeyRingPath) {
         if ((Test-Path -LiteralPath $OperationsPath) -and (Get-ChildItem -LiteralPath $KeyRingPath -Filter '*.xml')) {
             $probeJson = dotnet $OperationsPath backup-probe $KeyRingPath

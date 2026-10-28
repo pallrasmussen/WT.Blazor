@@ -7,10 +7,14 @@ on:
         description: Windows role represented by the selected runner
         required: true
         type: choice
-        options: [Viewer, Contributor, Admin]
+        options: [All, Viewer, Contributor, Admin]
       runner_label:
         description: Label of the self-hosted Windows runner using that role's identity
-        required: true
+        required: false
+        type: string
+      expected_identity:
+        description: Dedicated DOMAIN\account (single-role run only)
+        required: false
         type: string
       base_url:
         description: Isolated staging site URL
@@ -32,6 +36,11 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           ENABLED: ${{ vars.STAGING_BROWSER_ENABLED }}
           BASE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.base_url || vars.STAGING_BROWSER_BASE_URL }}
+          SELECTED_ROLE: ${{ inputs.role }}
+          MANUAL_IDENTITY: ${{ inputs.expected_identity }}
+          VIEWER_IDENTITY: ${{ vars.STAGING_VIEWER_IDENTITY }}
+          CONTRIBUTOR_IDENTITY: ${{ vars.STAGING_CONTRIBUTOR_IDENTITY }}
+          ADMIN_IDENTITY: ${{ vars.STAGING_ADMIN_IDENTITY }}
           MANUAL_RUNNER: ${{ inputs.runner_label }}
           VIEWER_RUNNER: ${{ vars.STAGING_VIEWER_RUNNER_LABEL }}
           CONTRIBUTOR_RUNNER: ${{ vars.STAGING_CONTRIBUTOR_RUNNER_LABEL }}
@@ -45,44 +54,52 @@ jobs:
           if (-not [Uri]::TryCreate($env:BASE_URL, [UriKind]::Absolute, [ref]$url) -or $url.Scheme -ne 'https' -or $url.UserInfo) {
             throw 'Staging requires an absolute HTTPS URL without embedded credentials.'
           }
-          $labels = if ($env:EVENT_NAME -eq 'workflow_dispatch') { @($env:MANUAL_RUNNER) } else { @($env:VIEWER_RUNNER, $env:CONTRIBUTOR_RUNNER, $env:ADMIN_RUNNER) }
+          $labels = if ($env:EVENT_NAME -eq 'workflow_dispatch' -and $env:SELECTED_ROLE -ne 'All') { @($env:MANUAL_RUNNER) } else { @($env:VIEWER_RUNNER, $env:CONTRIBUTOR_RUNNER, $env:ADMIN_RUNNER) }
           foreach ($label in $labels) {
             if ([string]::IsNullOrWhiteSpace($label) -or $label -in @('self-hosted', 'windows', 'linux', 'macOS', 'x64', 'ARM64')) {
               throw 'Configure a dedicated role-specific runner label for each selected role.'
             }
           }
-          if ($env:EVENT_NAME -eq 'schedule' -and @($labels | Sort-Object -Unique).Count -ne 3) {
+          if (($env:EVENT_NAME -eq 'schedule' -or $env:SELECTED_ROLE -eq 'All') -and @($labels | Sort-Object -Unique).Count -ne 3) {
             throw 'Viewer, Contributor and Admin must use distinct role-specific runner labels.'
           }
+          $identities = if ($env:EVENT_NAME -eq 'workflow_dispatch' -and $env:SELECTED_ROLE -ne 'All') { @($env:MANUAL_IDENTITY) } else { @($env:VIEWER_IDENTITY, $env:CONTRIBUTOR_IDENTITY, $env:ADMIN_IDENTITY) }
+          foreach ($identity in $identities) {
+            if ($identity -notmatch '^[^\\\s]+\\[^\\\s]+$') { throw 'Configure the expected DOMAIN\account for every selected role.' }
+          }
+          if ($identities.Count -eq 3 -and @($identities | Sort-Object -Unique).Count -ne 3) { throw 'Each role must use a different Windows identity.' }
   viewer:
     needs: configuration
     if: >-
-      (github.event_name == 'workflow_dispatch' && inputs.role == 'Viewer') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.role == 'Viewer' || inputs.role == 'All')) ||
       (github.event_name == 'schedule' && vars.STAGING_BROWSER_ENABLED == 'true')
     uses: ./.github/workflows/run-authenticated-staging-browser.yml
     with:
       role: Viewer
-      runner_label: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_label || vars.STAGING_VIEWER_RUNNER_LABEL }}
+      expected_identity: ${{ github.event_name == 'workflow_dispatch' && inputs.role != 'All' && inputs.expected_identity || vars.STAGING_VIEWER_IDENTITY }}
+      runner_label: ${{ github.event_name == 'workflow_dispatch' && inputs.role != 'All' && inputs.runner_label || vars.STAGING_VIEWER_RUNNER_LABEL }}
       base_url: ${{ github.event_name == 'workflow_dispatch' && inputs.base_url || vars.STAGING_BROWSER_BASE_URL }}
 
   contributor:
     needs: configuration
     if: >-
-      (github.event_name == 'workflow_dispatch' && inputs.role == 'Contributor') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.role == 'Contributor' || inputs.role == 'All')) ||
       (github.event_name == 'schedule' && vars.STAGING_BROWSER_ENABLED == 'true')
     uses: ./.github/workflows/run-authenticated-staging-browser.yml
     with:
       role: Contributor
-      runner_label: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_label || vars.STAGING_CONTRIBUTOR_RUNNER_LABEL }}
+      expected_identity: ${{ github.event_name == 'workflow_dispatch' && inputs.role != 'All' && inputs.expected_identity || vars.STAGING_CONTRIBUTOR_IDENTITY }}
+      runner_label: ${{ github.event_name == 'workflow_dispatch' && inputs.role != 'All' && inputs.runner_label || vars.STAGING_CONTRIBUTOR_RUNNER_LABEL }}
       base_url: ${{ github.event_name == 'workflow_dispatch' && inputs.base_url || vars.STAGING_BROWSER_BASE_URL }}
 
   admin:
     needs: configuration
     if: >-
-      (github.event_name == 'workflow_dispatch' && inputs.role == 'Admin') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.role == 'Admin' || inputs.role == 'All')) ||
       (github.event_name == 'schedule' && vars.STAGING_BROWSER_ENABLED == 'true')
     uses: ./.github/workflows/run-authenticated-staging-browser.yml
     with:
       role: Admin
-      runner_label: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_label || vars.STAGING_ADMIN_RUNNER_LABEL }}
+      expected_identity: ${{ github.event_name == 'workflow_dispatch' && inputs.role != 'All' && inputs.expected_identity || vars.STAGING_ADMIN_IDENTITY }}
+      runner_label: ${{ github.event_name == 'workflow_dispatch' && inputs.role != 'All' && inputs.runner_label || vars.STAGING_ADMIN_RUNNER_LABEL }}
       base_url: ${{ github.event_name == 'workflow_dispatch' && inputs.base_url || vars.STAGING_BROWSER_BASE_URL }}

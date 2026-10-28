@@ -142,7 +142,7 @@ public class ReviewRegressionTests
             });
         await db.SaveChangesAsync();
         var reader = new WaitingTimeReadService(db, TimeProvider.System);
-        Assert.Null(await new TrendReportService(reader).GetAsync(item.Id));
+        Assert.Null(await new TrendReportService(reader, new WT.Blazor.Tests.TestInfrastructure.DefaultSettingsService(), TimeProvider.System).GetAsync(item.Id));
         var changes = await reader.GetTrendChangesAsync([item.Id]);
         Assert.Equal(7, changes[item.Id]);
     }

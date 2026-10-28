@@ -9,6 +9,11 @@
         }
     </select>
 </div>
+<div class="edit-form-field">
+    <label for="@($"{Prefix}-wait-upper")">@AppText.Get("WaitUpperValue")</label>
+    <input id="@($"{Prefix}-wait-upper")" type="number" min="@State.WaitValue" max="@WaitDuration.MaximumValue(State.Unit)" @bind="State.WaitUpperValue" @bind:after="() => Changed.InvokeAsync()" disabled="@(State.EstimateStatus != EstimateStatus.Available)" aria-describedby="@($"{Prefix}-range-help")" />
+    <small id="@($"{Prefix}-range-help")">@AppText.Get("WaitRangeHelp")</small>
+</div>
 @if (IncludeDefinition)
 {
     <div class="edit-form-field">

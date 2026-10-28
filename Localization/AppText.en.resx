@@ -246,4 +246,13 @@
   <data name="PublishApprovedGuidance" xml:space="preserve"><value>Publish these approved instructions in both languages</value></data>
   <data name="PatientGuidanceValidation" xml:space="preserve"><value>Before publication, complete all four guidance fields. Each field must be no longer than 2,000 characters.</value></data>
   <data name="PatientGuidanceAuditChanged" xml:space="preserve"><value>Patient guidance changed</value></data>
+  <data name="EstimateExpired" xml:space="preserve"><value>Estimate expired</value></data>
+  <data name="EstimateExpiredContact" xml:space="preserve"><value>Please contact the relevant department for a current estimate. Older values in the chart are historical estimates.</value></data>
+  <data name="EstimateExpiryMonths" xml:space="preserve"><value>Estimate expiry (months)</value></data>
+  <data name="EstimateExpiryHelp" xml:space="preserve"><value>After this time from the last verification, hide the public waiting-time number. Estimates without recorded verification are also hidden.</value></data>
+  <data name="EstimateExpiryValidation" xml:space="preserve"><value>Estimate expiry must be between 1 and 60 months.</value></data>
+  <data name="WaitUpperValue" xml:space="preserve"><value>Upper waiting-time bound (optional)</value></data>
+  <data name="WaitRangeHelp" xml:space="preserve"><value>The waiting time becomes the lower bound. Use the same unit for both bounds. Leave blank for a single value. Enter only a range supported by the department.</value></data>
+  <data name="WaitRangeValidation" xml:space="preserve"><value>The upper bound must be at least the lower bound and within the supported waiting time.</value></data>
+  <data name="RangeTrendExplanation" xml:space="preserve"><value>This estimate is a range. Ranges are not plotted as single values; changes remain available in the internal audit history.</value></data>
 </root>

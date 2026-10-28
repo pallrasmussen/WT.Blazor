@@ -42,6 +42,24 @@ try {
     if (-not $ready) { throw "Browser fixture did not become healthy. See $WorkPath." }
     dotnet test (Join-Path $root 'WT.Blazor.Tests/WT.Blazor.Tests.csproj') --no-restore --filter 'FullyQualifiedName~PublicBrowserSmokeTests|FullyQualifiedName~LocalWorkflowBrowserTests' --logger trx --results-directory (Join-Path $WorkPath 'results')
     if ($LASTEXITCODE -ne 0) { throw 'Public browser smoke tests failed.' }
+    Stop-Process -Id $appProcess.Id -Force
+    $appProcess.WaitForExit()
+    $operations = Join-Path $WorkPath 'operations'
+    dotnet publish (Join-Path $root 'tools/WT.Blazor.Operations/WT.Blazor.Operations.csproj') --no-restore -o $operations
+    if ($LASTEXITCODE -ne 0) { throw 'Publishing the recovery tool failed.' }
+    $operationsDll = Join-Path $operations 'WT.Blazor.Operations.dll'
+    $backupDirectory = Join-Path $WorkPath 'backups'
+    New-Item -ItemType Directory -Path $backupDirectory | Out-Null
+    $backup = Join-Path $backupDirectory 'wt-blazor-fixture.db'
+    dotnet $operationsDll snapshot-database (Join-Path $WorkPath 'browser.db') $backup
+    if ($LASTEXITCODE -ne 0) { throw 'Creating a consistent fixture database snapshot failed.' }
+    $keys = Join-Path $publish 'App_Data/keys'
+    $probe = dotnet $operationsDll backup-probe $keys
+    if ($LASTEXITCODE -ne 0) { throw 'Creating the fixture recovery probe failed.' }
+    ($probe | ConvertFrom-Json).protectedValue | Set-Content -LiteralPath "$backup.probe" -Encoding ascii
+    Copy-Item -LiteralPath $keys -Destination (Join-Path $backupDirectory 'wt-blazor-fixture.keys') -Recurse
+    & (Join-Path $root 'deploy/Test-BackupRestore.ps1') -BackupPath $backupDirectory -OperationsPath $operationsDll -WorkPath (Join-Path $WorkPath 'recovery-drills') -ReportPath (Join-Path $WorkPath 'results/recovery.json')
+    if ($LASTEXITCODE -ne 0) { throw 'Packaged backup restoration smoke check failed.' }
 }
 finally {
     if ($appProcess -and -not $appProcess.HasExited) { Stop-Process -Id $appProcess.Id -Force }

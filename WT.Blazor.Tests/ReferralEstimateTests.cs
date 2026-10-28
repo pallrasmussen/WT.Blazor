@@ -40,7 +40,7 @@ public class ReferralEstimateTests
         var reader = new WaitingTimeReadService(db, clock);
         Assert.Empty(await reader.GetTrendPointsAsync(item.Id));
         Assert.Empty(await reader.GetTrendChangesAsync([item.Id]));
-        var unavailableReport = await new TrendReportService(reader).GetAsync(item.Id);
+        var unavailableReport = await new TrendReportService(reader, new WT.Blazor.Tests.TestInfrastructure.DefaultSettingsService(), TimeProvider.System).GetAsync(item.Id);
         Assert.NotNull(unavailableReport);
         Assert.Equal(ReferralEstimate.StatusLabel(status), unavailableReport.CurrentWait);
         Assert.Null(unavailableReport.VerifiedAt);

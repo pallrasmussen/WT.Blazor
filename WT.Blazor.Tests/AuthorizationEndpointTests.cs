@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -31,6 +32,26 @@ public class AuthorizationEndpointTests : IAsyncLifetime
         Assert.Equal(HttpStatusCode.Forbidden, (await GetAsAsync(groups.Viewer, "/diagnostics/deployment")).StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, (await GetAsAsync(groups.Contributor, "/diagnostics/deployment")).StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await GetAsAsync(groups.Admin, "/diagnostics/deployment")).StatusCode);
+    }
+
+    [Theory]
+    [InlineData(AuthenticatedWebApplicationFactory.ViewerGroup, false, false)]
+    [InlineData(AuthenticatedWebApplicationFactory.ContributorGroup, true, false)]
+    [InlineData(AuthenticatedWebApplicationFactory.AdminGroup, true, true)]
+    public async Task AuthenticationDiagnosticsReportOnlyTheCallersEffectivePermissions(string role, bool edit, bool administer)
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/diagnostics/authentication")).StatusCode);
+        using var response = await GetAsAsync(role, "/diagnostics/authentication");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.True(response.Headers.CacheControl?.NoStore);
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var result = document.RootElement;
+        Assert.Equal("test-user", result.GetProperty("name").GetString());
+        Assert.True(result.GetProperty("canView").GetBoolean());
+        Assert.Equal(edit, result.GetProperty("canEdit").GetBoolean());
+        Assert.Equal(administer, result.GetProperty("canAdminister").GetBoolean());
+        Assert.False(result.GetProperty("isWindowsIdentity").GetBoolean());
+        Assert.False(result.TryGetProperty("groups", out _));
     }
 
     [Fact]

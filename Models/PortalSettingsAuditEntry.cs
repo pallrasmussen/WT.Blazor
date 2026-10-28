@@ -6,6 +6,8 @@ public sealed class PortalSettingsAuditEntry
     public DateTime Timestamp { get; set; }
     public string Username { get; set; } = string.Empty;
     public int OldGreenMaximumAgeMonths { get; set; }
+    public int OldEstimateExpiryMonths { get; set; }
+    public int NewEstimateExpiryMonths { get; set; }
     public int OldYellowMaximumAgeMonths { get; set; }
     public int OldLongWaitMonths { get; set; }
     public string? OldReferralInstructionsFo { get; set; }

@@ -8,7 +8,7 @@ public static class EstimateReview
     public static EstimateReviewReason Reasons(WaitingTime item, int maximumAgeMonths, DateTime now)
     {
         var reasons = EstimateReviewReason.None;
-        if (item.EstimateStatus == EstimateStatus.Available && item.VerifiedAt is null) reasons |= EstimateReviewReason.MissingVerification;
+        if (item.EstimateStatus == EstimateStatus.Available && (item.VerifiedAt is null || item.VerifiedAt > now)) reasons |= EstimateReviewReason.MissingVerification;
         else if (UpdatedStatus.RequiresReview(ReferralEstimate.ReviewDate(item), maximumAgeMonths, now)) reasons |= EstimateReviewReason.Overdue;
         if (string.IsNullOrWhiteSpace(item.ResponsibleDepartment)) reasons |= EstimateReviewReason.MissingOwner;
         if (item.ReferralEndpoint == ReferralEndpoint.Unspecified) reasons |= EstimateReviewReason.MissingEndpoint;

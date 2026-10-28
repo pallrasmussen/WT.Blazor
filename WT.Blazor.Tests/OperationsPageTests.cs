@@ -81,7 +81,7 @@ public class OperationsPageTests : BunitContext
     {
         public (int RetentionDays, int GreenMaximumAgeMonths, int LongWaitMonths)? Request { get; private set; }
 
-        public Task<OperationsSummary> GetOperationsSummaryAsync(int retentionDays, int greenMaximumAgeMonths, int longWaitMonths)
+        public Task<OperationsSummary> GetOperationsSummaryAsync(int retentionDays, int greenMaximumAgeMonths, int longWaitMonths, int estimateExpiryMonths = 12)
         {
             Request = (retentionDays, greenMaximumAgeMonths, longWaitMonths);
             return Task.FromResult(new OperationsSummary(2, 3, 1, 4, 5));

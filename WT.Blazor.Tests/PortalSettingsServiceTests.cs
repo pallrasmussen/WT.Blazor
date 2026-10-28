@@ -21,6 +21,7 @@ public class PortalSettingsServiceTests
 
         await service.SaveAsync(new PortalSettings
         {
+            EstimateExpiryMonths = 9,
             GreenMaximumAgeMonths = 2,
             YellowMaximumAgeMonths = 5,
             LongWaitMonths = 10
@@ -28,11 +29,14 @@ public class PortalSettingsServiceTests
 
         var settings = await service.GetAsync();
 
+        Assert.Equal(9, settings.EstimateExpiryMonths);
         Assert.Equal(2, settings.GreenMaximumAgeMonths);
         Assert.Equal(5, settings.YellowMaximumAgeMonths);
         Assert.Equal(10, settings.LongWaitMonths);
         Assert.Equal(2, settings.Version);
         var auditEntry = Assert.Single(await service.GetRecentChangesAsync());
+        Assert.Equal(12, auditEntry.OldEstimateExpiryMonths);
+        Assert.Equal(9, auditEntry.NewEstimateExpiryMonths);
         Assert.Equal("test-user", auditEntry.Username);
         Assert.Equal(PortalSettings.DefaultGreenMaximumAgeMonths, auditEntry.OldGreenMaximumAgeMonths);
         Assert.Equal(2, auditEntry.NewGreenMaximumAgeMonths);

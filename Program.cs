@@ -170,6 +170,7 @@ app.UseRateLimiter();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+app.MapAuthenticationDiagnostics();
 app.MapHealthChecks("/health");
 app.MapGet("/diagnostics/deployment", () => Results.Ok(deploymentManifest))
     .RequireAuthorization(Policies.SuperAdminAccess);

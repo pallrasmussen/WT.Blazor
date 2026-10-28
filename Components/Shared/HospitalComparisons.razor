@@ -17,7 +17,7 @@
                         <li>
                             <h4>@DisplayNames.For(item.Hospital)</h4>
                             <p>@item.Name</p>
-                            <p class="comparison-value">@WaitDuration.ToDays(item.WaitValue, item.Unit) @DisplayNames.For(WaitUnit.Dagar, WaitDuration.ToDays(item.WaitValue, item.Unit))</p>
+                            <p class="comparison-value">@ReferralEstimate.NumericText(item, canonicalDays: true)</p>
                             <p class="@UpdatedStatus.CssClass(item.VerifiedAt!.Value, Settings.GreenMaximumAgeMonths, Settings.YellowMaximumAgeMonths, Now)">@AppText.Get("LastVerified"): @item.VerifiedAt.Value.ToLocalTime().ToString("dd. MMMM yyyy")</p>
                             @if (UpdatedStatus.RequiresReview(item.VerifiedAt.Value, Settings.GreenMaximumAgeMonths, Now))
                             { <p class="comparison-review-note">@AppText.Get("ComparisonEstimateOverdue")</p> }
@@ -35,5 +35,5 @@
     [Parameter] public PortalSettings Settings { get; set; } = new();
     [Parameter] public DateTime Now { get; set; }
     private IReadOnlyList<WaitingTimeComparison> groups = [];
-    protected override void OnParametersSet() => groups = WaitingTimeComparisons.Build(Items);
+    protected override void OnParametersSet() => groups = WaitingTimeComparisons.Build(Items.Where(item => !ReferralEstimate.IsExpired(item, Settings, Now)));
 }

@@ -8,6 +8,7 @@ public sealed class WaitingTimeFormState
     public string DepartmentName { get; set; } = "";
     public string Name { get; set; } = "";
     public int WaitValue { get; set; }
+    public int? WaitUpperValue { get; set; }
     public WaitUnit Unit { get; set; } = WaitUnit.Manadir;
     public EstimateStatus EstimateStatus { get; set; } = EstimateStatus.Unknown;
     public ReferralEndpoint ReferralEndpoint { get; set; }
@@ -21,6 +22,7 @@ public sealed class WaitingTimeFormState
         DepartmentName = item.Department is null ? "" : DisplayNames.For(item.Department.Value);
         Name = item.Name;
         WaitValue = item.WaitValue;
+        WaitUpperValue = item.WaitUpperValue;
         Unit = item.Unit;
         Note = item.Note;
         EstimateStatus = item.EstimateStatus;
@@ -35,6 +37,7 @@ public sealed class WaitingTimeFormState
         DepartmentName = "";
         Name = "";
         WaitValue = 0;
+        WaitUpperValue = null;
         Unit = WaitUnit.Manadir;
         Note = null;
         EstimateStatus = EstimateStatus.Unknown;

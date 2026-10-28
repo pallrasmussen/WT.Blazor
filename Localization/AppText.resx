@@ -310,4 +310,13 @@
   <data name="PublishApprovedGuidance" xml:space="preserve"><value>Almannakunnger hesar góðkendu vegleiðingar á báðum málum</value></data>
   <data name="PatientGuidanceValidation" xml:space="preserve"><value>Áðrenn almannakunngering skulu øll fýra feltini vera útfylt. Hvørt felt kann í mesta lagi hava 2.000 tekn.</value></data>
   <data name="PatientGuidanceAuditChanged" xml:space="preserve"><value>Sjúklingavegleiðing broytt</value></data>
+  <data name="EstimateExpired" xml:space="preserve"><value>Metingin er ov gomul</value></data>
+  <data name="EstimateExpiredContact" xml:space="preserve"><value>Set teg í samband við viðkomandi deild fyri at fáa eina dagførda meting. Eldri tøl í gongdini vísa søguligar metingar.</value></data>
+  <data name="EstimateExpiryMonths" xml:space="preserve"><value>Gildistíð fyri metingar (mánaðir)</value></data>
+  <data name="EstimateExpiryHelp" xml:space="preserve"><value>Eftir hesa tíðina frá seinastu váttan verður talið fjalt á almennu síðuni. Metingar uttan skrásetta váttan verða eisini fjaldar.</value></data>
+  <data name="EstimateExpiryValidation" xml:space="preserve"><value>Gildistíðin skal vera millum 1 og 60 mánaðir.</value></data>
+  <data name="WaitUpperValue" xml:space="preserve"><value>Ovara mark fyri bíðitíð (valfrítt)</value></data>
+  <data name="WaitRangeHelp" xml:space="preserve"><value>Bíðitíðin verður niðara markið. Nýt somu eind fyri bæði mørkini. Lat standa tómt fyri eitt tal. Skráset bert eitt bil, sum deildin kann standa inni fyri.</value></data>
+  <data name="WaitRangeValidation" xml:space="preserve"><value>Ovara markið skal vera minst líka stórt sum niðara markið og innan loyvda bíðitíð.</value></data>
+  <data name="RangeTrendExplanation" xml:space="preserve"><value>Henda metingin er eitt bil. Bil verða ikki víst sum einstøk tøl í gongdini; broytingar eru varðveittar í innanhýsis søguni.</value></data>
 </root>
