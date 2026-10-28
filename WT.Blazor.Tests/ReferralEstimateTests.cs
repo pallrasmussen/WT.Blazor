@@ -48,7 +48,7 @@ public class ReferralEstimateTests
         Assert.Null(audit.NewWaitValue);
         Assert.Null(audit.NewWaitDays);
         Assert.Equal("Radiology", audit.ResponsibleDepartment);
-        var reader = new WaitingTimeReadService(db, clock);
+        var reader = new TrendReadService(db, clock);
         Assert.Empty(await reader.GetTrendPointsAsync(item.Id));
         Assert.Empty(await reader.GetTrendChangesAsync([item.Id]));
         var unavailableReport = await new TrendReportService(reader, new WT.Blazor.Tests.TestInfrastructure.DefaultSettingsService(), TimeProvider.System).GetAsync(item.Id);
@@ -97,7 +97,7 @@ public class ReferralEstimateTests
         item = await manager.UpdateAsync(Update(item, EstimateStatus.Available, 4) with { ReferralEndpoint = ReferralEndpoint.Treatment });
         Assert.Equal(verified, item.VerifiedAt);
         Assert.Equal(2, item.EstimateSeries);
-        var reader = new WaitingTimeReadService(db, clock);
+        var reader = new TrendReadService(db, clock);
         Assert.Single(await reader.GetTrendPointsAsync(item.Id));
         item = await manager.MarkReviewedAsync(item.Id, item.Version, "reviewer");
         Assert.Equal(clock.Now.UtcDateTime, item.VerifiedAt);

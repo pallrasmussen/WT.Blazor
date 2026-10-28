@@ -118,7 +118,7 @@ public class AuditLogTests
                     NullLogger<WaitingTimeManagementService>.Instance,
                     new HttpContextAccessor { HttpContext = httpContext },
                     new FixedTimeProvider(timestamp));
-                var readService = new WaitingTimeReadService(db, new FixedTimeProvider(timestamp));
+                var readService = new HistoryReadService(db);
 
                 var waitingTime = await managementService.CreateAsync(new WaitingTimeCreate
                 {
@@ -263,7 +263,7 @@ public class AuditLogTests
                     NullLogger<WaitingTimeManagementService>.Instance,
                     new HttpContextAccessor(),
                     TimeProvider.System);
-                var readService = new WaitingTimeReadService(db, TimeProvider.System);
+                var readService = new WaitingTimeCatalogService(db);
                 var active = await managementService.CreateAsync(new WaitingTimeCreate
                 {
                     Name = "Virkin viðgerð",
@@ -287,7 +287,7 @@ public class AuditLogTests
                 await managementService.DeactivateAsync(inactive.Id, inactive.Version, "heilsunet\\test-user");
 
                 var results = await readService.GetActiveAsync(Hospital.Klaksvikar, null);
-                var history = await readService.GetHistoryAsync(new HistoryQuery(
+                var history = await new HistoryReadService(db).GetHistoryAsync(new HistoryQuery(
                     Name: inactive.Name,
                     Action: HistoryAction.Deactivated));
 
@@ -362,7 +362,7 @@ public class AuditLogTests
                     NullLogger<WaitingTimeManagementService>.Instance,
                     new HttpContextAccessor(),
                     TimeProvider.System);
-                var readService = new WaitingTimeReadService(db, TimeProvider.System);
+                var readService = new WaitingTimeCatalogService(db);
                 await managementService.CreateAsync(new WaitingTimeCreate
                 {
                     Name = "Frákoplað viðgerð",
@@ -522,7 +522,7 @@ public class AuditLogTests
                     new WaitingTimeHistoryEntry { WaitingTimeId = staleLongWait.Id, Timestamp = now.AddDays(-31).UtcDateTime, Hospital = staleLongWait.Hospital, Name = staleLongWait.Name },
                     new WaitingTimeHistoryEntry { WaitingTimeId = currentWait.Id, Timestamp = now.AddDays(-3).UtcDateTime, Hospital = currentWait.Hospital, Name = currentWait.Name });
                 await db.SaveChangesAsync();
-                var readService = new WaitingTimeReadService(db, new FixedTimeProvider(now));
+                var readService = new OperationsReadService(db, new FixedTimeProvider(now));
 
                 var summary = await readService.GetOperationsSummaryAsync(30, 3, 12);
 

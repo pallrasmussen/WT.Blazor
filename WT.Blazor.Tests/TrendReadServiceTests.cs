@@ -42,7 +42,7 @@ public class TrendReadServiceTests
         ignored.Action = HistoryAction.Reviewed;
         db.WaitingTimeHistoryEntries.Add(ignored);
         await db.SaveChangesAsync();
-        var reader = new WaitingTimeReadService(db, TimeProvider.System);
+        var reader = new TrendReadService(db, TimeProvider.System);
         var changes = await reader.GetTrendChangesAsync(items.Select(item => item.Id).Append(items[0].Id));
         foreach (var item in items.Take(2))
         {
@@ -77,7 +77,7 @@ public class TrendReadServiceTests
             db.WaitingTimeHistoryEntries.Add(entry);
         }
         await db.SaveChangesAsync();
-        var reader = new WaitingTimeReadService(db, TimeProvider.System);
+        var reader = new HistoryReadService(db);
         var review = Assert.Single(await reader.GetLatestReviewsAsync([item.Id, item.Id]));
         Assert.Equal("Reviewer 99", review.Value.Username);
         Assert.Empty(await reader.GetLatestReviewsAsync([]));
@@ -98,7 +98,7 @@ public class TrendReadServiceTests
         created.Action = HistoryAction.Created;
         db.WaitingTimeHistoryEntries.AddRange(created, History(item, new DateTime(2026, 2, 1), 10));
         await db.SaveChangesAsync();
-        var service = new WaitingTimeReadService(db, new FixedTimeProvider());
+        var service = new TrendReadService(db, new FixedTimeProvider());
         var all = await service.GetTrendPointsAsync(item.Id);
         Assert.Equal(2, all.Count);
         Assert.Equal(20, all[0].Value);
@@ -130,7 +130,7 @@ public class TrendReadServiceTests
             History(waitingTime, new DateTime(2026, 9, 3), 9));
         await db.SaveChangesAsync();
 
-        var service = new WaitingTimeReadService(db, new FixedTimeProvider());
+        var service = new TrendReadService(db, new FixedTimeProvider());
         var points = await service.GetTrendPointsAsync(waitingTime.Id, periodDays: 90);
 
         Assert.Equal(
@@ -150,7 +150,7 @@ public class TrendReadServiceTests
         var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connection).Options;
         await using var db = new ApplicationDbContext(options);
         await db.Database.EnsureCreatedAsync();
-        var service = new WaitingTimeReadService(db, TimeProvider.System);
+        var service = new TrendReadService(db, TimeProvider.System);
         using var source = new CancellationTokenSource();
         source.Cancel();
 

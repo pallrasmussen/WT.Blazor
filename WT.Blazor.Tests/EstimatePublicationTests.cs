@@ -57,7 +57,7 @@ public class EstimatePublicationTests
         var item = await manager.CreateAsync(create);
         Assert.Contains("6–10", ReferralEstimateText.WaitText(item));
         Assert.Contains("42–70", ReferralEstimateText.NumericText(item, canonicalDays: true));
-        var reader = new WaitingTimeReadService(db, TimeProvider.System);
+        var reader = new TrendReadService(db, TimeProvider.System);
         Assert.Empty(await reader.GetTrendPointsAsync(item.Id));
         Assert.Empty(await reader.GetTrendChangesAsync([item.Id]));
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => manager.CreateAsync(create with { WaitUpperValue = 5 }));
@@ -102,13 +102,13 @@ public class EstimatePublicationTests
         var item = new WaitingTime { Name = "Direct report", Hospital = Hospital.Klaksvikar, ResponsibleDepartment = "Imaging", ReferralEndpoint = ReferralEndpoint.Investigation, WaitValue = 6, WaitUpperValue = 10, Unit = WaitUnit.Vikur, VerifiedAt = DateTime.UtcNow.AddMonths(-2) };
         db.WaitingTimes.Add(item);
         await db.SaveChangesAsync();
-        var service = new TrendReportService(new WaitingTimeReadService(db, TimeProvider.System), settings, TimeProvider.System);
+        var service = new TrendReportService(new TrendReadService(db, TimeProvider.System), settings, TimeProvider.System);
         var expired = await service.GetAsync(item.Id);
         Assert.NotNull(expired);
         Assert.True(expired.IsExpired);
         Assert.True(EstimateReview.Reasons(item, 1, DateTime.UtcNow).HasFlag(EstimateReviewReason.Overdue));
-        Assert.Equal(0, (await new WaitingTimeReadService(db, TimeProvider.System).GetOperationsSummaryAsync(30, 3, 12)).NeedsReview);
-        Assert.Equal(1, (await new WaitingTimeReadService(db, TimeProvider.System).GetOperationsSummaryAsync(30, 3, 12, estimateExpiryMonths: 1)).NeedsReview);
+        Assert.Equal(0, (await new OperationsReadService(db, TimeProvider.System).GetOperationsSummaryAsync(30, 3, 12)).NeedsReview);
+        Assert.Equal(1, (await new OperationsReadService(db, TimeProvider.System).GetOperationsSummaryAsync(30, 3, 12, estimateExpiryMonths: 1)).NeedsReview);
         Assert.DoesNotContain("6–10", expired.CurrentWait);
         item.VerifiedAt = DateTime.UtcNow;
         await db.SaveChangesAsync();

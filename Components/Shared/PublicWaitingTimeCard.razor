@@ -1,0 +1,61 @@
+<article id="waiting-time-@Item.Id" class="waiting-card">
+    <div class="card-main">
+        <span class="chip">@(Item.Department is not null ? DisplayNames.For(Item.Department.Value) : DisplayNames.For(Item.Hospital))</span>
+        <span class="card-hospital">@DisplayNames.For(Item.Hospital)</span>
+        <h3>@Item.Name</h3>
+        <p class="referral-definition">@AppText.Get("ReferralEndpoint"): @ReferralEstimateText.EndpointLabel(Item.ReferralEndpoint)</p>
+        <div class="wait-value @(Item.EstimateStatus == EstimateStatus.Available && !IsExpired ? "" : "estimate-unavailable")">
+            @if (Item.EstimateStatus == EstimateStatus.Available && !IsExpired)
+            {
+                @(Item.WaitUpperValue is { } upper ? $"{Item.WaitValue}–{upper}" : Item.WaitValue.ToString())
+                <span>@($" {DisplayNames.For(Item.Unit, Item.WaitUpperValue ?? Item.WaitValue)}")</span>
+            }
+            else
+            {
+                @ReferralEstimateText.PublicWaitText(Item, Settings, Now)
+            }
+            @if (Item.EstimateStatus == EstimateStatus.Available && !IsExpired && Item.WaitUpperValue is null && TrendChange is { } change)
+            {
+                <span class="trend-arrow @TrendCssClass(change)" role="img" aria-label="@TrendLabel(change)" title="@TrendLabel(change)"></span>
+            }
+        </div>
+    </div>
+    @if (string.IsNullOrWhiteSpace(Item.Note))
+    {
+        <p class="note note-empty" aria-hidden="true"></p>
+    }
+    else
+    {
+        <p class="note"><strong>@AppText.Get("ReferralConditions"):</strong> @Item.Note</p>
+    }
+    @if (IsExpired)
+    { <p class="estimate-expired">@AppText.Get("EstimateExpiredContact")</p> }
+    @if (Item.EstimateStatus == EstimateStatus.Available)
+    {
+        <a class="graph-link" href="@TrendUrl">@AppText.Get("Trend")</a>
+        @if (Item.VerifiedAt is { } verified)
+        {
+            <div class="updated-note @UpdatedStatus.CssClass(verified, Settings.GreenMaximumAgeMonths, Settings.YellowMaximumAgeMonths, Now)">@AppText.Get("LastVerified"): @verified.ToLocalTime().ToString("dd. MMMM yyyy")</div>
+        }
+        else
+        {
+            <div class="updated-note">@AppText.Get("VerificationNotRecorded")</div>
+        }
+    }
+</article>
+
+@code {
+    [Parameter, EditorRequired] public WaitingTime Item { get; set; } = default!;
+    [Parameter, EditorRequired] public PortalSettings Settings { get; set; } = default!;
+    [Parameter] public DateTime Now { get; set; }
+    [Parameter] public int? TrendChange { get; set; }
+    [Parameter, EditorRequired] public string TrendUrl { get; set; } = "";
+    private bool IsExpired => ReferralEstimate.IsExpired(Item, Settings, Now);
+    private static string TrendCssClass(int change) => change switch { > 0 => "trend-up", < 0 => "trend-down", _ => "trend-flat" };
+    private static string TrendLabel(int change) => AppText.Get(change switch
+    {
+        > 0 => "TrendIncreasingSincePrevious",
+        < 0 => "TrendDecreasingSincePrevious",
+        _ => "TrendUnchangedSincePrevious"
+    });
+}

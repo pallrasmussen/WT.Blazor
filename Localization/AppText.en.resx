@@ -244,7 +244,7 @@
   <data name="ContactGuidanceFo" xml:space="preserve"><value>Contact guidance — Faroese</value></data>
   <data name="ContactGuidanceEn" xml:space="preserve"><value>Contact guidance — English</value></data>
   <data name="PublishApprovedGuidance" xml:space="preserve"><value>Publish these approved instructions in both languages</value></data>
-  <data name="PatientGuidanceValidation" xml:space="preserve"><value>Before publication, complete all four guidance fields. Each field must be no longer than 2,000 characters.</value></data>
+  <data name="PatientGuidanceValidation" xml:space="preserve"><value>Before publication, complete all four guidance fields. Each field must be no longer than {0:N0} characters.</value></data>
   <data name="PatientGuidanceAuditChanged" xml:space="preserve"><value>Patient guidance changed</value></data>
   <data name="EstimateExpired" xml:space="preserve"><value>Estimate expired</value></data>
   <data name="EstimateExpiredContact" xml:space="preserve"><value>Please contact the relevant department for a current estimate. Older values in the chart are historical estimates.</value></data>

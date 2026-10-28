@@ -39,10 +39,8 @@ public class WaitingTimeManagementService(
         db.WaitingTimes.Add(entity);
         await SaveChangesAsync();
 
-        var historyEntry = CreateHistoryEntry(entity, requestId, now, HistoryAction.Created, "Nýggj bíðitíð stovnað", create.Username);
-        historyEntry.NewWaitValue = input.EstimateStatus == EstimateStatus.Available ? input.WaitValue : null;
-        historyEntry.NewUnit = input.Unit;
-        historyEntry.NewWaitDays = input.EstimateStatus == EstimateStatus.Available ? WaitDuration.ToDays(input.WaitValue, input.Unit) : null;
+        var historyEntry = WaitingTimeHistorySnapshot.Create(entity, new(requestId, now, create.Username),
+            HistoryAction.Created, "Nýggj bíðitíð stovnað");
         db.WaitingTimeHistoryEntries.Add(historyEntry);
         await SaveChangesAsync();
         await transaction.CommitAsync();
@@ -62,6 +60,7 @@ public class WaitingTimeManagementService(
         if (largeChange && !update.ConfirmLargeChange)
             throw new LargeEstimateChangeException();
 
+        var previousDuration = WaitingTimeDurationSnapshot.Capture(entity);
         var oldStatus = entity.EstimateStatus;
         var oldWait = entity.WaitValue;
         var oldUpper = entity.WaitUpperValue;
@@ -106,14 +105,8 @@ public class WaitingTimeManagementService(
         entity.Version++;
 
         var action = waitChanged ? HistoryAction.Updated : HistoryAction.Edited;
-        var historyEntry = CreateHistoryEntry(entity, requestId, now, action, string.Join(" | ", changes), update.Username);
-        historyEntry.OldWaitUpperValue = oldUpper;
-        historyEntry.OldWaitValue = oldStatus == EstimateStatus.Available ? oldWait : null;
-        historyEntry.OldUnit = oldUnit;
-        historyEntry.OldWaitDays = oldStatus == EstimateStatus.Available ? WaitDuration.ToDays(oldWait, oldUnit) : null;
-        historyEntry.NewWaitValue = input.EstimateStatus == EstimateStatus.Available ? input.WaitValue : null;
-        historyEntry.NewUnit = input.Unit;
-        historyEntry.NewWaitDays = input.EstimateStatus == EstimateStatus.Available ? WaitDuration.ToDays(input.WaitValue, input.Unit) : null;
+        var historyEntry = WaitingTimeHistorySnapshot.Create(entity, new(requestId, now, update.Username),
+            action, string.Join(" | ", changes), previous: previousDuration);
         db.WaitingTimeHistoryEntries.Add(historyEntry);
         await SaveChangesAsync();
         logger.LogInformation("Waiting time updated. WaitingTimeId: {WaitingTimeId}, Name: {Name}, WaitChanged: {WaitChanged}, User: {Username}, RequestId: {RequestId}", entity.Id, entity.Name, waitChanged, update.Username, requestId);
@@ -129,12 +122,9 @@ public class WaitingTimeManagementService(
         entity.IsActive = false;
         entity.Version++;
 
-        var historyEntry = CreateHistoryEntry(entity, requestId, now, HistoryAction.Deactivated,
-            string.IsNullOrWhiteSpace(reason) ? "Bíðitíð tikin av almennu síðuni" : $"Bíðitíð tikin av almennu síðuni. Orsøk: {reason.Trim()}", username);
-        historyEntry.OldWaitUpperValue = entity.WaitUpperValue;
-        historyEntry.OldWaitValue = entity.EstimateStatus == EstimateStatus.Available ? entity.WaitValue : null;
-        historyEntry.OldUnit = entity.Unit;
-        historyEntry.OldWaitDays = entity.EstimateStatus == EstimateStatus.Available ? WaitDuration.ToDays(entity.WaitValue, entity.Unit) : null;
+        var historyEntry = WaitingTimeHistorySnapshot.Create(entity, new(requestId, now, username), HistoryAction.Deactivated,
+            string.IsNullOrWhiteSpace(reason) ? "Bíðitíð tikin av almennu síðuni" : $"Bíðitíð tikin av almennu síðuni. Orsøk: {reason.Trim()}",
+            previous: WaitingTimeDurationSnapshot.Capture(entity), includeCurrent: false);
         db.WaitingTimeHistoryEntries.Add(historyEntry);
         await SaveChangesAsync();
         logger.LogInformation("Waiting time deactivated. WaitingTimeId: {WaitingTimeId}, Name: {Name}, User: {Username}, RequestId: {RequestId}", entity.Id, entity.Name, username, requestId);
@@ -151,14 +141,8 @@ public class WaitingTimeManagementService(
         entity.IsActive = true;
         entity.Version++;
 
-        var historyEntry = CreateHistoryEntry(entity, requestId, now, HistoryAction.Reactivated, "Bíðitíð løgd aftur á almennu síðuna", username);
-        historyEntry.OldWaitUpperValue = entity.WaitUpperValue;
-        historyEntry.OldWaitValue = entity.EstimateStatus == EstimateStatus.Available ? entity.WaitValue : null;
-        historyEntry.OldUnit = entity.Unit;
-        historyEntry.OldWaitDays = entity.EstimateStatus == EstimateStatus.Available ? WaitDuration.ToDays(entity.WaitValue, entity.Unit) : null;
-        historyEntry.NewWaitValue = entity.EstimateStatus == EstimateStatus.Available ? entity.WaitValue : null;
-        historyEntry.NewUnit = entity.Unit;
-        historyEntry.NewWaitDays = entity.EstimateStatus == EstimateStatus.Available ? WaitDuration.ToDays(entity.WaitValue, entity.Unit) : null;
+        var historyEntry = WaitingTimeHistorySnapshot.Create(entity, new(requestId, now, username),
+            HistoryAction.Reactivated, "Bíðitíð løgd aftur á almennu síðuna", previous: WaitingTimeDurationSnapshot.Capture(entity));
         db.WaitingTimeHistoryEntries.Add(historyEntry);
         await SaveChangesAsync();
         logger.LogInformation("Waiting time reactivated. WaitingTimeId: {WaitingTimeId}, Name: {Name}, User: {Username}, RequestId: {RequestId}", entity.Id, entity.Name, username, requestId);
@@ -175,14 +159,8 @@ public class WaitingTimeManagementService(
         entity.UpdatedAt = now;
         entity.VerifiedAt = entity.EstimateStatus == EstimateStatus.Available ? now : null;
         entity.Version++;
-        var historyEntry = CreateHistoryEntry(entity, requestId, now, HistoryAction.Reviewed, "Bíðitíð eftirkannað uttan broyting", username);
-        historyEntry.OldWaitUpperValue = entity.WaitUpperValue;
-        historyEntry.OldWaitValue = entity.EstimateStatus == EstimateStatus.Available ? entity.WaitValue : null;
-        historyEntry.OldUnit = entity.Unit;
-        historyEntry.OldWaitDays = entity.EstimateStatus == EstimateStatus.Available ? WaitDuration.ToDays(entity.WaitValue, entity.Unit) : null;
-        historyEntry.NewWaitValue = entity.EstimateStatus == EstimateStatus.Available ? entity.WaitValue : null;
-        historyEntry.NewUnit = entity.Unit;
-        historyEntry.NewWaitDays = entity.EstimateStatus == EstimateStatus.Available ? WaitDuration.ToDays(entity.WaitValue, entity.Unit) : null;
+        var historyEntry = WaitingTimeHistorySnapshot.Create(entity, new(requestId, now, username),
+            HistoryAction.Reviewed, "Bíðitíð eftirkannað uttan broyting", previous: WaitingTimeDurationSnapshot.Capture(entity));
         db.WaitingTimeHistoryEntries.Add(historyEntry);
         await SaveChangesAsync();
         logger.LogInformation("Waiting time reviewed. WaitingTimeId: {WaitingTimeId}, Name: {Name}, User: {Username}, RequestId: {RequestId}", entity.Id, entity.Name, username, requestId);
@@ -218,25 +196,6 @@ public class WaitingTimeManagementService(
     }
 
     private static string WaitText(int value, WaitUnit unit) => $"{value} {DisplayNames.For(unit, value)}";
-
-    private static WaitingTimeHistoryEntry CreateHistoryEntry(WaitingTime entity, string requestId, DateTime timestamp, HistoryAction action, string detail, string username) => new()
-    {
-        WaitingTimeId = entity.Id,
-        RequestId = requestId,
-        Timestamp = timestamp,
-        Hospital = entity.Hospital,
-        Department = entity.Department,
-        Name = entity.Name,
-        EstimateStatus = entity.EstimateStatus,
-        ReferralEndpoint = entity.ReferralEndpoint,
-        ResponsibleDepartment = entity.ResponsibleDepartment,
-        ComparisonCode = entity.ComparisonCode,
-        EstimateSeries = entity.EstimateSeries,
-        NewWaitUpperValue = entity.WaitUpperValue,
-        Action = action,
-        Detail = detail,
-        Username = username
-    };
 
     private string RequestId() => httpContextAccessor.HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N");
 }

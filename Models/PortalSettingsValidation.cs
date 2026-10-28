@@ -15,7 +15,7 @@ public static class PortalSettingsValidation
     public static PortalSettingsError? Validate(PortalSettings settings)
     {
         var guidance = new[] { settings.ReferralInstructionsFo, settings.ReferralInstructionsEn, settings.ContactGuidanceFo, settings.ContactGuidanceEn };
-        if (guidance.Any(text => text?.Length > 2000) || settings.PublishPatientGuidance && guidance.Any(string.IsNullOrWhiteSpace))
+        if (guidance.Any(text => text?.Length > FieldLimits.PatientGuidance) || settings.PublishPatientGuidance && guidance.Any(string.IsNullOrWhiteSpace))
             return PortalSettingsError.Guidance;
         if (settings.EstimateExpiryMonths is < 1 or > 60) return PortalSettingsError.EstimateExpiry;
         if (settings.GreenMaximumAgeMonths is < 1 or > 24) return PortalSettingsError.GreenThreshold;
@@ -30,7 +30,7 @@ public static class PortalSettingsValidation
         if (Validate(settings) is not { } error) return;
         throw error switch
         {
-            PortalSettingsError.Guidance => new ArgumentException("Both language versions of published guidance are required and each field must be at most 2000 characters."),
+            PortalSettingsError.Guidance => new ArgumentException($"Both language versions of published guidance are required and each field must be at most {FieldLimits.PatientGuidance} characters."),
             PortalSettingsError.EstimateExpiry => new ArgumentOutOfRangeException(nameof(settings.EstimateExpiryMonths)),
             PortalSettingsError.GreenThreshold => new ArgumentOutOfRangeException(nameof(settings.GreenMaximumAgeMonths)),
             PortalSettingsError.YellowThreshold => new ArgumentOutOfRangeException(nameof(settings.YellowMaximumAgeMonths)),

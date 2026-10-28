@@ -308,7 +308,7 @@
   <data name="ContactGuidanceFo" xml:space="preserve"><value>Sambandsvegleiðing — føroyskt</value></data>
   <data name="ContactGuidanceEn" xml:space="preserve"><value>Sambandsvegleiðing — enskt</value></data>
   <data name="PublishApprovedGuidance" xml:space="preserve"><value>Almannakunnger hesar góðkendu vegleiðingar á báðum málum</value></data>
-  <data name="PatientGuidanceValidation" xml:space="preserve"><value>Áðrenn almannakunngering skulu øll fýra feltini vera útfylt. Hvørt felt kann í mesta lagi hava 2.000 tekn.</value></data>
+  <data name="PatientGuidanceValidation" xml:space="preserve"><value>Áðrenn almannakunngering skulu øll fýra feltini vera útfylt. Hvørt felt kann í mesta lagi hava {0:N0} tekn.</value></data>
   <data name="PatientGuidanceAuditChanged" xml:space="preserve"><value>Sjúklingavegleiðing broytt</value></data>
   <data name="EstimateExpired" xml:space="preserve"><value>Metingin er ov gomul</value></data>
   <data name="EstimateExpiredContact" xml:space="preserve"><value>Set teg í samband við viðkomandi deild fyri at fáa eina dagførda meting. Eldri tøl í gongdini vísa søguligar metingar.</value></data>

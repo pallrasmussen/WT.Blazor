@@ -400,8 +400,7 @@ public class InternalPageTests : BunitContext
             Username = "first"
         });
         await secondDb.WaitingTimes.FindAsync(item.Id);
-        var reader = new WaitingTimeReadService(secondDb, clock);
-        var cut = RenderInternal(Manager(secondDb), reviewQueue: quick, catalog: reader, history: reader);
+        var cut = RenderInternal(Manager(secondDb), reviewQueue: quick, catalog: new WaitingTimeCatalogService(secondDb), history: new HistoryReadService(secondDb));
         cut.WaitForAssertion(() => Assert.Contains("Two-user record", cut.Markup));
         if (quick) cut.Find(".admin-list").KeyDown("ArrowDown");
         else cut.FindAll("button").Single(button => button.TextContent == AppText.Get("Edit")).Click();
