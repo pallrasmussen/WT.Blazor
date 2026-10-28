@@ -30,9 +30,9 @@
   <data name="NoResults" xml:space="preserve"><value>Ongar bíðitíðir funnar.</value></data>
   <data name="ChangeFilters" xml:space="preserve"><value>Royn at broyta filtreringina ella leitiorðið.</value></data>
   <data name="Trend" xml:space="preserve"><value>Sí gongdina</value></data>
-  <data name="TrendHeading" xml:space="preserve"><value>Gongd í bíðitíð</value></data>
-  <data name="TrendDescription" xml:space="preserve"><value>Grafurin byggir á skrásettu byrjanarbíðitíðina og dagføringar. Tíðarskeið enda í dag; seinasta skrásetta virðið hvønn dag verður víst. Eingin virði verða gjørd fyri dagar uttan skráseting.</value></data>
-  <data name="TrendCurrentEstimate" xml:space="preserve"><value>Hvørt punkt vísir ta væntaðu bíðitíðina hjá einum nýggjum sjúklingi á skrásetingardegnum. Tann stiplaða linjan vísir, at seinasta skrásetta bíðitíðin framvegis er galdandi í dag.</value></data>
+  <data name="TrendHeading" xml:space="preserve"><value>Almennar metingar av bíðitíð</value></data>
+  <data name="TrendDescription" xml:space="preserve"><value>Myndin vísir skrásettar broytingar í almennu metingini fyri verandi endamál við ávísingini. Tíðarskeið enda í dag; seinasta skrásetta virðið hvønn dag verður víst.</value></data>
+  <data name="TrendCurrentEstimate" xml:space="preserve"><value>Strikaða linjan leingir seinastu almennu metingina; hon er ikki ein nýggj eftirkanning.</value></data>
   <data name="Current" xml:space="preserve"><value>Nú</value></data>
   <data name="NotFound" xml:space="preserve"><value>Bíðitíðin varð ikki funnin.</value></data>
   <data name="Back" xml:space="preserve"><value>Aftur til bíðitíðir</value></data>
@@ -84,7 +84,7 @@
   <data name="Date" xml:space="preserve"><value>Dagfesting</value></data>
   <data name="ExportedAt" xml:space="preserve"><value>Útskrivað</value></data>
   <data name="TrendExportFileName" xml:space="preserve"><value>Biditid_gongd</value></data>
-  <data name="TrendHistory" xml:space="preserve"><value>Loggur</value></data>
+  <data name="TrendHistory" xml:space="preserve"><value>Søga yvir almennar metingar</value></data>
   <data name="ExportRecords" xml:space="preserve"><value>{0} loggpostar</value></data>
   <data name="HistoryExportFileName" xml:space="preserve"><value>Biditidir_loggur</value></data>
   <data name="HistoryExportPdfFileName" xml:space="preserve"><value>Biditidir_loggur</value></data>
@@ -244,9 +244,9 @@
   <data name="ChangeHospital" xml:space="preserve"><value>Sjúkrahús: {0} → {1}</value></data>
   <data name="WaitingTimeGuidanceHeading" xml:space="preserve"><value>Væntað bíðitíð</value></data>
   <data name="WaitingTimeMeaningHeading" xml:space="preserve"><value>Hvat er væntað bíðitíð?</value></data>
-  <data name="WaitingTimeMeaningText" xml:space="preserve"><value>Væntað bíðitíð er eitt vegleiðandi mát fyri, hvussu leingi ein nýggjur sjúklingur kann vænta at bíða. Tín bíðitíð kann vera øðrvísi.</value></data>
+  <data name="WaitingTimeMeaningText" xml:space="preserve"><value>Metingin byrjar, tá ein nýggj ávísing við vanligari raðfesting er móttikin, og endar við viðtaluni, kanningini ella viðgerðini, sum er víst. Set teg í samband við deildina, um endamálið ikki er ásett.</value></data>
   <data name="WaitingTimeUpdateHeading" xml:space="preserve"><value>Nær verður hon dagførd?</value></data>
-  <data name="WaitingTimeUpdateText" xml:space="preserve"><value>Hvør deild hevur ábyrgd av at dagføra sína væntaðu bíðitíð. Dagfestingin verður víst saman við bíðitíðini.</value></data>
+  <data name="WaitingTimeUpdateText" xml:space="preserve"><value>Hvør deild hevur ábyrgd av at eftirkanna sína meting. Dagfestingin fyri seinastu eftirkanning snýr seg um metingina, ikki vanligar tekstbroytingar. Ein gomul dagfesting merkir, at metingin eigur at verða eftirkannað; tað merkir ikki, at tænastan ikki er tøk.</value></data>
   <data name="Activate" xml:space="preserve"><value>Virkja</value></data>
   <data name="Deactivate" xml:space="preserve"><value>Óvirkja</value></data>
   <data name="DeactivateWaitingTime" xml:space="preserve"><value>Óvirkja bíðitíð á almennu síðuni</value></data>
@@ -261,4 +261,22 @@
   <data name="MaximumWaitValidation" xml:space="preserve"><value>Skriva eina bíðitíð millum 0 og {0} fyri valdu eindina.</value></data>
   <data name="TrendLoadFailed" xml:space="preserve"><value>Tað bar ikki til at heinta gongdina. Royn aftur.</value></data>
   <data name="RetryTrend" xml:space="preserve"><value>Royn aftur</value></data>
+  <data name="EstimateStatus" xml:space="preserve"><value>Meting tøk</value></data>
+  <data name="EstimateStatusAvailable" xml:space="preserve"><value>Meting er tøk</value></data>
+  <data name="EstimateStatusUnknown" xml:space="preserve"><value>Eingin meting er tøk</value></data>
+  <data name="EstimateStatusServiceUnavailable" xml:space="preserve"><value>Tænastan er ikki tøk í løtuni</value></data>
+  <data name="ReferralEndpoint" xml:space="preserve"><value>Frá móttiknari ávísing til</value></data>
+  <data name="ReferralEndpointUnspecified" xml:space="preserve"><value>Endamálið við ávísingini er ikki ásett enn</value></data>
+  <data name="ReferralEndpointFirstConsultation" xml:space="preserve"><value>Fyrstu viðtalu</value></data>
+  <data name="ReferralEndpointInvestigation" xml:space="preserve"><value>Kanning</value></data>
+  <data name="ReferralEndpointTreatment" xml:space="preserve"><value>Viðgerðarbyrjan</value></data>
+  <data name="ResponsibleDepartment" xml:space="preserve"><value>Ábyrgdarhavandi deild (innanhýsis)</value></data>
+  <data name="ResponsibleDepartmentHelp" xml:space="preserve"><value>Deildin, ið hevur ábyrgd av at eftirkanna metingina. Bert starvsfólk síggja hetta felt.</value></data>
+  <data name="OwnerNotAssigned" xml:space="preserve"><value>Ikki ásett enn</value></data>
+  <data name="LastVerified" xml:space="preserve"><value>Seinast eftirkannað</value></data>
+  <data name="VerificationNotRecorded" xml:space="preserve"><value>Dagfesting fyri eftirkanning er ikki skrásett</value></data>
+  <data name="ReferralConditions" xml:space="preserve"><value>Treytir fyri ávísing / hvørjum metingin er ætlað</value></data>
+  <data name="ReferralEstimateDisclaimer" xml:space="preserve"><value>Hetta eru metingar fyri sjúklingar, ið nýliga eru ávístir við vanligari raðfesting. Tín bíðitíð kann vera øðrvísi alt eftir læknaligari raðfesting og tínum umstøðum.</value></data>
+  <data name="ReferralEstimateStaffHelp" xml:space="preserve"><value>Skráset mettu bíðitíðina fyri eina nýggja ávísing við vanligari raðfesting. Vel endamál, áset ábyrgdarhavandi deild og lýs treytir ella sjúklingabólkar. Vel, at meting ikki er tøk, um eingin meting er; null merkir eina metta bíðitíð upp á null.</value></data>
+  <data name="TrendSeriesExplanation" xml:space="preserve"><value>Gongdin vísir broytingar í almennum metingum, ikki máldar bíðitíðir hjá sjúklingum. Ein nýggj røð byrjar, tá endamálið broytist ella ein meting aftur er tøk. Eldri virði eru varðveitt í broytingarsøguni hjá starvsfólkum.</value></data>
 </root>

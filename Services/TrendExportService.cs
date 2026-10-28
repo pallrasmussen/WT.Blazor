@@ -52,6 +52,11 @@ public sealed class TrendExportService(
                 });
                 page.Content().PaddingTop(20).Column(column =>
                 {
+                    column.Item().Text(AppText.Get("ReferralEstimateDisclaimer"));
+                    if (report.ReferralDefinition is not null) column.Item().Text($"{AppText.Get("ReferralEndpoint")}: {report.ReferralDefinition}");
+                    if (report.VerifiedAt is { } verified) column.Item().Text($"{AppText.Get("LastVerified")}: {verified:dd.MM.yyyy}");
+                    if (!string.IsNullOrWhiteSpace(report.Conditions)) column.Item().Text($"{AppText.Get("ReferralConditions")}: {report.Conditions}");
+                    column.Item().Text(AppText.Get("TrendSeriesExplanation"));
                     column.Item().Text(AppText.Get(AppTextKey.TrendHistory)).FontSize(13).SemiBold();
                     column.Item().PaddingTop(8).Table(table =>
                     {

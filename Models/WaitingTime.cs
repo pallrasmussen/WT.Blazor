@@ -19,11 +19,23 @@ public class WaitingTime
 
     public WaitUnit Unit { get; set; }
 
+    public EstimateStatus EstimateStatus { get; set; }
+    public ReferralEndpoint ReferralEndpoint { get; set; }
+
+    [StringLength(200)]
+    public string? ResponsibleDepartment { get; set; }
+
+    // Start a new comparable trend when its definition changes or an estimate resumes.
+    public int EstimateSeries { get; set; } = 1;
+
     [StringLength(500)]
     public string? Note { get; set; }
 
-    // Last creation, waiting-time change, or explicit review; edit times live in History.
+    // Last estimate/status/definition change or explicit review; edit times live in History.
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    // Clinical estimate confirmation, independent of metadata edits and availability reviews.
+    public DateTime? VerifiedAt { get; set; }
 
     public bool IsActive { get; set; } = true;
 

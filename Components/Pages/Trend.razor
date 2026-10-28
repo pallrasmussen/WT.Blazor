@@ -28,6 +28,17 @@
             <span class="result-count">@AppText.Get("Current"): @report.CurrentWait</span>
         </div>
         <p class="result-count">@AppText.Get("TrendDescription")</p>
+        <p>@AppText.Get("ReferralEstimateDisclaimer")</p>
+        <p>@AppText.Get("ReferralEndpoint"): @report.ReferralDefinition</p>
+        @if (report.VerifiedAt is { } verified)
+        {
+            <p>@AppText.Get("LastVerified"): @verified.ToLocalTime().ToString("dd. MMMM yyyy")</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(report.Conditions))
+        {
+            <p>@AppText.Get("ReferralConditions"): @report.Conditions</p>
+        }
+        <p>@AppText.Get("TrendSeriesExplanation")</p>
         <p class="result-count">@AppText.Get("TrendCurrentEstimate")</p>
         <div class="trend-period-control">
             <label for="trend-period">@AppText.Get("TrendPeriod")</label>

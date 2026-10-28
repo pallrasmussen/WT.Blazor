@@ -44,7 +44,7 @@ public class TrendReadServiceTests
         await db.SaveChangesAsync();
         var reader = new WaitingTimeReadService(db, TimeProvider.System);
         var changes = await reader.GetTrendChangesAsync(items.Select(item => item.Id).Append(items[0].Id));
-        foreach (var item in items.Take(3))
+        foreach (var item in items.Take(2))
         {
             var history = await db.WaitingTimeHistoryEntries.Where(entry => entry.WaitingTimeId == item.Id
                     && (entry.Action == HistoryAction.Created || entry.Action == HistoryAction.Updated))
@@ -53,7 +53,7 @@ public class TrendReadServiceTests
             Assert.Equal(TrendPointReducer.LatestChange(history), changes[item.Id]);
         }
         Assert.Equal(-7, changes[items[1].Id]);
-        Assert.Equal(0, changes[items[2].Id]);
+        Assert.False(changes.ContainsKey(items[2].Id));
         Assert.False(changes.ContainsKey(items[3].Id));
         Assert.Empty(await reader.GetTrendChangesAsync([]));
     }

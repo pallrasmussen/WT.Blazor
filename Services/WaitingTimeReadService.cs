@@ -89,11 +89,11 @@ public class WaitingTimeReadService(
             .GroupBy(_ => 1)
             .Select(group => new
             {
-                NeedsReview = group.Count(waitingTime => waitingTime.UpdatedAt <= reviewCutoff),
-                LongWaits = group.Count(waitingTime =>
+                NeedsReview = group.Count(waitingTime => (waitingTime.VerifiedAt ?? (waitingTime.EstimateStatus == EstimateStatus.Available ? DateTime.MinValue : waitingTime.UpdatedAt)) <= reviewCutoff),
+                LongWaits = group.Count(waitingTime => waitingTime.EstimateStatus == EstimateStatus.Available && (
                     waitingTime.Unit == WaitUnit.Dagar && waitingTime.WaitValue > maxDays
                     || waitingTime.Unit == WaitUnit.Vikur && waitingTime.WaitValue > maxWeeks
-                    || waitingTime.Unit == WaitUnit.Manadir && waitingTime.WaitValue > maxMonths),
+                    || waitingTime.Unit == WaitUnit.Manadir && waitingTime.WaitValue > maxMonths)),
                 MissingDepartments = group.Count(waitingTime => waitingTime.Hospital == Hospital.Landssjukrahusid && waitingTime.Department == null)
             })
             .FirstOrDefaultAsync();
@@ -110,14 +110,15 @@ public class WaitingTimeReadService(
         using var operation = await DatabaseOperation.EnterAsync(db, cancellationToken);
         if (periodDays is <= 0) throw new ArgumentOutOfRangeException(nameof(periodDays), "Trend periods must contain at least one day.");
 
-        var displayUnit = await db.WaitingTimes.AsNoTracking()
+        var definition = await db.WaitingTimes.AsNoTracking()
             .Where(waitingTime => waitingTime.Id == waitingTimeId)
-            .Select(waitingTime => (WaitUnit?)waitingTime.Unit)
+            .Select(waitingTime => new { waitingTime.Unit, waitingTime.EstimateSeries, waitingTime.EstimateStatus })
             .FirstOrDefaultAsync(cancellationToken);
-        if (displayUnit is null) return [];
+        if (definition is null || definition.EstimateStatus != EstimateStatus.Available) return [];
+        var displayUnit = definition.Unit;
 
         var historyEntries = db.WaitingTimeHistoryEntries.AsNoTracking()
-            .Where(entry => entry.WaitingTimeId == waitingTimeId && (entry.Action == HistoryAction.Created || entry.Action == HistoryAction.Updated) && entry.NewWaitValue != null);
+            .Where(entry => entry.WaitingTimeId == waitingTimeId && entry.EstimateSeries == definition.EstimateSeries && (entry.Action == HistoryAction.Created || entry.Action == HistoryAction.Updated) && entry.NewWaitValue != null);
 
         if (periodDays is null)
         {
@@ -125,7 +126,7 @@ public class WaitingTimeReadService(
                 .OrderBy(entry => entry.Timestamp).ThenBy(entry => entry.Id)
                 .Select(entry => new TrendHistoryPoint(entry.Timestamp, entry.NewWaitValue!.Value, entry.NewUnit, entry.NewWaitDays))
                 .ToListAsync(cancellationToken);
-            return TrendPointReducer.Reduce(history, displayUnit.Value);
+            return TrendPointReducer.Reduce(history, displayUnit);
         }
 
         var windowEnd = timeProvider.GetUtcNow().UtcDateTime;
@@ -143,7 +144,7 @@ public class WaitingTimeReadService(
             .Select(entry => new TrendHistoryPoint(entry.Timestamp, entry.NewWaitValue!.Value, entry.NewUnit, entry.NewWaitDays))
             .ToListAsync(cancellationToken);
 
-        return TrendPointReducer.Reduce(latestPointBeforeCutoff.Concat(pointsInPeriod), displayUnit.Value)
+        return TrendPointReducer.Reduce(latestPointBeforeCutoff.Concat(pointsInPeriod), displayUnit)
             .Where(point => point.Timestamp >= cutoff)
             .ToList();
     }
@@ -172,7 +173,8 @@ public class WaitingTimeReadService(
         if (ids.Count == 0) return [];
 
         var history = db.WaitingTimeHistoryEntries.AsNoTracking()
-            .Where(entry => ids.Contains(entry.WaitingTimeId) && (entry.Action == HistoryAction.Created || entry.Action == HistoryAction.Updated) && entry.NewWaitValue != null);
+            .Where(entry => ids.Contains(entry.WaitingTimeId) && db.WaitingTimes.Any(item => item.Id == entry.WaitingTimeId
+                    && item.EstimateStatus == EstimateStatus.Available && item.EstimateSeries == entry.EstimateSeries) && (entry.Action == HistoryAction.Created || entry.Action == HistoryAction.Updated) && entry.NewWaitValue != null);
         // Keep the last entry on each UTC day, including the ID tie-breaker.
         var daily = history.Where(entry => !history.Any(other =>
                 other.WaitingTimeId == entry.WaitingTimeId && other.Timestamp.Date == entry.Timestamp.Date &&
@@ -189,6 +191,8 @@ public class WaitingTimeReadService(
         // transferring the entire audit history to every public Blazor circuit.
         var changes = await daily.Where(point => !daily.Any(other =>
                 other.WaitingTimeId == point.WaitingTimeId && other.Timestamp > point.Timestamp))
+            // A single published value cannot establish a direction.
+            .Where(point => daily.Any(previous => previous.WaitingTimeId == point.WaitingTimeId && previous.Timestamp < point.Timestamp))
             .Select(point => new
             {
                 point.WaitingTimeId,

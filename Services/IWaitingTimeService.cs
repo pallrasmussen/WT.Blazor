@@ -13,7 +13,10 @@ public record WaitingTimeCreate(
     int WaitValue,
     WaitUnit Unit,
     string? Note,
-    string Username);
+    string Username,
+    EstimateStatus EstimateStatus = EstimateStatus.Available,
+    ReferralEndpoint ReferralEndpoint = ReferralEndpoint.Unspecified,
+    string? ResponsibleDepartment = null);
 public record WaitingTimeUpdate(
     int Id,
     int ExpectedVersion,
@@ -23,7 +26,10 @@ public record WaitingTimeUpdate(
     int WaitValue,
     WaitUnit Unit,
     string? Note,
-    string Username);
+    string Username,
+    EstimateStatus EstimateStatus = EstimateStatus.Available,
+    ReferralEndpoint ReferralEndpoint = ReferralEndpoint.Unspecified,
+    string? ResponsibleDepartment = null);
 public record HistoryQuery(
     Hospital? Hospital = null,
     Department? Department = null,
