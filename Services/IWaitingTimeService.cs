@@ -16,7 +16,8 @@ public record WaitingTimeCreate(
     string Username,
     EstimateStatus EstimateStatus = EstimateStatus.Available,
     ReferralEndpoint ReferralEndpoint = ReferralEndpoint.Unspecified,
-    string? ResponsibleDepartment = null);
+    string? ResponsibleDepartment = null,
+    string? ComparisonCode = null);
 public record WaitingTimeUpdate(
     int Id,
     int ExpectedVersion,
@@ -29,7 +30,9 @@ public record WaitingTimeUpdate(
     string Username,
     EstimateStatus EstimateStatus = EstimateStatus.Available,
     ReferralEndpoint ReferralEndpoint = ReferralEndpoint.Unspecified,
-    string? ResponsibleDepartment = null);
+    string? ResponsibleDepartment = null,
+    string? ComparisonCode = null,
+    bool ConfirmLargeChange = false);
 public record HistoryQuery(
     Hospital? Hospital = null,
     Department? Department = null,

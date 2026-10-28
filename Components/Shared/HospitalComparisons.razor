@@ -1,0 +1,39 @@
+@using WT.Blazor.Services
+
+@if (groups.Count > 0)
+{
+    <section class="public-panel hospital-comparisons" aria-labelledby="hospital-comparisons-title">
+        <h2 id="hospital-comparisons-title">@AppText.Get("HospitalComparisons")</h2>
+        <p>@AppText.Get("HospitalComparisonExplanation")</p>
+        @foreach (var group in groups)
+        {
+            <article class="comparison-group">
+                <h3>@group.Name</h3>
+                <p>@AppText.Get("ReferralEndpoint"): @ReferralEstimate.EndpointLabel(group.Endpoint)</p>
+                <p>@AppText.Get("ReferralConditions"): @group.Conditions</p>
+                <ul class="comparison-estimates">
+                    @foreach (var item in group.Estimates)
+                    {
+                        <li>
+                            <h4>@DisplayNames.For(item.Hospital)</h4>
+                            <p>@item.Name</p>
+                            <p class="comparison-value">@WaitDuration.ToDays(item.WaitValue, item.Unit) @DisplayNames.For(WaitUnit.Dagar, WaitDuration.ToDays(item.WaitValue, item.Unit))</p>
+                            <p class="@UpdatedStatus.CssClass(item.VerifiedAt!.Value, Settings.GreenMaximumAgeMonths, Settings.YellowMaximumAgeMonths, Now)">@AppText.Get("LastVerified"): @item.VerifiedAt.Value.ToLocalTime().ToString("dd. MMMM yyyy")</p>
+                            @if (UpdatedStatus.RequiresReview(item.VerifiedAt.Value, Settings.GreenMaximumAgeMonths, Now))
+                            { <p class="comparison-review-note">@AppText.Get("ComparisonEstimateOverdue")</p> }
+                            <a href="@($"/gongd/{item.Id}")">@AppText.Get("Trend") <span class="visually-hidden">— @item.Name, @DisplayNames.For(item.Hospital)</span></a>
+                        </li>
+                    }
+                </ul>
+            </article>
+        }
+    </section>
+}
+
+@code {
+    [Parameter] public IEnumerable<WaitingTime> Items { get; set; } = [];
+    [Parameter] public PortalSettings Settings { get; set; } = new();
+    [Parameter] public DateTime Now { get; set; }
+    private IReadOnlyList<WaitingTimeComparison> groups = [];
+    protected override void OnParametersSet() => groups = WaitingTimeComparisons.Build(Items);
+}

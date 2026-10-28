@@ -14,10 +14,11 @@
         @if (!string.IsNullOrEmpty(userName))
         {
             <div class="internal-header-status">
-                <a class="internal-health @(isHealthy ? "healthy" : "unhealthy")" href="/internal/operations" aria-label="@AppText.Get("ViewSystemStatus")" title="@HealthStatusTitle">
+                <a class="internal-health @(isHealthy ? "healthy" : "unhealthy")" href="/internal/operations" title="@HealthStatusTitle">
                     <span class="internal-health-indicator" aria-hidden="true"></span>
                     <span class="internal-health-label">@(isHealthy ? AppText.Get("SystemHealthy") : AppText.Get("CheckSystem"))</span>
                     <span class="internal-health-checked">@string.Format(AppText.Get("HealthCheckedAt"), healthCheckedAt)</span>
+                    <span class="visually-hidden"> — @AppText.Get("ViewSystemStatus")</span>
                 </a>
                 <span class="internal-user">
                     <span class="internal-badge">@userName</span>

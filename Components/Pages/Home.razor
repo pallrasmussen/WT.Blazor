@@ -74,9 +74,9 @@
 	else
 	{
 		<div class="card-list-actions">
-			<div class="card-indicator-help public-legend" tabindex="0" aria-describedby="public-indicator-legend">
-				<span class="public-legend-trigger">@AppText.Get("ExplainIndicators")</span>
-				<div id="public-indicator-legend" class="public-legend-tooltip" role="tooltip">
+			<details class="card-indicator-help public-legend">
+				<summary class="public-legend-trigger">@AppText.Get("ExplainIndicators")</summary>
+				<div id="public-indicator-legend" class="public-legend-tooltip">
 					<div class="trend-legend" aria-label="@AppText.Get("TrendLegend")">
 						<span><i class="trend-arrow trend-up" aria-hidden="true"></i> @AppText.Get("TrendIncreasingSincePrevious")</span>
 						<span><i class="trend-arrow trend-down" aria-hidden="true"></i> @AppText.Get("TrendDecreasingSincePrevious")</span>
@@ -88,13 +88,14 @@
 						<span><i class="status-dot status-old" aria-hidden="true"></i>@AppText.Get("FreshnessOverdue")</span>
 					</div>
 				</div>
-			</div>
+			</details>
 			@if (!isLoading)
 			{
 				<button type="button" class="print-results" onclick="window.print()" title="@AppText.Get("PrintResults")"><span class="print-icon" aria-hidden="true">&#128424;</span><span>@AppText.Get("Print")</span></button>
 			}
 		</div>
-		<div class="waiting-grid">
+		<h2 class="visually-hidden">@AppText.Get("WaitingTime")</h2>
+        <div class="waiting-grid">
 			@foreach (var item in visibleItems)
 			{
 				<article id="waiting-time-@item.Id" class="waiting-card">
@@ -161,6 +162,9 @@
 		</article>
 	</div>
 </section>
+
+<HospitalComparisons Items="visibleItems" Settings="portalSettings" Now="CurrentUtc" />
+<PatientNextSteps Settings="portalSettings" />
 
 @code {
 	private string selectedHospitalName = "";

@@ -396,7 +396,9 @@ public class AuditLogTests
                     WaitValue = 2,
                     Unit = WaitUnit.Vikur,
                     UpdatedAt = now.UtcDateTime,
-                    VerifiedAt = now.UtcDateTime
+                    VerifiedAt = now.UtcDateTime,
+                    ResponsibleDepartment = "Ready department",
+                    ReferralEndpoint = ReferralEndpoint.Treatment
                 };
                 var inactiveLongWait = new WaitingTime
                 {
@@ -451,7 +453,7 @@ public class AuditLogTests
                     2,
                     WaitUnit.Manadir,
                     "Nýggj viðmerking",
-                    "heilsunet\\test-user"));
+                    "heilsunet\\test-user", ConfirmLargeChange: true));
 
                 var entries = await db.WaitingTimeHistoryEntries
                     .Where(entry => entry.WaitingTimeId == waitingTime.Id)

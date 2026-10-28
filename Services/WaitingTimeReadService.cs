@@ -89,7 +89,9 @@ public class WaitingTimeReadService(
             .GroupBy(_ => 1)
             .Select(group => new
             {
-                NeedsReview = group.Count(waitingTime => (waitingTime.VerifiedAt ?? (waitingTime.EstimateStatus == EstimateStatus.Available ? DateTime.MinValue : waitingTime.UpdatedAt)) <= reviewCutoff),
+                NeedsReview = group.Count(waitingTime => (waitingTime.VerifiedAt ?? (waitingTime.EstimateStatus == EstimateStatus.Available ? DateTime.MinValue : waitingTime.UpdatedAt)) <= reviewCutoff
+                    || waitingTime.ResponsibleDepartment == null || waitingTime.ResponsibleDepartment.Trim() == ""
+                    || waitingTime.ReferralEndpoint == ReferralEndpoint.Unspecified),
                 LongWaits = group.Count(waitingTime => waitingTime.EstimateStatus == EstimateStatus.Available && (
                     waitingTime.Unit == WaitUnit.Dagar && waitingTime.WaitValue > maxDays
                     || waitingTime.Unit == WaitUnit.Vikur && waitingTime.WaitValue > maxWeeks

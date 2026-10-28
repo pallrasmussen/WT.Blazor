@@ -2,15 +2,15 @@
 @using WT.Blazor.Models
 
 <div class="modal-backdrop" @ref="modalRef" @onkeydown="HandleKeyDown" tabindex="-1">
-    <div class="modal" @onclick:stopPropagation="true">
-        <h2>@AppText.Get("DeactivateWaitingTime")</h2>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deactivate-dialog-title" tabindex="-1" @onclick:stopPropagation="true">
+        <h2 id="deactivate-dialog-title">@AppText.Get("DeactivateWaitingTime")</h2>
         @if (ErrorMessage is not null)
         {
             <div class="login-error">@ErrorMessage</div>
         }
         <p><strong>@Item.Name</strong></p>
         <p>@DisplayNames.For(Item.Hospital)@(Item.Department is not null ? " · " + DisplayNames.For(Item.Department.Value) : "")</p>
-        <p>@Item.WaitValue @DisplayNames.For(Item.Unit, Item.WaitValue)</p>
+        <p>@ReferralEstimate.WaitText(Item)</p>
         <div class="edit-form-field">
             <label for="deactivation-reason">@AppText.Get(AppTextKey.Reason)</label>
             <input id="deactivation-reason" value="@Reason" @oninput="UpdateReason" placeholder="@AppText.Get(AppTextKey.Optional)" />

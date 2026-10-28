@@ -18,6 +18,7 @@ public class WaitingTimeHistoryEntry
     public EstimateStatus EstimateStatus { get; set; }
     public ReferralEndpoint ReferralEndpoint { get; set; }
     public string? ResponsibleDepartment { get; set; }
+    public string? ComparisonCode { get; set; }
     public int EstimateSeries { get; set; } = 1;
 
     public HistoryAction Action { get; set; }

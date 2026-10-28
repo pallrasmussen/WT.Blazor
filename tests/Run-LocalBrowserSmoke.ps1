@@ -19,7 +19,9 @@ $variables = @{
     ConnectionStrings__DefaultConnection = "Data Source=$(Join-Path $WorkPath 'browser.db');Pooling=False"
     AllowedHosts = 'localhost;127.0.0.1'
     RUN_BROWSER_TESTS = '1'
+    RUN_MUTATING_BROWSER_TESTS = '1'
     BROWSER_BASE_URL = $url
+    BROWSER_A11Y_RESULTS_PATH = (Join-Path $WorkPath 'results')
 }
 $previous = @{}
 $appProcess = $null
@@ -38,7 +40,7 @@ try {
         if (-not $ready) { Start-Sleep -Milliseconds 250 }
     } while (-not $ready -and [DateTime]::UtcNow -lt $deadline)
     if (-not $ready) { throw "Browser fixture did not become healthy. See $WorkPath." }
-    dotnet test (Join-Path $root 'WT.Blazor.Tests/WT.Blazor.Tests.csproj') --no-restore --filter 'FullyQualifiedName~PublicBrowserSmokeTests' --logger trx --results-directory (Join-Path $WorkPath 'results')
+    dotnet test (Join-Path $root 'WT.Blazor.Tests/WT.Blazor.Tests.csproj') --no-restore --filter 'FullyQualifiedName~PublicBrowserSmokeTests|FullyQualifiedName~LocalWorkflowBrowserTests' --logger trx --results-directory (Join-Path $WorkPath 'results')
     if ($LASTEXITCODE -ne 0) { throw 'Public browser smoke tests failed.' }
 }
 finally {

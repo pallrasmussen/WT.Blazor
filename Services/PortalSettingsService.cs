@@ -23,6 +23,10 @@ public sealed class PortalSettingsService(ApplicationDbContext db, PortalSetting
     public async Task SaveAsync(PortalSettings settings, string username, CancellationToken cancellationToken = default)
     {
         using var operation = await DatabaseOperation.EnterAsync(db, cancellationToken);
+        settings.ReferralInstructionsFo = string.IsNullOrWhiteSpace(settings.ReferralInstructionsFo) ? null : settings.ReferralInstructionsFo.Trim();
+        settings.ReferralInstructionsEn = string.IsNullOrWhiteSpace(settings.ReferralInstructionsEn) ? null : settings.ReferralInstructionsEn.Trim();
+        settings.ContactGuidanceFo = string.IsNullOrWhiteSpace(settings.ContactGuidanceFo) ? null : settings.ContactGuidanceFo.Trim();
+        settings.ContactGuidanceEn = string.IsNullOrWhiteSpace(settings.ContactGuidanceEn) ? null : settings.ContactGuidanceEn.Trim();
         Validate(settings);
 
         // A Blazor circuit can outlive changes saved by other administrators.
@@ -44,11 +48,26 @@ public sealed class PortalSettingsService(ApplicationDbContext db, PortalSetting
 
         var changed = current.GreenMaximumAgeMonths != settings.GreenMaximumAgeMonths
             || current.YellowMaximumAgeMonths != settings.YellowMaximumAgeMonths
-            || current.LongWaitMonths != settings.LongWaitMonths;
+            || current.LongWaitMonths != settings.LongWaitMonths
+            || current.ReferralInstructionsFo != settings.ReferralInstructionsFo
+            || current.ReferralInstructionsEn != settings.ReferralInstructionsEn
+            || current.ContactGuidanceFo != settings.ContactGuidanceFo
+            || current.ContactGuidanceEn != settings.ContactGuidanceEn
+            || current.PublishPatientGuidance != settings.PublishPatientGuidance;
         if (!changed) return;
 
         db.PortalSettingsAuditEntries.Add(new PortalSettingsAuditEntry
         {
+            OldReferralInstructionsFo = current.ReferralInstructionsFo,
+            OldReferralInstructionsEn = current.ReferralInstructionsEn,
+            OldContactGuidanceFo = current.ContactGuidanceFo,
+            OldContactGuidanceEn = current.ContactGuidanceEn,
+            NewReferralInstructionsFo = settings.ReferralInstructionsFo,
+            NewReferralInstructionsEn = settings.ReferralInstructionsEn,
+            NewContactGuidanceFo = settings.ContactGuidanceFo,
+            NewContactGuidanceEn = settings.ContactGuidanceEn,
+            OldPublishPatientGuidance = current.PublishPatientGuidance,
+            NewPublishPatientGuidance = settings.PublishPatientGuidance,
             Timestamp = timeProvider.GetUtcNow().UtcDateTime,
             Username = username,
             OldGreenMaximumAgeMonths = current.GreenMaximumAgeMonths,
@@ -61,6 +80,11 @@ public sealed class PortalSettingsService(ApplicationDbContext db, PortalSetting
         current.GreenMaximumAgeMonths = settings.GreenMaximumAgeMonths;
         current.YellowMaximumAgeMonths = settings.YellowMaximumAgeMonths;
         current.LongWaitMonths = settings.LongWaitMonths;
+        current.ReferralInstructionsFo = settings.ReferralInstructionsFo;
+        current.ReferralInstructionsEn = settings.ReferralInstructionsEn;
+        current.ContactGuidanceFo = settings.ContactGuidanceFo;
+        current.ContactGuidanceEn = settings.ContactGuidanceEn;
+        current.PublishPatientGuidance = settings.PublishPatientGuidance;
         current.Version++;
         try
         {
@@ -91,6 +115,10 @@ public sealed class PortalSettingsService(ApplicationDbContext db, PortalSetting
 
     private static void Validate(PortalSettings settings)
     {
+        var guidance = new[] { settings.ReferralInstructionsFo, settings.ReferralInstructionsEn, settings.ContactGuidanceFo, settings.ContactGuidanceEn };
+        if (guidance.Any(text => text?.Length > 2000)) throw new ArgumentException("Guidance cannot exceed 2000 characters per field.");
+        if (settings.PublishPatientGuidance && guidance.Any(string.IsNullOrWhiteSpace))
+            throw new ArgumentException("Both language versions of referral and contact guidance are required before publication.");
         if (settings.GreenMaximumAgeMonths is < 1 or > 24)
             throw new ArgumentOutOfRangeException(nameof(settings.GreenMaximumAgeMonths));
         if (settings.YellowMaximumAgeMonths is < 2 or > 36 || settings.YellowMaximumAgeMonths <= settings.GreenMaximumAgeMonths)

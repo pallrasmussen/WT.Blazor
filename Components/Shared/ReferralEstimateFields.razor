@@ -21,6 +21,11 @@
         </select>
     </div>
     <div class="edit-form-field">
+        <label for="@($"{Prefix}-comparison-code")">@AppText.Get("ComparisonCode")</label>
+        <input id="@($"{Prefix}-comparison-code")" maxlength="100" @bind="State.ComparisonCode" aria-describedby="@($"{Prefix}-comparison-help")" />
+        <small id="@($"{Prefix}-comparison-help")">@AppText.Get("ComparisonCodeHelp")</small>
+    </div>
+    <div class="edit-form-field">
         <label for="@($"{Prefix}-responsible-department")">@AppText.Get("ResponsibleDepartment")</label>
         <input id="@($"{Prefix}-responsible-department")" maxlength="200" @bind="State.ResponsibleDepartment" aria-describedby="@($"{Prefix}-owner-help")" />
         <small id="@($"{Prefix}-owner-help")">@AppText.Get("ResponsibleDepartmentHelp")</small>

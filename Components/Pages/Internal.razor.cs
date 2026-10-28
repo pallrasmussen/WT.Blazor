@@ -9,11 +9,11 @@ namespace WT.Blazor.Components.Pages;
 
 public partial class Internal
 {
-    private static readonly string LandssjukrahusidName = DisplayNames.For(Hospital.Landssjukrahusid);
+    private static string LandssjukrahusidName => DisplayNames.For(Hospital.Landssjukrahusid);
     private static readonly Hospital[] FilterHospitals = Enum.GetValues<Hospital>();
     private static readonly Hospital[] EditableHospitals = FilterHospitals;
     private static readonly Department[] AllDepartments = Enum.GetValues<Department>();
-    private static readonly string[] FormDepartments = AllDepartments.Select(DisplayNames.For).ToArray();
+    private static string[] FormDepartments => AllDepartments.Select(DisplayNames.For).ToArray();
 
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
     [Inject] private Microsoft.Extensions.Options.IOptions<AdGroupsOptions> AdGroupsOptions { get; set; } = default!;
@@ -48,10 +48,18 @@ public partial class Internal
     private Dictionary<int, ReviewInfo> latestReviews = [];
     private PortalSettings portalSettings = new();
     private DateTime CurrentUtc => TimeProvider.GetUtcNow().UtcDateTime;
+    private EstimateReviewReason reviewReason;
+    private string reviewOwner = "";
+    private EstimateReviewReason ReviewReasons(WaitingTime item) => EstimateReview.Reasons(item, portalSettings.GreenMaximumAgeMonths, CurrentUtc);
     private List<WaitingTime> visibleItems => items
         .Where(item => showInactive ? !item.IsActive : item.IsActive)
-        .Where(item => !showNeedsReview || UpdatedStatus.RequiresReview(ReferralEstimate.ReviewDate(item), portalSettings.GreenMaximumAgeMonths, CurrentUtc))
+        .Where(item => !showNeedsReview || ReviewReasons(item) != EstimateReviewReason.None)
+        .Where(item => !showNeedsReview || reviewReason == EstimateReviewReason.None || ReviewReasons(item).HasFlag(reviewReason))
+        .Where(item => !showNeedsReview || string.IsNullOrWhiteSpace(reviewOwner) || (item.ResponsibleDepartment ?? "").Contains(reviewOwner.Trim(), StringComparison.CurrentCultureIgnoreCase))
         .Where(item => string.IsNullOrWhiteSpace(searchText) || item.Name.Contains(searchText.Trim(), StringComparison.CurrentCultureIgnoreCase))
+        .OrderByDescending(item => showNeedsReview ? EstimateReview.Priority(ReviewReasons(item)) : 0)
+        .ThenBy(item => showNeedsReview ? ReferralEstimate.ReviewDate(item) : DateTime.MinValue)
+        .ThenBy(item => item.Name).ThenBy(item => item.Id)
         .ToList();
     private string? statusMessage;
     private WaitingTimeUndo? pendingUndo;
@@ -156,6 +164,7 @@ public partial class Internal
 
     private async Task FilterChangedAsync()
     {
+        if (showNeedsReview) showInactive = false;
         selectedPreset = null;
         UpdateFilterUrl();
         await LoadAsync();
@@ -182,6 +191,7 @@ public partial class Internal
             _ => null
         };
         showNeedsReview = preset == ReviewPreset;
+        if (showNeedsReview) showInactive = false;
     }
 
     private void UpdateFilterUrl() => NavigationManager.NavigateTo(
@@ -238,7 +248,7 @@ public partial class Internal
             createForm.WaitValue,
             createForm.Unit,
             createForm.Note?.Trim(),
-            username, createForm.EstimateStatus, createForm.ReferralEndpoint, createForm.ResponsibleDepartment));
+            username, createForm.EstimateStatus, createForm.ReferralEndpoint, createForm.ResponsibleDepartment, createForm.ComparisonCode));
         ShowStatus(string.Format(AppText.Get("CreatedMessage"), createForm.Name));
         createForm.Clear();
         showCreateForm = false;
@@ -333,6 +343,7 @@ public partial class Internal
         || editForm.Unit != editItem.Unit
         || editForm.EstimateStatus != editItem.EstimateStatus
         || editForm.ReferralEndpoint != editItem.ReferralEndpoint
+        || (editForm.ComparisonCode ?? "") != (editItem.ComparisonCode ?? "")
         || (editForm.ResponsibleDepartment ?? "") != (editItem.ResponsibleDepartment ?? "")
         || (editForm.Note ?? "") != (editItem.Note ?? ""));
 
@@ -348,6 +359,7 @@ public partial class Internal
         if (WaitValidation(editForm) is { } waitError) { SetEditError(waitError); return; }
         if (isSuperAdmin && string.IsNullOrWhiteSpace(editForm.Name)) { SetEditError(AppText.Get("EnterNameValidation")); return; }
         if (!EditFormHasChanges()) { SetEditError(AppText.Get("NoChanges")); return; }
+        largeEditSignature = null;
         showEditPreview = true;
     }
 
@@ -358,6 +370,7 @@ public partial class Internal
         if (quickEditItem is null) return;
         if (WaitValidation(quickEditForm) is { } waitError) { quickEditErrorMessage = waitError; return; }
         if (!QuickEditFormHasChanges()) { quickEditErrorMessage = AppText.Get("NoChanges"); return; }
+        largeQuickSignature = null;
         showQuickEditPreview = true;
     }
 
@@ -387,6 +400,22 @@ public partial class Internal
 
     }
 
+    private string? largeEditSignature;
+    private string? largeQuickSignature;
+    private static string ChangeSignature(WaitingTime item, WaitingTimeFormState form) => $"{item.Id}/{item.Version}/{form.WaitValue}/{form.Unit}/{form.EstimateStatus}/{form.ReferralEndpoint}";
+    private bool EditRequiresConfirmation => editItem is not null && EstimateChange.RequiresConfirmation(editItem, editForm.EstimateStatus, editForm.ReferralEndpoint, editForm.WaitValue, editForm.Unit);
+    private bool QuickRequiresConfirmation => quickEditItem is not null && EstimateChange.RequiresConfirmation(quickEditItem, quickEditForm.EstimateStatus, quickEditForm.ReferralEndpoint, quickEditForm.WaitValue, quickEditForm.Unit);
+    private bool LargeEditAcknowledged
+    {
+        get => editItem is not null && largeEditSignature == ChangeSignature(editItem, editForm);
+        set => largeEditSignature = value && editItem is not null ? ChangeSignature(editItem, editForm) : null;
+    }
+    private bool LargeQuickAcknowledged
+    {
+        get => quickEditItem is not null && largeQuickSignature == ChangeSignature(quickEditItem, quickEditForm);
+        set => largeQuickSignature = value && quickEditItem is not null ? ChangeSignature(quickEditItem, quickEditForm) : null;
+    }
+
     private async Task SaveEdit()
     {
         if (editItem is null) return;
@@ -405,6 +434,7 @@ public partial class Internal
                 ? DisplayNames.DepartmentFrom(editForm.DepartmentName) : null;
         }
 
+        if (EditRequiresConfirmation && !LargeEditAcknowledged) { showEditPreview = true; return; }
         var previous = WaitingTimeSnapshot.From(editItem);
         try
         {
@@ -417,12 +447,19 @@ public partial class Internal
                 editForm.WaitValue,
                 editForm.Unit,
                 editForm.Note,
-                username, editForm.EstimateStatus, editForm.ReferralEndpoint, editForm.ResponsibleDepartment));
+                username, editForm.EstimateStatus, editForm.ReferralEndpoint, editForm.ResponsibleDepartment, editForm.ComparisonCode, LargeEditAcknowledged));
         }
         catch (WaitingTimeConcurrencyException)
         {
             editConflict = true;
             SetEditError(AppText.Get("WaitingTimeConflict"));
+            return;
+        }
+        catch (LargeEstimateChangeException)
+        {
+            largeEditSignature = null;
+            showEditPreview = true;
+            SetEditError(AppText.Get("LargeChangeWarning"));
             return;
         }
         catch (WaitingTimeNotFoundException)
@@ -453,6 +490,7 @@ public partial class Internal
             return;
         }
 
+        if (QuickRequiresConfirmation && !LargeQuickAcknowledged) { showQuickEditPreview = true; return; }
         var previous = WaitingTimeSnapshot.From(quickEditItem);
         isQuickSaving = true;
         quickEditErrorMessage = null;
@@ -468,7 +506,7 @@ public partial class Internal
                 quickEditForm.WaitValue,
                 quickEditForm.Unit,
                 quickEditForm.Note?.Trim(),
-                username, quickEditForm.EstimateStatus, quickEditItem.ReferralEndpoint, quickEditItem.ResponsibleDepartment));
+                username, quickEditForm.EstimateStatus, quickEditItem.ReferralEndpoint, quickEditItem.ResponsibleDepartment, quickEditItem.ComparisonCode, LargeQuickAcknowledged));
 
             ApplyEstimateForm(quickEditItem, quickEditForm, TimeProvider.GetUtcNow().UtcDateTime);
             quickEditItem.Version++;
@@ -479,6 +517,12 @@ public partial class Internal
         {
             quickEditConflict = true;
             quickEditErrorMessage = AppText.Get("WaitingTimeConflict");
+        }
+        catch (LargeEstimateChangeException)
+        {
+            largeQuickSignature = null;
+            showQuickEditPreview = true;
+            quickEditErrorMessage = AppText.Get("LargeChangeWarning");
         }
         catch (WaitingTimeNotFoundException)
         {
@@ -519,6 +563,8 @@ public partial class Internal
             yield return $"{AppText.Get("EstimateStatus")}: {ReferralEstimate.StatusLabel(editItem.EstimateStatus)} → {ReferralEstimate.StatusLabel(editForm.EstimateStatus)}";
         if (editForm.ReferralEndpoint != editItem.ReferralEndpoint)
             yield return $"{AppText.Get("ReferralEndpoint")}: {ReferralEstimate.EndpointLabel(editItem.ReferralEndpoint)} → {ReferralEstimate.EndpointLabel(editForm.ReferralEndpoint)}";
+        if (editForm.ComparisonCode != editItem.ComparisonCode)
+            yield return $"{AppText.Get("ComparisonCode")}: {editItem.ComparisonCode} → {editForm.ComparisonCode}";
         if (editForm.ResponsibleDepartment != editItem.ResponsibleDepartment)
             yield return $"{AppText.Get("ResponsibleDepartment")}: {editItem.ResponsibleDepartment} → {editForm.ResponsibleDepartment}";
         if (editForm.EstimateStatus == EstimateStatus.Available && (editForm.WaitValue != editItem.WaitValue || editForm.Unit != editItem.Unit))
@@ -562,9 +608,10 @@ public partial class Internal
         isReviewing = true;
         try
         {
+            var reviewed = 0;
             foreach (var item in reviewItems)
-                await MarkReviewedAsync(item, showStatus: false);
-            ShowStatus(string.Format(AppText.Get("ReviewedCountMessage"), reviewItems.Count));
+                if (await MarkReviewedAsync(item, showStatus: false)) reviewed++;
+            ShowStatus(string.Format(AppText.Get("ReviewedCountMessage"), reviewed));
             confirmReviewAll = false;
         }
         finally
@@ -573,7 +620,7 @@ public partial class Internal
         }
     }
 
-    private async Task MarkReviewedAsync(WaitingTime item, bool showStatus = true)
+    private async Task<bool> MarkReviewedAsync(WaitingTime item, bool showStatus = true)
     {
         try
         {
@@ -583,6 +630,7 @@ public partial class Internal
             item.Version++;
             latestReviews[item.Id] = new ReviewInfo(item.UpdatedAt, username);
             if (showStatus) ShowStatus(string.Format(AppText.Get("ReviewedMessage"), item.Name));
+            return true;
         }
         catch (WaitingTimeConcurrencyException)
         {
@@ -594,6 +642,7 @@ public partial class Internal
             items.Remove(item);
             ShowStatus(AppText.Get("WaitingTimeNotFound"));
         }
+        return false;
     }
 
     private void HandleReviewQueueKeyDown(KeyboardEventArgs args)
@@ -694,7 +743,7 @@ public partial class Internal
             {
                 await WaitingTimeManager.UpdateAsync(new WaitingTimeUpdate(
                     undo.Id, undo.ExpectedVersion, undo.Snapshot.Name, undo.Snapshot.Hospital,
-                    undo.Snapshot.Department, undo.Snapshot.WaitValue, undo.Snapshot.Unit, undo.Snapshot.Note, username, undo.Snapshot.EstimateStatus, undo.Snapshot.ReferralEndpoint, undo.Snapshot.ResponsibleDepartment));
+                    undo.Snapshot.Department, undo.Snapshot.WaitValue, undo.Snapshot.Unit, undo.Snapshot.Note, username, undo.Snapshot.EstimateStatus, undo.Snapshot.ReferralEndpoint, undo.Snapshot.ResponsibleDepartment, undo.Snapshot.ComparisonCode, ConfirmLargeChange: true));
                 var item = items.FirstOrDefault(candidate => candidate.Id == undo.Id);
                 if (item is not null)
                     undo.Snapshot.ApplyTo(item, undo.ExpectedVersion + 1);
@@ -727,14 +776,15 @@ public partial class Internal
         item.Note = form.Note?.Trim();
         item.EstimateStatus = form.EstimateStatus;
         item.ReferralEndpoint = form.ReferralEndpoint;
+        item.ComparisonCode = string.IsNullOrWhiteSpace(form.ComparisonCode) ? null : form.ComparisonCode.Trim().ToUpperInvariant();
         item.ResponsibleDepartment = string.IsNullOrWhiteSpace(form.ResponsibleDepartment) ? null : form.ResponsibleDepartment.Trim();
     }
 
     private sealed record WaitingTimeUndo(int Id, int ExpectedVersion, WaitingTimeSnapshot Snapshot, bool Reactivate);
 
-    private sealed record WaitingTimeSnapshot(string Name, Hospital Hospital, Department? Department, int WaitValue, WaitUnit Unit, string? Note, EstimateStatus EstimateStatus, ReferralEndpoint ReferralEndpoint, string? ResponsibleDepartment)
+    private sealed record WaitingTimeSnapshot(string Name, Hospital Hospital, Department? Department, int WaitValue, WaitUnit Unit, string? Note, EstimateStatus EstimateStatus, ReferralEndpoint ReferralEndpoint, string? ResponsibleDepartment, string? ComparisonCode)
     {
-        public static WaitingTimeSnapshot From(WaitingTime item) => new(item.Name, item.Hospital, item.Department, item.WaitValue, item.Unit, item.Note, item.EstimateStatus, item.ReferralEndpoint, item.ResponsibleDepartment);
+        public static WaitingTimeSnapshot From(WaitingTime item) => new(item.Name, item.Hospital, item.Department, item.WaitValue, item.Unit, item.Note, item.EstimateStatus, item.ReferralEndpoint, item.ResponsibleDepartment, item.ComparisonCode);
 
         public void ApplyTo(WaitingTime item, int version)
         {

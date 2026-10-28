@@ -10,5 +10,11 @@ public sealed class PortalSettings
     public int GreenMaximumAgeMonths { get; set; } = DefaultGreenMaximumAgeMonths;
     public int YellowMaximumAgeMonths { get; set; } = DefaultYellowMaximumAgeMonths;
     public int LongWaitMonths { get; set; } = DefaultLongWaitMonths;
+    public string? ReferralInstructionsFo { get; set; }
+    public string? ReferralInstructionsEn { get; set; }
+    public string? ContactGuidanceFo { get; set; }
+    public string? ContactGuidanceEn { get; set; }
+    public bool PublishPatientGuidance { get; set; }
+
     public int Version { get; set; } = 1;
 }

@@ -32,3 +32,5 @@ jobs:
           path: |
             ${{ runner.temp }}/wt-browser/*.log
             ${{ runner.temp }}/wt-browser/results/*.trx
+            ${{ runner.temp }}/wt-browser/results/*.json
+            ${{ runner.temp }}/wt-browser/results/*.png

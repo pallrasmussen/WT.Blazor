@@ -243,3 +243,71 @@ are not rewritten. Back up the database before deployment, apply the migration
 on staging, then have data owners define legacy endpoints/ownership and explicitly
 review estimates. Older binaries cannot represent the new statuses correctly;
 roll back by restoring the pre-upgrade database and matching application bundle.
+
+## Review queues and unusually large changes
+
+The staff review queue includes active records with missing verification dates,
+overdue verification, no responsible department, or an unspecified referral
+endpoint. Missing verification comes first, then overdue records, then incomplete
+metadata; ties use the oldest review date, name and ID. Staff can filter by reason
+and responsible department. **Still correct** records a review without changing
+the value. It does not fill missing metadata, so incomplete records remain in the
+queue. Bulk confirmation reports the number actually reviewed, excluding conflicts.
+
+Updates that at least double or halve an available estimate and change it by at
+least 28 canonical days require explicit confirmation in both editing forms and
+on the server. Unit-only conversions do not trigger the warning. Changing the
+value/unit after checking confirmation invalidates the acknowledgement. Confirmed
+large changes are noted in audit history; concurrency protection still applies.
+
+## Hospital comparisons
+
+Staff may assign an optional comparison procedure code to records representing
+the same clinical procedure at different hospitals. Use an agreed clinical code;
+do not group procedures merely because their names look similar. Comparisons
+require an available, verified estimate, a specified referral endpoint and
+explicit identical patient conditions (the public note). Blank conditions are
+not assumed equivalent. Different conditions/endpoints, unknown or inactive
+records, shared waiting lists, and duplicate hospital entries are excluded.
+
+Comparable results are shown together on the public page using canonical days,
+with verification dates and overdue warnings. Comparisons follow the selected
+public filters; choose all hospitals to see cross-hospital results. They do not
+guarantee referral choice or clinical suitability. Codes and responsible
+owner fields are internal and are not printed in public comparison cards.
+
+## Patient guidance publication
+
+Administrators can edit referral instructions and contact guidance in Faroese and
+English under Settings. The four fields are limited to 2,000 characters each and
+rendered as plain text. Obtain local clinical approval for wording and contact
+details before selecting **Publish these approved instructions** and saving.
+All four fields are required to publish; publication and text changes use the
+existing settings concurrency and immutable audit history. Unchecking publication
+removes the approved text from public pages. No contact numbers are invented.
+
+The public page always explains that the portal cannot show individual queue
+positions or appointment status, directs individual questions to the referring
+clinician/relevant department, and discourages sending medical information through
+the portal. Without published local text, these generic instructions remain.
+
+## Accessibility verification
+
+The disposable local browser runner now performs axe-core WCAG A/AA checks in both
+languages, checks 320px reflow with enlarged text as well as desktop layouts, and
+verifies keyboard focus stays in editing dialogs and returns on Escape. It also
+checks the comparison/large-change/guidance workflow using synthetic records.
+CI uploads axe JSON reports and failure screenshots alongside TRX results.
+These checks complement manual assistive-technology and clinical usability review;
+they do not establish complete accessibility conformance.
+
+Run `tests/Run-LocalBrowserSmoke.ps1` for these checks. Mutating workflow tests and
+staff-only browser checks require `RUN_MUTATING_BROWSER_TESTS=1`, set only by the
+runner for its disposable Development database. Never enable this flag against a
+real deployment. Tests share a browser-fixture collection to avoid simultaneous
+fixture mutations. For an existing system Chromium on Linux, the optional
+`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` test variable selects that executable.
+
+Back up and test the additive `AddComparisonsAndPatientGuidance` migration on
+staging before deployment. Existing comparison codes/guidance remain blank and
+publication remains disabled; clinical staff must deliberately configure them.

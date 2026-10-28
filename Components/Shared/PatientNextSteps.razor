@@ -1,0 +1,23 @@
+@using System.Globalization
+
+<section class="public-panel patient-next-steps" aria-labelledby="patient-next-steps-title">
+    <h2 id="patient-next-steps-title">@AppText.Get("PatientNextSteps")</h2>
+    <p>@AppText.Get("PatientQueueLimit")</p>
+    @if (Settings.PublishPatientGuidance)
+    {
+        <h3>@AppText.Get("ReferralRequirements")</h3>
+        <p class="approved-guidance">@(English ? Settings.ReferralInstructionsEn : Settings.ReferralInstructionsFo)</p>
+        <h3>@AppText.Get("ContactQuestions")</h3>
+        <p class="approved-guidance">@(English ? Settings.ContactGuidanceEn : Settings.ContactGuidanceFo)</p>
+    }
+    else
+    {
+        <p>@AppText.Get("PatientContactDefault")</p>
+    }
+    <p>@AppText.Get("PatientPrivacyReminder")</p>
+</section>
+
+@code {
+    [Parameter] public PortalSettings Settings { get; set; } = new();
+    private static bool English => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en";
+}
