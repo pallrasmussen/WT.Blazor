@@ -25,6 +25,9 @@ public class WaitingTime
     [StringLength(200)]
     public string? ResponsibleDepartment { get; set; }
 
+    [StringLength(100)]
+    public string? ComparisonCode { get; set; }
+
     // Start a new comparable trend when its definition changes or an estimate resumes.
     public int EstimateSeries { get; set; } = 1;
 

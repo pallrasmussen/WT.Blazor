@@ -12,11 +12,11 @@
             <div class="language-switcher" aria-label="@AppText.Get("Language")">
                 <form method="get" action="/culture/fo" data-enhance="false">
                     <input type="hidden" name="returnUrl" value="@ReturnUrl" />
-                    <button type="submit" aria-label="@AppText.Get("Faroese")" class="@(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "fo" ? "active" : "")">FO</button>
+                    <button type="submit" aria-label="FO — @AppText.Get("Faroese")" class="@(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "fo" ? "active" : "")">FO</button>
                 </form>
                 <form method="get" action="/culture/en" data-enhance="false">
                     <input type="hidden" name="returnUrl" value="@ReturnUrl" />
-                    <button type="submit" aria-label="@AppText.Get("English")" class="@(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en" ? "active" : "")">EN</button>
+                    <button type="submit" aria-label="EN — @AppText.Get("English")" class="@(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en" ? "active" : "")">EN</button>
                 </form>
             </div>
             <a class="internal-link" href="/internal">@AppText.Get("Administration")</a>

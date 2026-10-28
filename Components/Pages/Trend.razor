@@ -42,7 +42,7 @@
         <p class="result-count">@AppText.Get("TrendCurrentEstimate")</p>
         <div class="trend-period-control">
             <label for="trend-period">@AppText.Get("TrendPeriod")</label>
-            <select id="trend-period" value="@(selectedPeriodDays?.ToString() ?? "")" @onchange="ChangePeriodAsync">
+            <select id="trend-period" disabled="@(!isInteractive)" value="@(selectedPeriodDays?.ToString() ?? "")" @onchange="ChangePeriodAsync">
                 <option value="">@AppText.Get("TrendPeriodAll")</option>
                 <option value="90">@AppText.Get("TrendPeriodThreeMonths")</option>
                 <option value="365">@AppText.Get("TrendPeriodYear")</option>
@@ -57,7 +57,7 @@
     {
         <div class="trend-load-error">
             <p class="login-error" role="alert">@AppText.Get("TrendLoadFailed")</p>
-            <button type="button" class="btn-secondary retry-trend" @onclick="LoadReportAsync">@AppText.Get("RetryTrend")</button>
+            <button type="button" class="btn-secondary retry-trend" disabled="@(!isInteractive)" @onclick="LoadReportAsync">@AppText.Get("RetryTrend")</button>
         </div>
     }
     else if (report is null)
@@ -82,6 +82,7 @@
 
     private TrendReport? report;
     private bool isLoading = true;
+    private bool isInteractive;
     private bool loadFailed;
     private bool disposed;
     private long requestVersion;
@@ -107,6 +108,15 @@
             report = null;
         }
         await LoadReportAsync();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        // Prerendered HTML is visible before the server circuit can receive events.
+        // Enable event-driven controls only after the first interactive render.
+        if (!firstRender || disposed) return;
+        isInteractive = true;
+        StateHasChanged();
     }
 
     private async Task ChangePeriodAsync(ChangeEventArgs args)

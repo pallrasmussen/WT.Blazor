@@ -108,7 +108,7 @@
   <data name="ReviewQueue" xml:space="preserve"><value>{0} bíðitíðir bíða eftir eftirliti</value></data>
   <data name="ReviewAll" xml:space="preserve"><value>Eftirkanna allar</value></data>
   <data name="ConfirmReviewAll" xml:space="preserve"><value>Vátta eftirlit av øllum</value></data>
-  <data name="MarkReviewed" xml:space="preserve"><value>Merk sum eftirkannað</value></data>
+  <data name="MarkReviewed" xml:space="preserve"><value>Framvegis rætt</value></data>
   <data name="ReviewedMessage" xml:space="preserve"><value>{0} er eftirkannað.</value></data>
   <data name="ReviewedCountMessage" xml:space="preserve"><value>{0} bíðitíðir eru eftirkannaðar.</value></data>
   <data name="ReviewQueueKeyboardHint" xml:space="preserve"><value>Nýt upp- og niðurpílar á listanum til at fara ígjøgnum.</value></data>
@@ -279,4 +279,35 @@
   <data name="ReferralEstimateDisclaimer" xml:space="preserve"><value>Hetta eru metingar fyri sjúklingar, ið nýliga eru ávístir við vanligari raðfesting. Tín bíðitíð kann vera øðrvísi alt eftir læknaligari raðfesting og tínum umstøðum.</value></data>
   <data name="ReferralEstimateStaffHelp" xml:space="preserve"><value>Skráset mettu bíðitíðina fyri eina nýggja ávísing við vanligari raðfesting. Vel endamál, áset ábyrgdarhavandi deild og lýs treytir ella sjúklingabólkar. Vel, at meting ikki er tøk, um eingin meting er; null merkir eina metta bíðitíð upp á null.</value></data>
   <data name="TrendSeriesExplanation" xml:space="preserve"><value>Gongdin vísir broytingar í almennum metingum, ikki máldar bíðitíðir hjá sjúklingum. Ein nýggj røð byrjar, tá endamálið broytist ella ein meting aftur er tøk. Eldri virði eru varðveitt í broytingarsøguni hjá starvsfólkum.</value></data>
+  <data name="ReviewReason" xml:space="preserve"><value>Krevur ans</value></data>
+  <data name="AllReviewReasons" xml:space="preserve"><value>Allar orsøkir</value></data>
+  <data name="ReviewReasonOverdue" xml:space="preserve"><value>Eftirkanning ov gomul</value></data>
+  <data name="ReviewReasonMissingVerification" xml:space="preserve"><value>Eingin dagfesting fyri eftirkanning</value></data>
+  <data name="ReviewReasonMissingOwner" xml:space="preserve"><value>Ábyrgdarhavandi deild manglar</value></data>
+  <data name="ReviewReasonMissingEndpoint" xml:space="preserve"><value>Endamál við ávísing manglar</value></data>
+  <data name="ReviewOwnerFilter" xml:space="preserve"><value>Sía eftir ábyrgdarhavandi deild</value></data>
+  <data name="ReviewQueueExplanation" xml:space="preserve"><value>Metingar uttan dagfesting fyri eftirkanning standa fremst, síðani gamlar metingar og ófullfíggjaðar upplýsingar. “Framvegis rætt” váttar virðið ella tøkið. Manglandi deildir og endamál verða standandi, til tey eru rættað.</value></data>
+  <data name="OpenReviewQueue" xml:space="preserve"><value>Opna raðfestan eftirkanningarlista</value></data>
+  <data name="LargeChangeWarning" xml:space="preserve"><value>Henda broytingin í minsta lagi tvífaldar ella helvtar metingina og er í minsta lagi 28 dagar. Kanna virðið og eindina, áðrenn tú váttar.</value></data>
+  <data name="ConfirmLargeChange" xml:space="preserve"><value>Eg havi kannað virðið og eindina og vátti hesa stóru broyting.</value></data>
+  <data name="ComparisonCode" xml:space="preserve"><value>Mannagongdarkota til samanbering (valfrítt)</value></data>
+  <data name="ComparisonCodeHelp" xml:space="preserve"><value>Nýt somu kotu bert fyri somu mannagongd á ymiskum sjúkrahúsum. Samanbering krevur eisini sama endamál, eins greitt lýstar treytir og eftirkannaða meting. Lat standa tómt, um tú ivast.</value></data>
+  <data name="HospitalComparisons" xml:space="preserve"><value>Samanber samsvarandi tænastur á sjúkrahúsunum</value></data>
+  <data name="HospitalComparisonExplanation" xml:space="preserve"><value>Bert mannagongdir, sum starvsfólk hava knýtt saman við sama endamáli og somu sjúklingatreytum, verða samanbornar. Metingarnar verða vístar í døgum. Hetta tryggjar ikki frítt val av sjúkrahúsi; spyr læknan, sum ávísir teg, hvørjir møguleikar eru.</value></data>
+  <data name="ComparisonEstimateOverdue" xml:space="preserve"><value>Henda metingin eigur at verða eftirkannað; vátta hana hjá deildini.</value></data>
+  <data name="PatientNextSteps" xml:space="preserve"><value>Hvat skal eg gera nú?</value></data>
+  <data name="PatientQueueLimit" xml:space="preserve"><value>Henda síðan kann ikki vísa títt egna pláss á bíðilistanum ella støðuna á tínari avtalu.</value></data>
+  <data name="PatientContactDefault" xml:space="preserve"><value>Við spurningum um ávísing ella tína egnu viðgerð, set teg í samband við læknan, sum ávísir teg, ella viðkomandi sjúkrahúsdeild.</value></data>
+  <data name="PatientPrivacyReminder" xml:space="preserve"><value>Skriva ella send ikki persónligar heilsuupplýsingar gjøgnum hesa síðu.</value></data>
+  <data name="ReferralRequirements" xml:space="preserve"><value>Treytir fyri ávísing</value></data>
+  <data name="ContactQuestions" xml:space="preserve"><value>Hvønn kanst tú seta teg í samband við?</value></data>
+  <data name="PatientGuidanceSettings" xml:space="preserve"><value>Góðkendar sjúklingavegleiðingar</value></data>
+  <data name="PatientGuidanceApprovalHelp" xml:space="preserve"><value>Skriva staðbundnar góðkendar vegleiðingar um ávísing og samband á báðum málum. Almannakunnger bert, tá ábyrgdarhavandi kliniska toymið hevur góðkent orðing og sambandsupplýsingar. Vanligur tekstur uttan persónligar sjúklingaupplýsingar. Tak merkið burtur fyri at taka vegleiðingina av almennu síðuni.</value></data>
+  <data name="ReferralInstructionsFo" xml:space="preserve"><value>Ávísingarvegleiðing — føroyskt</value></data>
+  <data name="ReferralInstructionsEn" xml:space="preserve"><value>Ávísingarvegleiðing — enskt</value></data>
+  <data name="ContactGuidanceFo" xml:space="preserve"><value>Sambandsvegleiðing — føroyskt</value></data>
+  <data name="ContactGuidanceEn" xml:space="preserve"><value>Sambandsvegleiðing — enskt</value></data>
+  <data name="PublishApprovedGuidance" xml:space="preserve"><value>Almannakunnger hesar góðkendu vegleiðingar á báðum málum</value></data>
+  <data name="PatientGuidanceValidation" xml:space="preserve"><value>Áðrenn almannakunngering skulu øll fýra feltini vera útfylt. Hvørt felt kann í mesta lagi hava 2.000 tekn.</value></data>
+  <data name="PatientGuidanceAuditChanged" xml:space="preserve"><value>Sjúklingavegleiðing broytt</value></data>
 </root>

@@ -44,6 +44,7 @@
         <h2>@AppText.Get("RecentChanges")</h2>
         <p>@string.Format(AppText.Get("RecentChangesCount"), summary.RecentChanges)</p>
         <p>@string.Format(AppText.Get("NeedsReviewCount"), summary.NeedsReview)</p>
+        <a href="/internal?review=true">@AppText.Get("OpenReviewQueue")</a>
     </article>
     <article class="internal-card">
         <h2>@AppText.Get("DataQuality")</h2>

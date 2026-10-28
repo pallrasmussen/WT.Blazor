@@ -35,7 +35,7 @@
   <data name="ReviewQueue" xml:space="preserve"><value>{0} waiting times need review</value></data>
   <data name="ReviewAll" xml:space="preserve"><value>Review all</value></data>
   <data name="ConfirmReviewAll" xml:space="preserve"><value>Confirm review of all</value></data>
-  <data name="MarkReviewed" xml:space="preserve"><value>Mark reviewed</value></data>
+  <data name="MarkReviewed" xml:space="preserve"><value>Still correct</value></data>
   <data name="ReviewedMessage" xml:space="preserve"><value>{0} was reviewed.</value></data>
   <data name="ReviewedCountMessage" xml:space="preserve"><value>{0} waiting times were reviewed.</value></data>
   <data name="ReviewQueueKeyboardHint" xml:space="preserve"><value>Use the Up and Down arrows on the list to move through records.</value></data>
@@ -215,4 +215,35 @@
   <data name="ReferralEstimateDisclaimer" xml:space="preserve"><value>These are estimates for newly referred patients with routine referrals. Your actual wait may differ depending on clinical priority and individual circumstances.</value></data>
   <data name="ReferralEstimateStaffHelp" xml:space="preserve"><value>Record the estimate for a newly received routine referral. Choose its endpoint, assign the responsible department, and describe any referral requirements or patient groups. Use an unavailable status when there is no estimate; zero means an estimated wait of zero.</value></data>
   <data name="TrendSeriesExplanation" xml:space="preserve"><value>The trend shows changes in published estimates, not measured patient waits. A new series starts when the referral endpoint changes or an estimate becomes available again. Earlier values remain in the staff audit history.</value></data>
+  <data name="ReviewReason" xml:space="preserve"><value>Needs attention</value></data>
+  <data name="AllReviewReasons" xml:space="preserve"><value>All reasons</value></data>
+  <data name="ReviewReasonOverdue" xml:space="preserve"><value>Verification overdue</value></data>
+  <data name="ReviewReasonMissingVerification" xml:space="preserve"><value>Verification date missing</value></data>
+  <data name="ReviewReasonMissingOwner" xml:space="preserve"><value>Responsible department missing</value></data>
+  <data name="ReviewReasonMissingEndpoint" xml:space="preserve"><value>Referral endpoint missing</value></data>
+  <data name="ReviewOwnerFilter" xml:space="preserve"><value>Filter by responsible department</value></data>
+  <data name="ReviewQueueExplanation" xml:space="preserve"><value>Missing verification dates appear first, followed by overdue estimates and incomplete definitions. Confirming “Still correct” checks the value or availability; missing departments and endpoints stay in the queue until edited.</value></data>
+  <data name="OpenReviewQueue" xml:space="preserve"><value>Open prioritised review queue</value></data>
+  <data name="LargeChangeWarning" xml:space="preserve"><value>This change at least doubles or halves the estimate and differs by at least 28 days. Check the value and unit before confirming.</value></data>
+  <data name="ConfirmLargeChange" xml:space="preserve"><value>I checked the value and unit and confirm this large change.</value></data>
+  <data name="ComparisonCode" xml:space="preserve"><value>Comparison procedure code (optional)</value></data>
+  <data name="ComparisonCodeHelp" xml:space="preserve"><value>Use the same code only for the same procedure at different hospitals. Comparisons also require the same referral endpoint, explicit identical conditions and a verified estimate. Leave blank if comparability is uncertain.</value></data>
+  <data name="HospitalComparisons" xml:space="preserve"><value>Compare matching services across hospitals</value></data>
+  <data name="HospitalComparisonExplanation" xml:space="preserve"><value>Only staff-linked procedures with the same referral endpoint and stated patient conditions are compared. Estimates use days for a consistent comparison. This does not guarantee a choice of hospital; ask your referring clinician which options apply to you.</value></data>
+  <data name="ComparisonEstimateOverdue" xml:space="preserve"><value>This estimate needs review; confirm it with the department.</value></data>
+  <data name="PatientNextSteps" xml:space="preserve"><value>What should I do next?</value></data>
+  <data name="PatientQueueLimit" xml:space="preserve"><value>This portal cannot show your individual queue position or appointment status.</value></data>
+  <data name="PatientContactDefault" xml:space="preserve"><value>For referral requirements or questions about your own care, contact your referring clinician or the relevant hospital department.</value></data>
+  <data name="PatientPrivacyReminder" xml:space="preserve"><value>Do not enter or send personal medical information through this portal.</value></data>
+  <data name="ReferralRequirements" xml:space="preserve"><value>Referral requirements</value></data>
+  <data name="ContactQuestions" xml:space="preserve"><value>Who to contact with questions</value></data>
+  <data name="PatientGuidanceSettings" xml:space="preserve"><value>Approved patient guidance</value></data>
+  <data name="PatientGuidanceApprovalHelp" xml:space="preserve"><value>Enter locally approved referral and contact instructions in both languages. Publish only after the responsible clinical team has approved the wording and contact details. Plain text only; no patient-identifiable information. Uncheck publication to remove the guidance from public pages.</value></data>
+  <data name="ReferralInstructionsFo" xml:space="preserve"><value>Referral instructions — Faroese</value></data>
+  <data name="ReferralInstructionsEn" xml:space="preserve"><value>Referral instructions — English</value></data>
+  <data name="ContactGuidanceFo" xml:space="preserve"><value>Contact guidance — Faroese</value></data>
+  <data name="ContactGuidanceEn" xml:space="preserve"><value>Contact guidance — English</value></data>
+  <data name="PublishApprovedGuidance" xml:space="preserve"><value>Publish these approved instructions in both languages</value></data>
+  <data name="PatientGuidanceValidation" xml:space="preserve"><value>Before publication, complete all four guidance fields. Each field must be no longer than 2,000 characters.</value></data>
+  <data name="PatientGuidanceAuditChanged" xml:space="preserve"><value>Patient guidance changed</value></data>
 </root>

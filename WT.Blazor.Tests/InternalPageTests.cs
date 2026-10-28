@@ -21,6 +21,47 @@ namespace WT.Blazor.Tests;
 public class InternalPageTests : BunitContext
 {
     [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void LargeChangeAcknowledgementIsRequiredAndInvalidatedWhenTheValueChanges(bool quick)
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        var manager = new WaitingTimeManager();
+        var cut = RenderInternal(manager, reviewQueue: quick);
+        if (quick) cut.Find(".admin-list").KeyDown("ArrowDown");
+        else cut.FindAll("button").Single(button => button.TextContent == AppText.Get("Edit")).Click();
+        var input = quick ? "#quick-wait-1" : "#edit-wait";
+        var checkbox = quick ? "#confirm-large-quick" : "#confirm-large-edit";
+        cut.Find(input).Change("40");
+        cut.FindAll("button").Single(button => button.TextContent == AppText.Get("SaveChanges")).Click();
+        var save = () => cut.FindAll("button").Single(button => button.TextContent == AppText.Get("ConfirmSave"));
+        Assert.True(save().HasAttribute("disabled"));
+        Assert.Null(manager.UpdateRequest);
+        cut.Find(checkbox).Change(true);
+        Assert.False(save().HasAttribute("disabled"));
+        cut.Find(input).Change("41");
+        Assert.True(save().HasAttribute("disabled"));
+        cut.Find(checkbox).Change(true);
+        save().Click();
+        Assert.True(manager.UpdateRequest?.ConfirmLargeChange);
+        Assert.Equal(41, manager.UpdateRequest?.WaitValue);
+    }
+
+    [Fact]
+    public void ConfirmingAValueDoesNotClearMissingOwnershipOrEndpointReasons()
+    {
+        var manager = new WaitingTimeManager();
+        var cut = RenderInternal(manager, reviewQueue: true);
+        cut.Find("#review-reason").Change(EstimateReviewReason.MissingOwner.ToString());
+        Assert.Single(cut.FindAll(".admin-row"));
+        cut.FindAll("button").Single(button => button.TextContent == AppText.Get("MarkReviewed")).Click();
+        Assert.Single(cut.FindAll(".admin-row"));
+        Assert.Contains(AppText.Get("ReviewReasonMissingOwner"), cut.Find(".review-reasons").TextContent);
+        cut.Find("#review-owner").Input("No such department");
+        Assert.Empty(cut.FindAll(".admin-row"));
+    }
+
+    [Theory]
     [InlineData("create")]
     [InlineData("edit")]
     [InlineData("quick")]
@@ -209,6 +250,7 @@ public class InternalPageTests : BunitContext
         cut.Find("#edit-wait").Change("9");
         cut.FindAll("button").Single(button => button.TextContent == AppText.Get("SaveChanges")).Click();
         cut.WaitForAssertion(() => Assert.Single(cut.FindAll("button"), button => button.TextContent == AppText.Get("ConfirmSave")));
+        foreach (var checkbox in cut.FindAll("#confirm-large-edit, #confirm-large-quick")) checkbox.Change(true);
         cut.FindAll("button").Single(button => button.TextContent == AppText.Get("ConfirmSave")).Click();
 
         cut.WaitForAssertion(() => Assert.Contains(AppText.Get("WaitingTimeConflict"), cut.Markup));
@@ -238,6 +280,7 @@ public class InternalPageTests : BunitContext
         cut.Find("#quick-wait-1").Change("5");
         cut.FindAll("button").Single(button => button.TextContent == AppText.Get("SaveChanges")).Click();
         cut.WaitForAssertion(() => Assert.Single(cut.FindAll("button"), button => button.TextContent == AppText.Get("ConfirmSave")));
+        foreach (var checkbox in cut.FindAll("#confirm-large-edit, #confirm-large-quick")) checkbox.Change(true);
         cut.FindAll("button").Single(button => button.TextContent == AppText.Get("ConfirmSave")).Click();
 
         cut.WaitForAssertion(() => Assert.Equal(5, manager.UpdateRequest?.WaitValue));
@@ -275,6 +318,7 @@ public class InternalPageTests : BunitContext
         {
             cut.FindAll("button").Single(button => button.TextContent == AppText.Get("SaveChanges")).Click();
             cut.WaitForAssertion(() => Assert.Single(cut.FindAll("button"), button => button.TextContent == AppText.Get("ConfirmSave")));
+            foreach (var checkbox in cut.FindAll("#confirm-large-edit, #confirm-large-quick")) checkbox.Change(true);
             cut.FindAll("button").Single(button => button.TextContent == AppText.Get("ConfirmSave")).Click();
         }
         Save();
@@ -339,6 +383,12 @@ public class InternalPageTests : BunitContext
             WaitValue = item.WaitValue,
             Unit = item.Unit,
             Note = item.Note,
+            VerifiedAt = item.VerifiedAt,
+            EstimateStatus = item.EstimateStatus,
+            ReferralEndpoint = item.ReferralEndpoint,
+            ResponsibleDepartment = item.ResponsibleDepartment,
+            ComparisonCode = item.ComparisonCode,
+            EstimateSeries = item.EstimateSeries,
             IsActive = item.IsActive,
             UpdatedAt = item.UpdatedAt,
             Version = item.Version

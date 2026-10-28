@@ -124,9 +124,8 @@ public class HomePageTests : BunitContext
 
         var cut = Render<Home>();
 
-        Assert.Equal("0", cut.Find(".public-legend").GetAttribute("tabindex"));
-        Assert.Equal("public-indicator-legend", cut.Find(".public-legend").GetAttribute("aria-describedby"));
-        Assert.Equal("tooltip", cut.Find(".public-legend-tooltip").GetAttribute("role"));
+        Assert.Equal("DETAILS", cut.Find(".public-legend").TagName);
+        Assert.NotNull(cut.Find(".public-legend summary"));
         Assert.Single(cut.FindAll(".public-legend-tooltip .trend-legend"));
         Assert.Single(cut.FindAll(".public-legend-tooltip .freshness-legend"));
     }

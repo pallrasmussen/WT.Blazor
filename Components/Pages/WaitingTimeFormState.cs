@@ -12,6 +12,7 @@ public sealed class WaitingTimeFormState
     public EstimateStatus EstimateStatus { get; set; } = EstimateStatus.Unknown;
     public ReferralEndpoint ReferralEndpoint { get; set; }
     public string? ResponsibleDepartment { get; set; }
+    public string? ComparisonCode { get; set; }
     public string? Note { get; set; }
 
     public void Load(WaitingTime item)
@@ -25,6 +26,7 @@ public sealed class WaitingTimeFormState
         EstimateStatus = item.EstimateStatus;
         ReferralEndpoint = item.ReferralEndpoint;
         ResponsibleDepartment = item.ResponsibleDepartment;
+        ComparisonCode = item.ComparisonCode;
     }
 
     public void Clear()
@@ -38,5 +40,6 @@ public sealed class WaitingTimeFormState
         EstimateStatus = EstimateStatus.Unknown;
         ReferralEndpoint = ReferralEndpoint.Unspecified;
         ResponsibleDepartment = null;
+        ComparisonCode = null;
     }
 }

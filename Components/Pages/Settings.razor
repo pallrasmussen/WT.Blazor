@@ -44,6 +44,18 @@ else
     </section>
 
     <section class="internal-card settings-card">
+        <h2>@AppText.Get("PatientGuidanceSettings")</h2>
+        <p>@AppText.Get("PatientGuidanceApprovalHelp")</p>
+        <div class="settings-grid">
+            <div><label for="referral-fo">@AppText.Get("ReferralInstructionsFo")</label><textarea id="referral-fo" maxlength="2000" rows="5" @bind="settings.ReferralInstructionsFo"></textarea></div>
+            <div><label for="referral-en">@AppText.Get("ReferralInstructionsEn")</label><textarea id="referral-en" maxlength="2000" rows="5" @bind="settings.ReferralInstructionsEn"></textarea></div>
+            <div><label for="contact-fo">@AppText.Get("ContactGuidanceFo")</label><textarea id="contact-fo" maxlength="2000" rows="5" @bind="settings.ContactGuidanceFo"></textarea></div>
+            <div><label for="contact-en">@AppText.Get("ContactGuidanceEn")</label><textarea id="contact-en" maxlength="2000" rows="5" @bind="settings.ContactGuidanceEn"></textarea></div>
+        </div>
+        <label for="publish-guidance"><input id="publish-guidance" type="checkbox" @bind="settings.PublishPatientGuidance" /> @AppText.Get("PublishApprovedGuidance")</label>
+    </section>
+
+    <section class="internal-card settings-card">
         <h2>@AppText.Get("Operations")</h2>
         <p>@AppText.Get("OperationsSettingsIntro")</p>
         <div class="settings-grid">
@@ -84,7 +96,12 @@ else
             <ul class="settings-audit-list">
                 @foreach (var change in recentChanges)
                 {
-                    <li>@string.Format(AppText.Get("SettingsAuditEntry"), change.Timestamp.ToLocalTime(), change.Username, change.OldGreenMaximumAgeMonths, change.NewGreenMaximumAgeMonths, change.OldYellowMaximumAgeMonths, change.NewYellowMaximumAgeMonths, change.OldLongWaitMonths, change.NewLongWaitMonths)</li>
+                    <li>@string.Format(AppText.Get("SettingsAuditEntry"), change.Timestamp.ToLocalTime(), change.Username, change.OldGreenMaximumAgeMonths, change.NewGreenMaximumAgeMonths, change.OldYellowMaximumAgeMonths, change.NewYellowMaximumAgeMonths, change.OldLongWaitMonths, change.NewLongWaitMonths)
+                        @if (change.OldPublishPatientGuidance != change.NewPublishPatientGuidance
+                            || change.OldReferralInstructionsFo != change.NewReferralInstructionsFo || change.OldReferralInstructionsEn != change.NewReferralInstructionsEn
+                            || change.OldContactGuidanceFo != change.NewContactGuidanceFo || change.OldContactGuidanceEn != change.NewContactGuidanceEn)
+                        { <span> · @AppText.Get("PatientGuidanceAuditChanged")</span> }
+                    </li>
                 }
             </ul>
         }
@@ -116,7 +133,12 @@ else
     private bool allowNavigation;
     private bool hasUnsavedChanges => settings.GreenMaximumAgeMonths != savedSettings.GreenMaximumAgeMonths
         || settings.YellowMaximumAgeMonths != savedSettings.YellowMaximumAgeMonths
-        || settings.LongWaitMonths != savedSettings.LongWaitMonths;
+        || settings.LongWaitMonths != savedSettings.LongWaitMonths
+        || settings.ReferralInstructionsFo != savedSettings.ReferralInstructionsFo
+        || settings.ReferralInstructionsEn != savedSettings.ReferralInstructionsEn
+        || settings.ContactGuidanceFo != savedSettings.ContactGuidanceFo
+        || settings.ContactGuidanceEn != savedSettings.ContactGuidanceEn
+        || settings.PublishPatientGuidance != savedSettings.PublishPatientGuidance;
 
     protected override async Task OnInitializedAsync()
     {
@@ -186,6 +208,9 @@ else
 
     private string? Validate()
     {
+        var guidance = new[] { settings.ReferralInstructionsFo, settings.ReferralInstructionsEn, settings.ContactGuidanceFo, settings.ContactGuidanceEn };
+        if (guidance.Any(text => text?.Length > 2000) || settings.PublishPatientGuidance && guidance.Any(string.IsNullOrWhiteSpace))
+            return AppText.Get("PatientGuidanceValidation");
         if (settings.GreenMaximumAgeMonths is < 1 or > 24)
             return AppText.Get("GreenThresholdValidation");
         if (settings.YellowMaximumAgeMonths is < 2 or > 36 || settings.YellowMaximumAgeMonths <= settings.GreenMaximumAgeMonths)
@@ -225,6 +250,11 @@ else
         GreenMaximumAgeMonths = source.GreenMaximumAgeMonths,
         YellowMaximumAgeMonths = source.YellowMaximumAgeMonths,
         LongWaitMonths = source.LongWaitMonths,
+        ReferralInstructionsFo = source.ReferralInstructionsFo,
+        ReferralInstructionsEn = source.ReferralInstructionsEn,
+        ContactGuidanceFo = source.ContactGuidanceFo,
+        ContactGuidanceEn = source.ContactGuidanceEn,
+        PublishPatientGuidance = source.PublishPatientGuidance,
         Version = source.Version
     };
 }

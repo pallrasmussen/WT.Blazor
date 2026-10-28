@@ -58,17 +58,30 @@
             </div>
             <label class="review-filter" for="needs-review">
                 <input id="needs-review" type="checkbox" @bind="showNeedsReview" @bind:after="FilterChangedAsync" />
-                @string.Format(AppText.Get("NeedsReview"), items.Count(item => UpdatedStatus.RequiresReview(ReferralEstimate.ReviewDate(item), portalSettings.GreenMaximumAgeMonths, CurrentUtc)))
+                @string.Format(AppText.Get("NeedsReview"), items.Count(item => item.IsActive && ReviewReasons(item) != EstimateReviewReason.None))
             </label>
             @if (isSuperAdmin)
             {
                 <label class="review-filter" for="show-inactive">
-                    <input id="show-inactive" type="checkbox" @bind="showInactive" @bind:after="FilterChangedAsync" />
+                    <input id="show-inactive" type="checkbox" disabled="@showNeedsReview" @bind="showInactive" @bind:after="FilterChangedAsync" />
                     @string.Format(AppText.Get("ShowInactive"), items.Count(item => !item.IsActive))
                 </label>
             }
         </div>
 
+        @if (showNeedsReview)
+        {
+            <div class="review-queue-filters">
+                <div><label for="review-reason">@AppText.Get("ReviewReason")</label>
+                <select id="review-reason" @bind="reviewReason">
+                    <option value="@EstimateReviewReason.None">@AppText.Get("AllReviewReasons")</option>
+                    @foreach (var reason in Enum.GetValues<EstimateReviewReason>().Where(reason => reason != EstimateReviewReason.None))
+                    { <option value="@reason">@AppText.Get($"ReviewReason{reason}")</option> }
+                </select></div>
+                <div><label for="review-owner">@AppText.Get("ReviewOwnerFilter")</label><input id="review-owner" type="search" @bind="reviewOwner" @bind:event="oninput" /></div>
+            </div>
+            <p>@AppText.Get("ReviewQueueExplanation")</p>
+        }
         @if (showNeedsReview && visibleItems.Count > 0)
         {
             <ReviewQueueActions Count="visibleItems.Count" Confirming="confirmReviewAll" Busy="isReviewing" Confirm="ConfirmReviewAllAsync" Cancel="CancelReviewAll" Begin="BeginReviewAll" />
@@ -162,12 +175,17 @@
         }
         else
         {
+        <h2 class="visually-hidden">@AppText.Get("WaitingTime")</h2>
         <section class="admin-list" tabindex="0" @onkeydown="HandleReviewQueueKeyDown">
             @foreach (var item in visibleItems)
             {
                 <article class="admin-row @(item.IsActive ? "" : "inactive")">
                     <div>
                         <h3>@item.Name</h3>
+                        <ul class="review-reasons" aria-label="@AppText.Get("ReviewReason")">
+                            @foreach (var reason in EstimateReview.IndividualReasons(ReviewReasons(item)))
+                            { <li>@AppText.Get($"ReviewReason{reason}")</li> }
+                        </ul>
                         <div class="meta">
                             @DisplayNames.For(item.Hospital)@(item.Department is not null ? " · " + DisplayNames.For(item.Department.Value) : "")<br />
                             @if (item.EstimateStatus == EstimateStatus.Available && item.VerifiedAt is { } verified)
@@ -250,7 +268,12 @@
                                             <li>@change</li>
                                         }
                                     </ul>
-                                    <button class="btn-teal" @onclick="SaveQuickEdit" disabled="@isQuickSaving">@AppText.Get("ConfirmSave")</button>
+                                    @if (QuickRequiresConfirmation)
+                                    {
+                                        <p class="large-change-warning" role="alert">@AppText.Get("LargeChangeWarning")</p>
+                                        <label for="confirm-large-quick"><input id="confirm-large-quick" type="checkbox" @bind="LargeQuickAcknowledged" /> @AppText.Get("ConfirmLargeChange")</label>
+                                    }
+                                    <button class="btn-teal" @onclick="SaveQuickEdit" disabled="@(isQuickSaving || QuickRequiresConfirmation && !LargeQuickAcknowledged)">@AppText.Get("ConfirmSave")</button>
                                     <button class="btn-secondary" @onclick="CancelQuickEditPreview" disabled="@isQuickSaving">@AppText.Get("Cancel")</button>
                                 </div>
                             }
@@ -282,8 +305,8 @@
     @if (editItem is not null)
     {
         <div class="modal-backdrop" @ref="editModalRef" @onkeydown="@(e => { if (e.Key == "Escape") RequestCloseEdit(); })" tabindex="-1">
-            <div class="modal" @onclick:stopPropagation="true">
-                <h2>@AppText.Get("EditWaitingTime")</h2>
+            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="edit-dialog-title" tabindex="-1" @onclick:stopPropagation="true">
+                <h2 id="edit-dialog-title">@AppText.Get("EditWaitingTime")</h2>
                 @if (editErrorMessage is not null)
                 {
                     <div class="login-error" @ref="editErrorRef" role="alert" tabindex="-1">@editErrorMessage</div>
@@ -352,7 +375,12 @@
                                 <li>@change</li>
                             }
                         </ul>
-                        <button class="btn-teal" @onclick="SaveEdit">@AppText.Get("ConfirmSave")</button>
+                        @if (EditRequiresConfirmation)
+                        {
+                            <p class="large-change-warning" role="alert">@AppText.Get("LargeChangeWarning")</p>
+                            <label for="confirm-large-edit"><input id="confirm-large-edit" type="checkbox" @bind="LargeEditAcknowledged" /> @AppText.Get("ConfirmLargeChange")</label>
+                        }
+                        <button class="btn-teal" @onclick="SaveEdit" disabled="@(EditRequiresConfirmation && !LargeEditAcknowledged)">@AppText.Get("ConfirmSave")</button>
                         <button class="btn-secondary" @onclick="CancelEditPreview">@AppText.Get("Cancel")</button>
                     </div>
                 }

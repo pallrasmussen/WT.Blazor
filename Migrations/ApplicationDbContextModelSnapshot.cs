@@ -23,11 +23,30 @@ namespace WT.Blazor.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ContactGuidanceEn")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ContactGuidanceFo")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("GreenMaximumAgeMonths")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("LongWaitMonths")
                         .HasColumnType("INTEGER");
+
+                    b.Property<bool>("PublishPatientGuidance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReferralInstructionsEn")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReferralInstructionsFo")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Version")
                         .IsConcurrencyToken()
@@ -47,20 +66,58 @@ namespace WT.Blazor.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("NewContactGuidanceEn")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NewContactGuidanceFo")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("NewGreenMaximumAgeMonths")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("NewLongWaitMonths")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("NewPublishPatientGuidance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("NewReferralInstructionsEn")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NewReferralInstructionsFo")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("NewYellowMaximumAgeMonths")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("OldContactGuidanceEn")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OldContactGuidanceFo")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("OldGreenMaximumAgeMonths")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("OldLongWaitMonths")
                         .HasColumnType("INTEGER");
+
+                    b.Property<bool>("OldPublishPatientGuidance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("OldReferralInstructionsEn")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OldReferralInstructionsFo")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("OldYellowMaximumAgeMonths")
                         .HasColumnType("INTEGER");
@@ -85,6 +142,10 @@ namespace WT.Blazor.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("ComparisonCode")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("Department")
                         .HasColumnType("INTEGER");
@@ -150,6 +211,10 @@ namespace WT.Blazor.Migrations
 
                     b.Property<int>("Action")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("ComparisonCode")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("Department")
                         .HasColumnType("INTEGER");
