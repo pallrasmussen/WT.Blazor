@@ -21,11 +21,11 @@ public record HistoryExportRow(
         entry.Name,
         DisplayNames.For(entry.Action),
         entry.Detail ?? string.Empty,
-        WaitText(entry.OldWaitValue, entry.OldUnit),
-        entry.NewWaitValue is null && entry.EstimateStatus != EstimateStatus.Available ? ReferralEstimate.StatusLabel(entry.EstimateStatus) : WaitText(entry.NewWaitValue, entry.NewUnit),
+        WaitText(entry.OldWaitValue, entry.OldUnit, entry.OldWaitUpperValue),
+        entry.NewWaitValue is null && entry.EstimateStatus != EstimateStatus.Available ? ReferralEstimate.StatusLabel(entry.EstimateStatus) : WaitText(entry.NewWaitValue, entry.NewUnit, entry.NewWaitUpperValue),
         entry.Username ?? string.Empty,
         entry.RequestId ?? string.Empty);
 
-    private static string WaitText(int? value, WaitUnit? unit) =>
-        value is null ? string.Empty : $"{value} {(unit is not null ? DisplayNames.For(unit.Value, value.Value) : string.Empty)}".TrimEnd();
+    private static string WaitText(int? value, WaitUnit? unit, int? upper = null) =>
+        value is null ? string.Empty : $"{(upper is null ? value.ToString() : $"{value}–{upper}")} {(unit is not null ? DisplayNames.For(unit.Value, value.Value) : string.Empty)}".TrimEnd();
 }

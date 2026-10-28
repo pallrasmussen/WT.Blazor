@@ -93,9 +93,9 @@ public class WaitingTimeReadService(
                     || waitingTime.ResponsibleDepartment == null || waitingTime.ResponsibleDepartment.Trim() == ""
                     || waitingTime.ReferralEndpoint == ReferralEndpoint.Unspecified),
                 LongWaits = group.Count(waitingTime => waitingTime.EstimateStatus == EstimateStatus.Available && (
-                    waitingTime.Unit == WaitUnit.Dagar && waitingTime.WaitValue > maxDays
-                    || waitingTime.Unit == WaitUnit.Vikur && waitingTime.WaitValue > maxWeeks
-                    || waitingTime.Unit == WaitUnit.Manadir && waitingTime.WaitValue > maxMonths)),
+                    waitingTime.Unit == WaitUnit.Dagar && (waitingTime.WaitUpperValue ?? waitingTime.WaitValue) > maxDays
+                    || waitingTime.Unit == WaitUnit.Vikur && (waitingTime.WaitUpperValue ?? waitingTime.WaitValue) > maxWeeks
+                    || waitingTime.Unit == WaitUnit.Manadir && (waitingTime.WaitUpperValue ?? waitingTime.WaitValue) > maxMonths)),
                 MissingDepartments = group.Count(waitingTime => waitingTime.Hospital == Hospital.Landssjukrahusid && waitingTime.Department == null)
             })
             .FirstOrDefaultAsync();
@@ -114,9 +114,9 @@ public class WaitingTimeReadService(
 
         var definition = await db.WaitingTimes.AsNoTracking()
             .Where(waitingTime => waitingTime.Id == waitingTimeId)
-            .Select(waitingTime => new { waitingTime.Unit, waitingTime.EstimateSeries, waitingTime.EstimateStatus })
+            .Select(waitingTime => new { waitingTime.Unit, waitingTime.EstimateSeries, waitingTime.EstimateStatus, waitingTime.WaitUpperValue })
             .FirstOrDefaultAsync(cancellationToken);
-        if (definition is null || definition.EstimateStatus != EstimateStatus.Available) return [];
+        if (definition is null || definition.EstimateStatus != EstimateStatus.Available || definition.WaitUpperValue != null) return [];
         var displayUnit = definition.Unit;
 
         var historyEntries = db.WaitingTimeHistoryEntries.AsNoTracking()
@@ -176,7 +176,7 @@ public class WaitingTimeReadService(
 
         var history = db.WaitingTimeHistoryEntries.AsNoTracking()
             .Where(entry => ids.Contains(entry.WaitingTimeId) && db.WaitingTimes.Any(item => item.Id == entry.WaitingTimeId
-                    && item.EstimateStatus == EstimateStatus.Available && item.EstimateSeries == entry.EstimateSeries) && (entry.Action == HistoryAction.Created || entry.Action == HistoryAction.Updated) && entry.NewWaitValue != null);
+                    && item.EstimateStatus == EstimateStatus.Available && item.WaitUpperValue == null && item.EstimateSeries == entry.EstimateSeries) && (entry.Action == HistoryAction.Created || entry.Action == HistoryAction.Updated) && entry.NewWaitValue != null);
         // Keep the last entry on each UTC day, including the ID tie-breaker.
         var daily = history.Where(entry => !history.Any(other =>
                 other.WaitingTimeId == entry.WaitingTimeId && other.Timestamp.Date == entry.Timestamp.Date &&

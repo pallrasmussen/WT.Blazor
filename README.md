@@ -311,3 +311,51 @@ fixture mutations. For an existing system Chromium on Linux, the optional
 Back up and test the additive `AddComparisonsAndPatientGuidance` migration on
 staging before deployment. Existing comparison codes/guidance remain blank and
 publication remains disabled; clinical staff must deliberately configure them.
+
+### Estimate expiry and optional ranges
+
+Administrators can set **Estimate expiry (months)** in Settings (1–60 months,
+default 12). This is independent of the earlier freshness/review indicators.
+At the exact calendar-month boundary after `VerifiedAt`, the public card and
+current-value text in trend/PDF reports show an expired message and direct the
+patient to the relevant department. Available estimates with no verification,
+or an invalid future verification, are also hidden. Staff retain the stored
+values for review. Metadata edits do not renew verification. Explicit review or
+a changed clinical estimate renews it. Historical chart values remain labelled
+as history; expired estimates are excluded from hospital comparisons.
+
+Staff can optionally enter an upper waiting-time bound in the same unit as the
+existing value, making the existing value the lower bound (for example, 6–10
+weeks). Leave the upper bound blank for a single value. The upper bound must be
+at least the lower bound and fit the supported unit limits. Enter only a range
+supported by the department; no statistical interval is invented. Either bound
+can trigger large-change confirmation. Both bounds survive metadata edits,
+undo, history snapshots, and history downloads; hospital comparisons convert
+both to canonical days. Long-wait counts use the upper bound.
+
+Ranges are not plotted as lower-bound-only points or given a directional arrow.
+Switching between a range and a single value starts a fresh trend series; range
+changes remain in the internal audit history. Existing estimates and historical
+values are preserved by the additive `AddEstimateExpiryAndRanges` migration;
+upper bounds start null and existing settings receive a 12-month expiry. Back up
+and stage the migration before deployment, and review the expiry policy with the
+responsible departments.
+
+### Automated backup recovery acceptance
+
+The disposable Windows browser runner now also publishes the operations tool,
+creates a consistent SQLite snapshot (including committed WAL data), archives
+matching Data Protection keys/probe, and runs the real `Test-BackupRestore.ps1`
+against an isolated copy. The recovery JSON report is uploaded with the browser
+artifacts. This is part of Validate CI. Unit/integration checks
+also restore estimates with ranges, ownership/verification, history and portal
+settings, verify wrong-key rejection, and ensure snapshot paths cannot overwrite
+existing files. Recovery now materializes all application entities so a database
+with unreadable application columns cannot pass on table counts alone.
+
+Use the operations bundle from the matching release when validating an actual
+backup. Run `deploy/Test-BackupRestore.ps1` against the backup directory and
+retain its result as deployment evidence; the existing scheduled recovery-drill
+installer and monitor support periodic checks. CI verifies synthetic recovery,
+not the contents of a hospital's real backups. Real IIS permission acceptance is
+documented in [STAGING-BROWSER-CHECKS.md](docs/STAGING-BROWSER-CHECKS.md).

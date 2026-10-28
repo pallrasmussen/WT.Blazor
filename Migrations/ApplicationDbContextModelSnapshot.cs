@@ -31,6 +31,11 @@ namespace WT.Blazor.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("EstimateExpiryMonths")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(12);
+
                     b.Property<int>("GreenMaximumAgeMonths")
                         .HasColumnType("INTEGER");
 
@@ -74,6 +79,9 @@ namespace WT.Blazor.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("NewEstimateExpiryMonths")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("NewGreenMaximumAgeMonths")
                         .HasColumnType("INTEGER");
 
@@ -101,6 +109,9 @@ namespace WT.Blazor.Migrations
                     b.Property<string>("OldContactGuidanceFo")
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("OldEstimateExpiryMonths")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("OldGreenMaximumAgeMonths")
                         .HasColumnType("INTEGER");
@@ -193,6 +204,9 @@ namespace WT.Blazor.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("WaitUpperValue")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("WaitValue")
                         .HasColumnType("INTEGER");
 
@@ -243,6 +257,9 @@ namespace WT.Blazor.Migrations
                     b.Property<int?>("NewWaitDays")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("NewWaitUpperValue")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int?>("NewWaitValue")
                         .HasColumnType("INTEGER");
 
@@ -250,6 +267,9 @@ namespace WT.Blazor.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("OldWaitDays")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("OldWaitUpperValue")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("OldWaitValue")

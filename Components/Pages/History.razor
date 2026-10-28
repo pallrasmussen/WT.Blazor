@@ -209,7 +209,7 @@
                             }
                         </td>
                         }
-                        @if (showWaitColumns) { <td data-label="@AppText.Get("HistoryOldWait")">@WaitText(e.OldWaitValue, e.OldUnit)</td><td data-label="@AppText.Get("HistoryNewWait")">@(e.NewWaitValue is null && e.EstimateStatus != EstimateStatus.Available ? ReferralEstimate.StatusLabel(e.EstimateStatus) : WaitText(e.NewWaitValue, e.NewUnit))</td> }
+                        @if (showWaitColumns) { <td data-label="@AppText.Get("HistoryOldWait")">@WaitText(e.OldWaitValue, e.OldUnit, e.OldWaitUpperValue)</td><td data-label="@AppText.Get("HistoryNewWait")">@(e.NewWaitValue is null && e.EstimateStatus != EstimateStatus.Available ? ReferralEstimate.StatusLabel(e.EstimateStatus) : WaitText(e.NewWaitValue, e.NewUnit, e.NewWaitUpperValue))</td> }
                         @if (showUsernameColumn) { <td data-label="@AppText.Get("HistoryColumnUsername")">@(e.Username ?? "–")</td> }
                     </tr>
                 }
@@ -400,8 +400,8 @@
         .Where(parameter => parameter.Value is not null)
         .Select(parameter => $"{parameter.Key}={Uri.EscapeDataString(parameter.Value!.ToString()!)}"));
 
-    private static string WaitText(int? value, WaitUnit? unit) =>
-        value is null ? "–" : $"{value} {(unit is not null ? DisplayNames.For(unit.Value, value.Value) : "")}";
+    private static string WaitText(int? value, WaitUnit? unit, int? upper = null) =>
+        value is null ? "–" : $"{(upper is null ? value.ToString() : $"{value}–{upper}")} {(unit is not null ? DisplayNames.For(unit.Value, value.Value) : "")}";
 
     private static string CountText(int n) => string.Format(AppText.Get(n == 1 ? "HistoryRecordCountSingle" : "HistoryRecordCountPlural"), n);
 

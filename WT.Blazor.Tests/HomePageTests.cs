@@ -56,6 +56,25 @@ public class HomePageTests : BunitContext
         }
     }
 
+    [Fact]
+    public void ExpiredRangesHideTheCurrentNumberAndGiveContactGuidance()
+    {
+        using var culture = new WT.Blazor.Tests.TestInfrastructure.TestCulture("en");
+        var item = new WaitingTime { Id = 22, Name = "MRI", Hospital = Hospital.Klaksvikar, WaitValue = 6, WaitUpperValue = 10, Unit = WaitUnit.Vikur, VerifiedAt = DateTime.UtcNow.AddMonths(-13) };
+        Services.AddSingleton<IWaitingTimeCatalogService>(new SingleItemCatalog(item));
+        Services.AddSingleton<ITrendReadService>(new EmptyTrendReadService());
+        Services.AddSingleton<IPortalSettingsService>(new DefaultPortalSettingsService());
+        Services.AddSingleton<PortalSettingsChangeNotifier>();
+        Services.AddSingleton<PortalTelemetry>();
+        Services.AddSingleton(TimeProvider.System);
+        var cut = Render<Home>();
+        var card = cut.Find("#waiting-time-22");
+        Assert.Equal("Estimate expired", card.QuerySelector(".wait-value")!.TextContent.Trim());
+        Assert.Contains("contact the relevant department", card.TextContent);
+        Assert.DoesNotContain("6–10", card.TextContent);
+        Assert.Empty(card.QuerySelectorAll(".trend-arrow"));
+    }
+
     private sealed class SingleItemCatalog(WaitingTime item) : IWaitingTimeCatalogService
     {
         public Task<List<WaitingTime>> GetActiveAsync(Hospital? hospital, Department? department) => Task.FromResult(new List<WaitingTime> { item });

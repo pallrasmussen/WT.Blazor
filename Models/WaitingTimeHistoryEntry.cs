@@ -24,6 +24,9 @@ public class WaitingTimeHistoryEntry
     public HistoryAction Action { get; set; }
     public string? Detail { get; set; }
 
+    public int? OldWaitUpperValue { get; set; }
+    public int? NewWaitUpperValue { get; set; }
+
     public int? OldWaitValue { get; set; }
     public WaitUnit? OldUnit { get; set; }
     public int? OldWaitDays { get; set; }

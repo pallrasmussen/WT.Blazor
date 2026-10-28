@@ -12,6 +12,30 @@ namespace WT.Blazor.Tests;
 public class DatabaseMaintenanceTests
 {
     [Fact]
+    public async Task SnapshotIncludesCommittedWalDataAndRefusesToOverwriteAnyFile()
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"wt-snapshot-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(root);
+        var source = Path.Combine(root, "live.db");
+        var backup = Path.Combine(root, "backup.db");
+        await using var connection = new SqliteConnection($"Data Source={source};Pooling=False");
+        await connection.OpenAsync();
+        using var command = connection.CreateCommand();
+        command.CommandText = "PRAGMA journal_mode=WAL; CREATE TABLE Fixture (Value TEXT); INSERT INTO Fixture VALUES ('committed WAL data');";
+        await command.ExecuteNonQueryAsync();
+        Assert.True(File.Exists(source + "-wal"));
+        await DatabaseMaintenance.SnapshotDatabaseAsync(source, backup);
+        await using var restored = new SqliteConnection($"Data Source={backup};Mode=ReadOnly;Pooling=False");
+        await restored.OpenAsync();
+        using var check = restored.CreateCommand();
+        check.CommandText = "SELECT Value FROM Fixture";
+        Assert.Equal("committed WAL data", await check.ExecuteScalarAsync());
+        await Assert.ThrowsAsync<IOException>(() => DatabaseMaintenance.SnapshotDatabaseAsync(source, backup));
+        await Assert.ThrowsAsync<IOException>(() => DatabaseMaintenance.SnapshotDatabaseAsync(source, source));
+        Assert.True(File.Exists(source));
+    }
+
+    [Fact]
     public async Task RecoveryCopiesAndVerifiesDataAndKeysWithoutChangingTheBackup()
     {
         var root = Path.Combine(Path.GetTempPath(), $"wt-recovery-{Guid.NewGuid():N}");
@@ -21,11 +45,11 @@ public class DatabaseMaintenanceTests
         await using (var db = new ApplicationDbContext(options))
         {
             await db.Database.MigrateAsync();
-            db.PortalSettings.Add(new PortalSettings());
-            var item = new WaitingTime { Name = "Real record", Hospital = Hospital.Klaksvikar };
+            db.PortalSettings.Add(new PortalSettings { EstimateExpiryMonths = 9, ContactGuidanceEn = "Recovery contact", PublishPatientGuidance = true });
+            var item = new WaitingTime { Name = "Real record", Hospital = Hospital.Klaksvikar, WaitValue = 6, WaitUpperValue = 10, Unit = WaitUnit.Vikur, ResponsibleDepartment = "Imaging", VerifiedAt = DateTime.UtcNow };
             db.WaitingTimes.Add(item);
             await db.SaveChangesAsync();
-            db.WaitingTimeHistoryEntries.Add(new WaitingTimeHistoryEntry { WaitingTimeId = item.Id, Name = item.Name, Username = "demo", Detail = "Demo" });
+            db.WaitingTimeHistoryEntries.Add(new WaitingTimeHistoryEntry { WaitingTimeId = item.Id, Name = item.Name, Username = "demo", Detail = "Demo", NewWaitValue = 6, NewWaitUpperValue = 10, NewUnit = WaitUnit.Vikur });
             await db.SaveChangesAsync();
         }
         var keys = Path.Combine(root, "backup.keys");
@@ -41,6 +65,20 @@ public class DatabaseMaintenanceTests
         Assert.Equal(1, report.RowCounts["WaitingTimeHistoryEntries"]);
         Assert.Equal(1, report.RowCounts["PortalSettings"]);
         Assert.True(report.KeyContinuityVerified);
+        Assert.True(report.ApplicationDataReadable);
+        await using (var restored = new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite($"Data Source={Path.Combine(report.RestorePath, "wt-blazor.db")};Mode=ReadOnly;Pooling=False").Options))
+        {
+            var restoredItem = await restored.WaitingTimes.SingleAsync();
+            Assert.Equal(6, restoredItem.WaitValue);
+            Assert.Equal(10, restoredItem.WaitUpperValue);
+            Assert.Equal("Imaging", restoredItem.ResponsibleDepartment);
+            Assert.NotNull(restoredItem.VerifiedAt);
+            var settings = await restored.PortalSettings.SingleAsync();
+            Assert.Equal(9, settings.EstimateExpiryMonths);
+            Assert.Equal("Recovery contact", settings.ContactGuidanceEn);
+            Assert.True(settings.PublishPatientGuidance);
+            Assert.Equal(10, (await restored.WaitingTimeHistoryEntries.SingleAsync()).NewWaitUpperValue);
+        }
         Assert.True(report.KeyFiles > 0);
         Assert.Equal(before, SHA256.HashData(await File.ReadAllBytesAsync(database)));
         var review = Assert.Single(await DatabaseMaintenance.ReviewDemoHistoryAsync(database));

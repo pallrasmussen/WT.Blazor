@@ -9,6 +9,9 @@ on:
       runner_label:
         required: true
         type: string
+      expected_identity:
+        required: true
+        type: string
       base_url:
         required: true
         type: string
@@ -24,6 +27,7 @@ jobs:
     env:
       BROWSER_BASE_URL: ${{ inputs.base_url }}
       RUN_AUTH_BROWSER_TESTS: "1"
+      STAGING_BROWSER_EXPECTED_IDENTITY: ${{ inputs.expected_identity }}
       STAGING_BROWSER_ROLE: ${{ inputs.role }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5

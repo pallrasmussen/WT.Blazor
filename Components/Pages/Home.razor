@@ -104,16 +104,17 @@
 						<span class="card-hospital">@DisplayNames.For(item.Hospital)</span>
 						<h3>@item.Name</h3>
                         <p class="referral-definition">@AppText.Get("ReferralEndpoint"): @ReferralEstimate.EndpointLabel(item.ReferralEndpoint)</p>
-						<div class="wait-value @(item.EstimateStatus == EstimateStatus.Available ? "" : "estimate-unavailable")">
-							@if (item.EstimateStatus == EstimateStatus.Available)
+						<div class="wait-value @(item.EstimateStatus == EstimateStatus.Available && !ReferralEstimate.IsExpired(item, portalSettings, CurrentUtc) ? "" : "estimate-unavailable")">
+                            @if (item.EstimateStatus == EstimateStatus.Available && !ReferralEstimate.IsExpired(item, portalSettings, CurrentUtc))
                             {
-                                @item.WaitValue <span>@DisplayNames.For(item.Unit, item.WaitValue)</span>
+                                @(item.WaitUpperValue is { } upper ? $"{item.WaitValue}–{upper}" : item.WaitValue.ToString())
+                                <span>@($" {DisplayNames.For(item.Unit, item.WaitUpperValue ?? item.WaitValue)}")</span>
                             }
                             else
                             {
-                                @ReferralEstimate.StatusLabel(item.EstimateStatus)
+                                @ReferralEstimate.PublicWaitText(item, portalSettings, CurrentUtc)
                             }
-							@if (item.EstimateStatus == EstimateStatus.Available && trendChanges.TryGetValue(item.Id, out var change))
+							@if (item.EstimateStatus == EstimateStatus.Available && !ReferralEstimate.IsExpired(item, portalSettings, CurrentUtc) && item.WaitUpperValue is null && trendChanges.TryGetValue(item.Id, out var change))
 							{
 								<span class="trend-arrow @TrendCssClass(change)" role="img" aria-label="@TrendLabel(change)" title="@TrendLabel(change)"></span>
 							}
@@ -127,6 +128,8 @@
 					{
 						<p class="note"><strong>@AppText.Get("ReferralConditions"):</strong> @item.Note</p>
 					}
+                    @if (ReferralEstimate.IsExpired(item, portalSettings, CurrentUtc))
+                    { <p class="estimate-expired">@AppText.Get("EstimateExpiredContact")</p> }
                     @if (item.EstimateStatus == EstimateStatus.Available)
                     {
                         <a class="graph-link" href="@TrendUri(item.Id)">@AppText.Get("Trend")</a>

@@ -40,6 +40,11 @@ else
                 <label>@AppText.Get("RedThreshold")</label>
                 <p class="setting-readonly">@string.Format(AppText.Get("RedThresholdHint"), settings.YellowMaximumAgeMonths)</p>
             </div>
+            <div>
+                <label for="expiry-months">@AppText.Get("EstimateExpiryMonths")</label>
+                <input id="expiry-months" type="number" min="1" max="60" @bind="settings.EstimateExpiryMonths" />
+                <small>@AppText.Get("EstimateExpiryHelp")</small>
+            </div>
         </div>
     </section>
 
@@ -97,6 +102,8 @@ else
                 @foreach (var change in recentChanges)
                 {
                     <li>@string.Format(AppText.Get("SettingsAuditEntry"), change.Timestamp.ToLocalTime(), change.Username, change.OldGreenMaximumAgeMonths, change.NewGreenMaximumAgeMonths, change.OldYellowMaximumAgeMonths, change.NewYellowMaximumAgeMonths, change.OldLongWaitMonths, change.NewLongWaitMonths)
+                        @if (change.OldEstimateExpiryMonths != change.NewEstimateExpiryMonths)
+                        { <span> · @AppText.Get("EstimateExpiryMonths"): @change.OldEstimateExpiryMonths → @change.NewEstimateExpiryMonths</span> }
                         @if (change.OldPublishPatientGuidance != change.NewPublishPatientGuidance
                             || change.OldReferralInstructionsFo != change.NewReferralInstructionsFo || change.OldReferralInstructionsEn != change.NewReferralInstructionsEn
                             || change.OldContactGuidanceFo != change.NewContactGuidanceFo || change.OldContactGuidanceEn != change.NewContactGuidanceEn)
@@ -132,6 +139,7 @@ else
     private bool showNavigationWarning;
     private bool allowNavigation;
     private bool hasUnsavedChanges => settings.GreenMaximumAgeMonths != savedSettings.GreenMaximumAgeMonths
+        || settings.EstimateExpiryMonths != savedSettings.EstimateExpiryMonths
         || settings.YellowMaximumAgeMonths != savedSettings.YellowMaximumAgeMonths
         || settings.LongWaitMonths != savedSettings.LongWaitMonths
         || settings.ReferralInstructionsFo != savedSettings.ReferralInstructionsFo
@@ -211,6 +219,8 @@ else
         var guidance = new[] { settings.ReferralInstructionsFo, settings.ReferralInstructionsEn, settings.ContactGuidanceFo, settings.ContactGuidanceEn };
         if (guidance.Any(text => text?.Length > 2000) || settings.PublishPatientGuidance && guidance.Any(string.IsNullOrWhiteSpace))
             return AppText.Get("PatientGuidanceValidation");
+        if (settings.EstimateExpiryMonths is < 1 or > 60)
+            return AppText.Get("EstimateExpiryValidation");
         if (settings.GreenMaximumAgeMonths is < 1 or > 24)
             return AppText.Get("GreenThresholdValidation");
         if (settings.YellowMaximumAgeMonths is < 2 or > 36 || settings.YellowMaximumAgeMonths <= settings.GreenMaximumAgeMonths)
@@ -247,6 +257,7 @@ else
 
     private static PortalSettings Copy(PortalSettings source) => new()
     {
+        EstimateExpiryMonths = source.EstimateExpiryMonths,
         GreenMaximumAgeMonths = source.GreenMaximumAgeMonths,
         YellowMaximumAgeMonths = source.YellowMaximumAgeMonths,
         LongWaitMonths = source.LongWaitMonths,

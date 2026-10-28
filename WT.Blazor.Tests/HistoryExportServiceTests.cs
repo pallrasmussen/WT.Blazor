@@ -176,6 +176,7 @@ public class HistoryExportServiceTests
         {
             Id = 42,
             Name = "MR-skanning",
+            VerifiedAt = DateTime.UtcNow,
             Hospital = Hospital.Landssjukrahusid,
             Department = Department.Medisinskidepilin,
             WaitValue = 3,
@@ -183,7 +184,7 @@ public class HistoryExportServiceTests
         };
         var points = new List<TrendPoint> { new(new DateTime(2026, 9, 1), 2) };
         var reader = new StubTrendReader(item: item, points: points);
-        var service = new TrendReportService(reader);
+        var service = new TrendReportService(reader, new WT.Blazor.Tests.TestInfrastructure.DefaultSettingsService(), TimeProvider.System);
 
         using var source = new CancellationTokenSource();
         var report = await service.GetAsync(item.Id, source.Token, periodDays: 90);

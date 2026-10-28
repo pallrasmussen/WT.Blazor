@@ -38,6 +38,10 @@
         {
             <p>@AppText.Get("ReferralConditions"): @report.Conditions</p>
         }
+        @if (report.IsExpired)
+        { <p class="estimate-expired">@AppText.Get("EstimateExpiredContact")</p> }
+        @if (report.IsRange)
+        { <p>@AppText.Get("RangeTrendExplanation")</p> }
         <p>@AppText.Get("TrendSeriesExplanation")</p>
         <p class="result-count">@AppText.Get("TrendCurrentEstimate")</p>
         <div class="trend-period-control">

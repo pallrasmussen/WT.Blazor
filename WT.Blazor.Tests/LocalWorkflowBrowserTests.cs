@@ -69,7 +69,31 @@ public class LocalWorkflowBrowserTests : IAsyncLifetime
         await Assertions.Expect(page.Locator(".patient-next-steps")).ToContainTextAsync("Góðkend royndarvegleiðing");
     }
 
-    private async Task CreateAsync(IPage page, string name, string hospital, int weeks, string conditions, string comparisonCode)
+    [LocalWorkflowBrowserFact]
+    public async Task StaffCanPublishARangeAndEditMetadataWithoutLosingEitherBound()
+    {
+        var page = await browser!.NewPageAsync();
+        var name = $"Browser Range {Guid.NewGuid():N}";
+        await page.GotoAsync($"{baseUrl}/culture/en?returnUrl=/", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+        await CreateAsync(page, name, "Klaksvík Hospital", 6, "Routine referrals", "", upper: 10);
+        await page.GotoAsync(baseUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+        var card = page.Locator(".waiting-card").Filter(new LocatorFilterOptions { HasText = name });
+        await Assertions.Expect(card.Locator(".wait-value")).ToHaveTextAsync("6–10 weeks");
+        await card.Locator(".graph-link").ClickAsync();
+        await Assertions.Expect(page.Locator(".section-heading")).ToContainTextAsync("6–10 weeks");
+        await Assertions.Expect(page.Locator(".public-panel")).ToContainTextAsync("Ranges are not plotted as single values");
+        await page.GotoAsync($"{baseUrl}/internal", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+        await page.Locator(".admin-row").Filter(new LocatorFilterOptions { HasText = name }).Locator(".admin-actions button.btn-teal").ClickAsync();
+        await Assertions.Expect(page.Locator("#edit-wait-upper")).ToHaveValueAsync("10");
+        await page.Locator("#edit-note").FillAsync("Routine adult referrals");
+        await page.GetByRole(AriaRole.Button, new() { Name = "Save changes", Exact = true }).ClickAsync();
+        await page.Locator(".change-preview button.btn-teal").ClickAsync();
+        await Assertions.Expect(page.GetByRole(AriaRole.Dialog)).ToHaveCountAsync(0);
+        await page.GotoAsync(baseUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+        await Assertions.Expect(page.Locator(".waiting-card").Filter(new LocatorFilterOptions { HasText = name }).Locator(".wait-value")).ToHaveTextAsync("6–10 weeks");
+    }
+
+    private async Task CreateAsync(IPage page, string name, string hospital, int weeks, string conditions, string comparisonCode, int? upper = null)
     {
         await page.GotoAsync($"{baseUrl}/internal?new=true", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
         await page.Locator("#new-hospital").SelectOptionAsync(new SelectOptionValue { Label = hospital });
@@ -79,6 +103,7 @@ public class LocalWorkflowBrowserTests : IAsyncLifetime
         await Assertions.Expect(page.Locator("#new-wait")).ToBeEnabledAsync();
         await page.Locator("#new-wait").FillAsync(weeks.ToString());
         await page.Locator("#new-unit").SelectOptionAsync("Vikur");
+        if (upper is { } bound) await page.Locator("#new-wait-upper").FillAsync(bound.ToString());
         await page.Locator("#new-referral-endpoint").SelectOptionAsync("Investigation");
         await page.Locator("#new-comparison-code").FillAsync(comparisonCode);
         await page.Locator("#new-responsible-department").FillAsync("Imaging");
