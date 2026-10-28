@@ -270,13 +270,13 @@ input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible
 .card-main { display: grid; }
 .chip { background: #eef7f6; border-radius: 999px; color: var(--wt-teal); font-size: .7rem; font-weight: 700; padding: .3rem .55rem; width: fit-content; }
 .card-hospital { color: var(--wt-muted); font-size: .72rem; font-weight: 700; margin-top: .55rem; }
-.waiting-card h3 { margin: .8rem 0 .5rem; }
+.waiting-card h3 { margin: .8rem 0 .5rem; min-height: 2.4em; }
 .public-large-text .waiting-card h3 { font-size: 1.55rem; }
 .public-large-text .wait-value { font-size: 2.45rem; }
 .public-large-text .waiting-card .note { font-size: .95rem; }
 .wait-value { color: var(--wt-teal); font-size: 2rem; font-weight: 800; }
 .public-large-text .wait-value.estimate-unavailable { font-size: 1.25rem; line-height: 1.5; }
-.referral-definition { margin: .35rem 0; color: var(--wt-muted, #52616b); font-size: .95rem; }
+.referral-definition { color: var(--wt-muted, #52616b); font-size: .95rem; line-height: 1.4; margin: .35rem 0; min-height: 2.8em; }
 .wait-value span { font-size: 1rem; font-weight: 600; }
 .note-empty { visibility: hidden; }
 .waiting-card .note { color: var(--wt-muted); font-size: .85rem; line-height: 1.4; margin: .85rem 0 0; min-height: 2.4rem; }
