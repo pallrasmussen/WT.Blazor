@@ -47,6 +47,92 @@ public class InternalPageTests : BunitContext
         Assert.Equal(41, manager.UpdateRequest?.WaitValue);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void EditorsUseTheSavedServerRecordAndItsVersionForUndo(bool quick)
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        var serverDate = new DateTime(2026, 2, 3);
+        var manager = new WaitingTimeManager
+        {
+            UpdateResult = new WaitingTime
+            {
+                Id = 1,
+                Version = 17,
+                Name = "Server normalized name",
+                Hospital = Hospital.Klaksvikar,
+                WaitValue = 5,
+                WaitUpperValue = 9,
+                Unit = WaitUnit.Vikur,
+                VerifiedAt = serverDate,
+                UpdatedAt = serverDate,
+                EstimateSeries = 12
+            }
+        };
+        var cut = RenderInternal(manager, reviewQueue: quick);
+        if (quick) cut.Find(".admin-list").KeyDown("ArrowDown");
+        else cut.FindAll("button").Single(button => button.TextContent == AppText.Get("Edit")).Click();
+        cut.Find(quick ? "#quick-wait-1" : "#edit-wait").Change("5");
+        cut.FindAll("button").Single(button => button.TextContent == AppText.Get("SaveChanges")).Click();
+        cut.FindAll("button").Single(button => button.TextContent == AppText.Get("ConfirmSave")).Click();
+        var row = cut.Find(".admin-row");
+        Assert.Contains("Server normalized name", row.TextContent);
+        Assert.Contains("5–9", row.TextContent);
+        Assert.Contains(serverDate.ToString("dd. MMMM yyyy"), row.TextContent);
+        Assert.Equal(@"TEST-SERVER\test-admin", manager.UpdateRequest?.Username);
+        cut.FindAll("button").Single(button => button.TextContent == AppText.Get("Undo")).Click();
+        Assert.Equal(17, manager.UpdateRequest?.ExpectedVersion);
+        Assert.Equal(2, manager.UpdateRequest?.WaitValue);
+        Assert.Null(manager.UpdateRequest?.WaitUpperValue);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ChangingTheUpperBoundInvalidatesSharedEditorAcknowledgement(bool quick)
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        var manager = new WaitingTimeManager();
+        var cut = RenderInternal(manager, reviewQueue: quick);
+        if (quick) cut.Find(".admin-list").KeyDown("ArrowDown");
+        else cut.FindAll("button").Single(button => button.TextContent == AppText.Get("Edit")).Click();
+        var upper = quick ? "#quick-1-wait-upper" : "#edit-wait-upper";
+        var checkbox = quick ? "#confirm-large-quick" : "#confirm-large-edit";
+        cut.Find(upper).Change("40");
+        cut.FindAll("button").Single(button => button.TextContent == AppText.Get("SaveChanges")).Click();
+        var save = () => cut.FindAll("button").Single(button => button.TextContent == AppText.Get("ConfirmSave"));
+        Assert.True(save().HasAttribute("disabled"));
+        cut.Find(checkbox).Change(true);
+        Assert.False(save().HasAttribute("disabled"));
+        cut.Find(upper).Change("41");
+        Assert.True(save().HasAttribute("disabled"));
+        Assert.Null(manager.UpdateRequest);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void UnrelatedParentRefreshPreservesTheEditorsDraft(bool quick)
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        var manager = new WaitingTimeManager();
+        var cut = RenderInternal(manager, reviewQueue: quick);
+        if (quick) cut.Find(".admin-list").KeyDown("ArrowDown");
+        else cut.FindAll("button").Single(button => button.TextContent == AppText.Get("Edit")).Click();
+        var input = quick ? "#quick-wait-1" : "#edit-wait";
+        cut.Find(input).Change("9");
+        cut.Find("#admin-search").Input("Active");
+        Assert.Equal("9", cut.Find(input).GetAttribute("value"));
+        cut.Find("#admin-search").Input("No matching row");
+        if (quick) Assert.Empty(cut.FindAll(input));
+        cut.Find("#admin-search").Input("Active");
+        Assert.Equal("9", cut.Find(input).GetAttribute("value"));
+        cut.FindAll(".filter-presets button").First().Click();
+        cut.WaitForAssertion(() => Assert.Equal("9", cut.Find(input).GetAttribute("value")));
+        Assert.Null(manager.UpdateRequest);
+    }
+
     [Fact]
     public void ConfirmingAValueDoesNotClearMissingOwnershipOrEndpointReasons()
     {
@@ -195,6 +281,7 @@ public class InternalPageTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var request = Assert.IsType<WaitingTimeCreate>(manager.CreateRequest);
+            Assert.Equal(@"TEST-SERVER\test-admin", request.Username);
             Assert.Equal("New waiting time", request.Name);
             Assert.Equal(Hospital.Klaksvikar, request.Hospital);
             Assert.Null(request.Department);
@@ -302,7 +389,16 @@ public class InternalPageTests : BunitContext
         WT.Blazor.Services.WaitingTimeManagementService Manager(ApplicationDbContext db) =>
             new(db, NullLogger<WT.Blazor.Services.WaitingTimeManagementService>.Instance, new HttpContextAccessor(), clock);
         var first = Manager(firstDb);
-        var item = await first.CreateAsync(new WaitingTimeCreate("Two-user record", Hospital.Klaksvikar, null, 2, WaitUnit.Vikur, null, "first"));
+        var item = await first.CreateAsync(new WaitingTimeCreate
+        {
+            Name = "Two-user record",
+            Hospital = Hospital.Klaksvikar,
+            Department = null,
+            WaitValue = 2,
+            Unit = WaitUnit.Vikur,
+            Note = null,
+            Username = "first"
+        });
         await secondDb.WaitingTimes.FindAsync(item.Id);
         var reader = new WaitingTimeReadService(secondDb, clock);
         var cut = RenderInternal(Manager(secondDb), reviewQueue: quick, catalog: reader, history: reader);
@@ -313,7 +409,18 @@ public class InternalPageTests : BunitContext
         cut.WaitForAssertion(() => Assert.Single(cut.FindAll(input)));
         cut.Find(input).Change("9");
 
-        await first.UpdateAsync(new WaitingTimeUpdate(item.Id, 1, item.Name, Hospital.Klaksvikar, null, 5, WaitUnit.Vikur, null, "first"));
+        await first.UpdateAsync(new WaitingTimeUpdate
+        {
+            Id = item.Id,
+            ExpectedVersion = 1,
+            Name = item.Name,
+            Hospital = Hospital.Klaksvikar,
+            Department = null,
+            WaitValue = 5,
+            Unit = WaitUnit.Vikur,
+            Note = null,
+            Username = "first"
+        });
         void Save()
         {
             cut.FindAll("button").Single(button => button.TextContent == AppText.Get("SaveChanges")).Click();
@@ -433,6 +540,7 @@ public class InternalPageTests : BunitContext
         public (int Id, int Version)? ReviewRequest { get; private set; }
         public WaitingTimeUpdate? UpdateRequest { get; private set; }
         public Exception? UpdateException { get; init; }
+        public WaitingTime? UpdateResult { get; init; }
 
         public Task<WaitingTime> CreateAsync(WaitingTimeCreate create)
         {
@@ -441,7 +549,7 @@ public class InternalPageTests : BunitContext
             {
                 Id = 3,
                 Name = create.Name,
-                Hospital = create.Hospital,
+                Hospital = create.Hospital!.Value,
                 Department = create.Department,
                 WaitValue = create.WaitValue,
                 Unit = create.Unit,
@@ -449,21 +557,54 @@ public class InternalPageTests : BunitContext
             });
         }
 
-        public Task UpdateAsync(WaitingTimeUpdate update)
+        public Task<WaitingTime> UpdateAsync(WaitingTimeUpdate update)
         {
             if (UpdateException is not null) throw UpdateException;
             UpdateRequest = update;
-            return Task.CompletedTask;
+            if (UpdateResult is not null) return Task.FromResult(UpdateResult);
+            return Task.FromResult(new WaitingTime
+            {
+                Id = update.Id,
+                Version = update.ExpectedVersion + 1,
+                Name = update.Name,
+                Hospital = update.Hospital!.Value,
+                Department = update.Department,
+                WaitValue = update.WaitValue,
+                WaitUpperValue = update.WaitUpperValue,
+                Unit = update.Unit,
+                EstimateStatus = update.EstimateStatus,
+                ReferralEndpoint = update.ReferralEndpoint,
+                ResponsibleDepartment = update.ResponsibleDepartment,
+                ComparisonCode = update.ComparisonCode,
+                Note = update.Note
+            });
         }
-        public Task MarkReviewedAsync(int id, int expectedVersion, string username)
+        public Task<WaitingTime> MarkReviewedAsync(int id, int expectedVersion, string username)
         {
             ReviewRequest = (id, expectedVersion);
-            return Task.CompletedTask;
+            return Task.FromResult(new WaitingTime
+            {
+                Id = id,
+                Version = expectedVersion + 1,
+                Name = "Active waiting time",
+                Hospital = Hospital.Klaksvikar,
+                WaitValue = 2,
+                Unit = WaitUnit.Vikur,
+                VerifiedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
         }
-        public Task DeactivateAsync(int id, int expectedVersion, string username, string? reason = null)
+        public Task<WaitingTime> DeactivateAsync(int id, int expectedVersion, string username, string? reason = null)
         {
             DeactivationRequest = (id, expectedVersion, reason);
-            return Task.CompletedTask;
+            return Task.FromResult(new WaitingTime
+            {
+                Id = id,
+                Version = expectedVersion + 1,
+                Name = "Active waiting time",
+                Hospital = Hospital.Klaksvikar,
+                IsActive = false
+            });
         }
 
         public Task<WaitingTime> ReactivateAsync(int id, int expectedVersion, string username)

@@ -16,6 +16,21 @@ public sealed class WaitingTimeFormState
     public string? ComparisonCode { get; set; }
     public string? Note { get; set; }
 
+    public WaitingTimeInput ToInput() => new()
+    {
+        Name = Name,
+        Hospital = DisplayNames.TryHospitalFrom(HospitalName),
+        Department = DisplayNames.TryDepartmentFrom(DepartmentName),
+        WaitValue = WaitValue,
+        WaitUpperValue = WaitUpperValue,
+        Unit = Unit,
+        Note = Note,
+        EstimateStatus = EstimateStatus,
+        ReferralEndpoint = ReferralEndpoint,
+        ResponsibleDepartment = ResponsibleDepartment,
+        ComparisonCode = ComparisonCode
+    };
+
     public void Load(WaitingTime item)
     {
         HospitalName = DisplayNames.For(item.Hospital);

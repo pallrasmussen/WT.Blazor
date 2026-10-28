@@ -214,21 +214,8 @@ else
         }
     }
 
-    private string? Validate()
-    {
-        var guidance = new[] { settings.ReferralInstructionsFo, settings.ReferralInstructionsEn, settings.ContactGuidanceFo, settings.ContactGuidanceEn };
-        if (guidance.Any(text => text?.Length > 2000) || settings.PublishPatientGuidance && guidance.Any(string.IsNullOrWhiteSpace))
-            return AppText.Get("PatientGuidanceValidation");
-        if (settings.EstimateExpiryMonths is < 1 or > 60)
-            return AppText.Get("EstimateExpiryValidation");
-        if (settings.GreenMaximumAgeMonths is < 1 or > 24)
-            return AppText.Get("GreenThresholdValidation");
-        if (settings.YellowMaximumAgeMonths is < 2 or > 36 || settings.YellowMaximumAgeMonths <= settings.GreenMaximumAgeMonths)
-            return AppText.Get("YellowThresholdValidation");
-        if (settings.LongWaitMonths is < 1 or > 60)
-            return AppText.Get("LongWaitThresholdValidation");
-        return null;
-    }
+    private string? Validate() => PortalSettingsValidation.Validate(settings) is { } error
+        ? PortalSettingsValidationText.Message(error) : null;
 
     private Task ConfirmNavigationAsync(LocationChangingContext context)
     {

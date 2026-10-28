@@ -1,3 +1,4 @@
+using WT.Blazor.Localization;
 using WT.Blazor.Models;
 
 namespace WT.Blazor.Services;
@@ -22,7 +23,7 @@ public record HistoryExportRow(
         DisplayNames.For(entry.Action),
         entry.Detail ?? string.Empty,
         WaitText(entry.OldWaitValue, entry.OldUnit, entry.OldWaitUpperValue),
-        entry.NewWaitValue is null && entry.EstimateStatus != EstimateStatus.Available ? ReferralEstimate.StatusLabel(entry.EstimateStatus) : WaitText(entry.NewWaitValue, entry.NewUnit, entry.NewWaitUpperValue),
+        entry.NewWaitValue is null && entry.EstimateStatus != EstimateStatus.Available ? ReferralEstimateText.StatusLabel(entry.EstimateStatus) : WaitText(entry.NewWaitValue, entry.NewUnit, entry.NewWaitUpperValue),
         entry.Username ?? string.Empty,
         entry.RequestId ?? string.Empty);
 

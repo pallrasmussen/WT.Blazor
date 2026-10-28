@@ -209,7 +209,7 @@
                             }
                         </td>
                         }
-                        @if (showWaitColumns) { <td data-label="@AppText.Get("HistoryOldWait")">@WaitText(e.OldWaitValue, e.OldUnit, e.OldWaitUpperValue)</td><td data-label="@AppText.Get("HistoryNewWait")">@(e.NewWaitValue is null && e.EstimateStatus != EstimateStatus.Available ? ReferralEstimate.StatusLabel(e.EstimateStatus) : WaitText(e.NewWaitValue, e.NewUnit, e.NewWaitUpperValue))</td> }
+                        @if (showWaitColumns) { <td data-label="@AppText.Get("HistoryOldWait")">@WaitText(e.OldWaitValue, e.OldUnit, e.OldWaitUpperValue)</td><td data-label="@AppText.Get("HistoryNewWait")">@(e.NewWaitValue is null && e.EstimateStatus != EstimateStatus.Available ? ReferralEstimateText.StatusLabel(e.EstimateStatus) : WaitText(e.NewWaitValue, e.NewUnit, e.NewWaitUpperValue))</td> }
                         @if (showUsernameColumn) { <td data-label="@AppText.Get("HistoryColumnUsername")">@(e.Username ?? "–")</td> }
                     </tr>
                 }

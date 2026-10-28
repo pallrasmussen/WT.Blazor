@@ -10,7 +10,7 @@
         }
         <p><strong>@Item.Name</strong></p>
         <p>@DisplayNames.For(Item.Hospital)@(Item.Department is not null ? " · " + DisplayNames.For(Item.Department.Value) : "")</p>
-        <p>@ReferralEstimate.WaitText(Item)</p>
+        <p>@ReferralEstimateText.WaitText(Item)</p>
         <div class="edit-form-field">
             <label for="deactivation-reason">@AppText.Get(AppTextKey.Reason)</label>
             <input id="deactivation-reason" value="@Reason" @oninput="UpdateReason" placeholder="@AppText.Get(AppTextKey.Optional)" />

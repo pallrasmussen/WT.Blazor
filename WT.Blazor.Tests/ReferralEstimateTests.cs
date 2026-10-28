@@ -1,3 +1,4 @@
+using WT.Blazor.Localization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -24,13 +25,23 @@ public class ReferralEstimateTests
         await db.Database.EnsureCreatedAsync();
         var clock = new Clock();
         var manager = Manager(db, clock);
-        var item = await manager.CreateAsync(new WaitingTimeCreate("MRI", Hospital.Klaksvikar, null, 4, WaitUnit.Vikur,
-            "Adults", "staff", ReferralEndpoint: ReferralEndpoint.Investigation, ResponsibleDepartment: " Radiology "));
+        var item = await manager.CreateAsync(new WaitingTimeCreate
+        {
+            Name = "MRI",
+            Hospital = Hospital.Klaksvikar,
+            Department = null,
+            WaitValue = 4,
+            Unit = WaitUnit.Vikur,
+            Note = "Adults",
+            Username = "staff",
+            ReferralEndpoint = ReferralEndpoint.Investigation,
+            ResponsibleDepartment = " Radiology "
+        });
         var initialVerifiedAt = item.VerifiedAt;
         clock.Now = clock.Now.AddDays(1);
-        await manager.UpdateAsync(Update(item, EstimateStatus.Available, 6));
+        item = await manager.UpdateAsync(Update(item, EstimateStatus.Available, 6));
         clock.Now = clock.Now.AddDays(1);
-        await manager.UpdateAsync(Update(item, status, 999));
+        item = await manager.UpdateAsync(Update(item, status, 999));
         Assert.Null(item.VerifiedAt);
         var audit = await db.WaitingTimeHistoryEntries.OrderByDescending(entry => entry.Id).FirstAsync();
         Assert.Equal(status, audit.EstimateStatus);
@@ -42,12 +53,12 @@ public class ReferralEstimateTests
         Assert.Empty(await reader.GetTrendChangesAsync([item.Id]));
         var unavailableReport = await new TrendReportService(reader, new WT.Blazor.Tests.TestInfrastructure.DefaultSettingsService(), TimeProvider.System).GetAsync(item.Id);
         Assert.NotNull(unavailableReport);
-        Assert.Equal(ReferralEstimate.StatusLabel(status), unavailableReport.CurrentWait);
+        Assert.Equal(ReferralEstimateText.StatusLabel(status), unavailableReport.CurrentWait);
         Assert.Null(unavailableReport.VerifiedAt);
         Assert.DoesNotContain("0 ", unavailableReport.CurrentWait);
 
         clock.Now = clock.Now.AddDays(1);
-        await manager.UpdateAsync(Update(item, EstimateStatus.Available, 0));
+        item = await manager.UpdateAsync(Update(item, EstimateStatus.Available, 0));
         Assert.True(item.VerifiedAt > initialVerifiedAt);
         Assert.Equal(clock.Now.UtcDateTime, item.VerifiedAt);
         var point = Assert.Single(await reader.GetTrendPointsAsync(item.Id));
@@ -65,20 +76,30 @@ public class ReferralEstimateTests
         await db.Database.EnsureCreatedAsync();
         var clock = new Clock();
         var manager = Manager(db, clock);
-        var item = await manager.CreateAsync(new WaitingTimeCreate("MRI", Hospital.Klaksvikar, null, 4, WaitUnit.Vikur,
-            null, "staff", ReferralEndpoint: ReferralEndpoint.Investigation, ResponsibleDepartment: "Radiology"));
+        var item = await manager.CreateAsync(new WaitingTimeCreate
+        {
+            Name = "MRI",
+            Hospital = Hospital.Klaksvikar,
+            Department = null,
+            WaitValue = 4,
+            Unit = WaitUnit.Vikur,
+            Note = null,
+            Username = "staff",
+            ReferralEndpoint = ReferralEndpoint.Investigation,
+            ResponsibleDepartment = "Radiology"
+        });
         var verified = item.VerifiedAt;
         clock.Now = clock.Now.AddDays(10);
-        await manager.UpdateAsync(Update(item, EstimateStatus.Available, 4) with { Note = "Adults only", ResponsibleDepartment = "Imaging" });
+        item = await manager.UpdateAsync(Update(item, EstimateStatus.Available, 4) with { Note = "Adults only", ResponsibleDepartment = "Imaging" });
         Assert.Equal(verified, item.VerifiedAt);
         Assert.Equal(1, item.EstimateSeries);
         Assert.Equal(HistoryAction.Edited, (await db.WaitingTimeHistoryEntries.OrderByDescending(entry => entry.Id).FirstAsync()).Action);
-        await manager.UpdateAsync(Update(item, EstimateStatus.Available, 4) with { ReferralEndpoint = ReferralEndpoint.Treatment });
+        item = await manager.UpdateAsync(Update(item, EstimateStatus.Available, 4) with { ReferralEndpoint = ReferralEndpoint.Treatment });
         Assert.Equal(verified, item.VerifiedAt);
         Assert.Equal(2, item.EstimateSeries);
         var reader = new WaitingTimeReadService(db, clock);
         Assert.Single(await reader.GetTrendPointsAsync(item.Id));
-        await manager.MarkReviewedAsync(item.Id, item.Version, "reviewer");
+        item = await manager.MarkReviewedAsync(item.Id, item.Version, "reviewer");
         Assert.Equal(clock.Now.UtcDateTime, item.VerifiedAt);
         Assert.Equal(4, await db.WaitingTimeHistoryEntries.CountAsync());
     }
@@ -128,17 +149,38 @@ public class ReferralEstimateTests
         await connection.OpenAsync();
         await using var db = new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connection).Options);
         await db.Database.EnsureCreatedAsync();
-        var create = new WaitingTimeCreate("MRI", Hospital.Klaksvikar, null, 4, WaitUnit.Vikur, null, "staff",
-            invalidStatus ? (EstimateStatus)99 : EstimateStatus.Available,
-            invalidStatus ? ReferralEndpoint.Investigation : (ReferralEndpoint)99);
+        var create = new WaitingTimeCreate
+        {
+            Name = "MRI",
+            Hospital = Hospital.Klaksvikar,
+            Department = null,
+            WaitValue = 4,
+            Unit = WaitUnit.Vikur,
+            Note = null,
+            Username = "staff",
+            EstimateStatus = invalidStatus ? (EstimateStatus)99 : EstimateStatus.Available,
+            ReferralEndpoint = invalidStatus ? ReferralEndpoint.Investigation : (ReferralEndpoint)99
+        };
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => Manager(db, new Clock()).CreateAsync(create));
         Assert.Empty(await db.WaitingTimes.ToListAsync());
         Assert.Empty(await db.WaitingTimeHistoryEntries.ToListAsync());
     }
 
-    private static WaitingTimeUpdate Update(WaitingTime item, EstimateStatus status, int value) => new(
-        item.Id, item.Version, item.Name, item.Hospital, item.Department, value, item.Unit, item.Note, "staff",
-        status, item.ReferralEndpoint, item.ResponsibleDepartment);
+    private static WaitingTimeUpdate Update(WaitingTime item, EstimateStatus status, int value) => new WaitingTimeUpdate
+    {
+        Id = item.Id,
+        ExpectedVersion = item.Version,
+        Name = item.Name,
+        Hospital = item.Hospital,
+        Department = item.Department,
+        WaitValue = value,
+        Unit = item.Unit,
+        Note = item.Note,
+        Username = "staff",
+        EstimateStatus = status,
+        ReferralEndpoint = item.ReferralEndpoint,
+        ResponsibleDepartment = item.ResponsibleDepartment
+    };
 
     private static WaitingTimeManagementService Manager(ApplicationDbContext db, TimeProvider clock) =>
         new(db, NullLogger<WaitingTimeManagementService>.Instance, new HttpContextAccessor(), clock);

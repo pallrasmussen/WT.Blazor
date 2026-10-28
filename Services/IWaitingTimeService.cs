@@ -6,35 +6,23 @@ public record TrendPoint(DateTime Timestamp, int Value);
 public record HistoryPage(IReadOnlyList<WaitingTimeHistoryEntry> Entries, int TotalCount);
 public record ReviewInfo(DateTime Timestamp, string? Username);
 public record OperationsSummary(int EntriesForReview, int RecentChanges, int NeedsReview, int LongWaits, int MissingDepartments);
-public record WaitingTimeCreate(
-    string Name,
-    Hospital Hospital,
-    Department? Department,
-    int WaitValue,
-    WaitUnit Unit,
-    string? Note,
-    string Username,
-    EstimateStatus EstimateStatus = EstimateStatus.Available,
-    ReferralEndpoint ReferralEndpoint = ReferralEndpoint.Unspecified,
-    string? ResponsibleDepartment = null,
-    string? ComparisonCode = null,
-    int? WaitUpperValue = null);
-public record WaitingTimeUpdate(
-    int Id,
-    int ExpectedVersion,
-    string Name,
-    Hospital Hospital,
-    Department? Department,
-    int WaitValue,
-    WaitUnit Unit,
-    string? Note,
-    string Username,
-    EstimateStatus EstimateStatus = EstimateStatus.Available,
-    ReferralEndpoint ReferralEndpoint = ReferralEndpoint.Unspecified,
-    string? ResponsibleDepartment = null,
-    string? ComparisonCode = null,
-    bool ConfirmLargeChange = false,
-    int? WaitUpperValue = null);
+public sealed record WaitingTimeCreate : WaitingTimeInput
+{
+    public WaitingTimeCreate() { }
+    public WaitingTimeCreate(WaitingTimeInput input) : base(input) { }
+    public required string Username { get; init; }
+}
+
+public sealed record WaitingTimeUpdate : WaitingTimeInput
+{
+    public WaitingTimeUpdate() { }
+    public WaitingTimeUpdate(WaitingTimeInput input) : base(input) { }
+    public required int Id { get; init; }
+    public required int ExpectedVersion { get; init; }
+    public required string Username { get; init; }
+    public bool ConfirmLargeChange { get; init; }
+}
+
 public record HistoryQuery(
     Hospital? Hospital = null,
     Department? Department = null,
@@ -79,8 +67,8 @@ public interface ITrendReadService
 public interface IWaitingTimeManagementService
 {
     Task<WaitingTime> CreateAsync(WaitingTimeCreate create);
-    Task UpdateAsync(WaitingTimeUpdate update);
-    Task MarkReviewedAsync(int id, int expectedVersion, string username);
-    Task DeactivateAsync(int id, int expectedVersion, string username, string? reason = null);
+    Task<WaitingTime> UpdateAsync(WaitingTimeUpdate update);
+    Task<WaitingTime> MarkReviewedAsync(int id, int expectedVersion, string username);
+    Task<WaitingTime> DeactivateAsync(int id, int expectedVersion, string username, string? reason = null);
     Task<WaitingTime> ReactivateAsync(int id, int expectedVersion, string username);
 }

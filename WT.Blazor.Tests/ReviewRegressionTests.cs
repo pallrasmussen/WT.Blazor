@@ -105,7 +105,18 @@ public class ReviewRegressionTests
 
         Task Change() => action switch
         {
-            "update" => manager.UpdateAsync(new WaitingTimeUpdate(item.Id, 1, "Changed", Hospital.Klaksvikar, null, 3, WaitUnit.Dagar, null, "tester")),
+            "update" => manager.UpdateAsync(new WaitingTimeUpdate
+            {
+                Id = item.Id,
+                ExpectedVersion = 1,
+                Name = "Changed",
+                Hospital = Hospital.Klaksvikar,
+                Department = null,
+                WaitValue = 3,
+                Unit = WaitUnit.Dagar,
+                Note = null,
+                Username = "tester"
+            }),
             "deactivate" => manager.DeactivateAsync(item.Id, 1, "tester"),
             "reactivate" => manager.ReactivateAsync(item.Id, 1, "tester"),
             _ => manager.MarkReviewedAsync(item.Id, 1, "tester")

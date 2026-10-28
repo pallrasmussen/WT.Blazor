@@ -1,3 +1,4 @@
+using WT.Blazor.Localization;
 using WT.Blazor.Models;
 
 namespace WT.Blazor.Services;
@@ -36,10 +37,10 @@ public sealed class TrendReportService(ITrendReadService trendReader, IPortalSet
             item.Name,
             DisplayNames.For(item.Hospital),
             item.Department is null ? null : DisplayNames.For(item.Department.Value),
-            ReferralEstimate.PublicWaitText(item, settings, now),
+            ReferralEstimateText.PublicWaitText(item, settings, now),
             DisplayNames.For(item.Unit, item.WaitValue),
             points,
-            ReferralEstimate.EndpointLabel(item.ReferralEndpoint),
+            ReferralEstimateText.EndpointLabel(item.ReferralEndpoint),
             item.EstimateStatus == EstimateStatus.Available ? item.VerifiedAt : null,
             item.Note,
             ReferralEstimate.IsExpired(item, settings, now),

@@ -1,0 +1,99 @@
+@using WT.Blazor.Components.Shared
+@inherits WaitingTimeEditorBase
+
+    <div class="modal-backdrop" @ref="DialogElement" @onkeydown="HandleKeyDownAsync" tabindex="-1">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="edit-dialog-title" tabindex="-1" @onclick:stopPropagation="true">
+            <h2 id="edit-dialog-title">@AppText.Get("EditWaitingTime")</h2>
+            @if (Error is not null)
+            {
+                <div class="login-error" @ref="ErrorElement" role="alert" tabindex="-1">@Error</div>
+                @if (Conflict)
+                {
+                    <p>@AppText.Get("ReloadLatestHint")</p>
+                    <button class="btn-secondary reload-latest" @onclick="Reload">@AppText.Get("ReloadLatest")</button>
+                }
+            }
+            <p>@AppText.Get("ReferralEstimateStaffHelp")</p>
+            <div class="edit-form-grid">
+                <ReferralEstimateFields State="Form" Prefix="edit" Changed="StateHasChanged" />
+                @if (IsSuperAdmin)
+                {
+                <div class="edit-form-field edit-form-field-wide">
+                    <label for="edit-name">@AppText.Get("SpecialtyTreatment")</label>
+                    <input id="edit-name" @bind="Form.Name" />
+                </div>
+                <div class="edit-form-field">
+                    <label for="edit-hospital">@AppText.Get("HistoryColumnHospital")</label>
+                    <select id="edit-hospital" @bind="Form.HospitalName">
+                        @foreach (var h in EditableHospitals)
+                        {
+                            <option value="@DisplayNames.For(h)">@(h == Hospital.Sjukrahusverkid ? AppText.Get("SharedWaitingLists") : DisplayNames.For(h))</option>
+                        }
+                    </select>
+                </div>
+                @if (Form.HospitalName == LandssjukrahusidName)
+                {
+                    <div class="edit-form-field">
+                        <label for="edit-department">@AppText.Get("Department")</label>
+                        <select id="edit-department" @bind="Form.DepartmentName">
+                            <option value="">@AppText.Get("ChooseDepartment")</option>
+                            @foreach (var d in FormDepartments)
+                            {
+                                <option value="@d">@d</option>
+                            }
+                        </select>
+                    </div>
+                }
+                }
+                <div class="edit-form-field">
+                    <label for="edit-wait">@AppText.Get("Wait")</label>
+                    <input id="edit-wait" type="number" min="0" max="@WaitDuration.MaximumValue(Form.Unit)" @bind="Form.WaitValue" disabled="@(Form.EstimateStatus != EstimateStatus.Available)" />
+                </div>
+                <div class="edit-form-field">
+                    <label for="edit-unit">@AppText.Get("Unit")</label>
+                    <select id="edit-unit" @bind="Form.Unit" disabled="@(Form.EstimateStatus != EstimateStatus.Available)">
+                        <option value="@WaitUnit.Dagar">@AppText.Get("UnitDays")</option>
+                        <option value="@WaitUnit.Vikur">@AppText.Get("UnitWeeks")</option>
+                        <option value="@WaitUnit.Manadir">@AppText.Get("UnitMonths")</option>
+                    </select>
+                </div>
+                <div class="edit-form-field edit-form-field-wide">
+                    <label for="edit-note">@AppText.Get("ReferralConditions")</label>
+                    <input maxlength="500" id="edit-note" @bind="Form.Note" placeholder="@AppText.Get("Optional")" />
+                </div>
+            </div>
+            @if (ShowPreview)
+            {
+                <div class="change-preview" role="status">
+                    <strong>@AppText.Get("ChangePreview")</strong>
+                    <ul>
+                        @foreach (var change in PreviewChanges)
+                        {
+                            <li>@change</li>
+                        }
+                    </ul>
+                    @if (RequiresConfirmation)
+                    {
+                        <p class="large-change-warning" role="alert">@AppText.Get("LargeChangeWarning")</p>
+                        <label for="confirm-large-edit"><input id="confirm-large-edit" type="checkbox" @bind="Acknowledged" /> @AppText.Get("ConfirmLargeChange")</label>
+                    }
+                    <button class="btn-teal" @onclick="SaveAsync" disabled="@(Busy || RequiresConfirmation && !Acknowledged)">@AppText.Get("ConfirmSave")</button>
+                    <button class="btn-secondary" @onclick="CancelPreview">@AppText.Get("Cancel")</button>
+                </div>
+            }
+            <div class="modal-actions">
+                <button class="btn-secondary" @onclick="RequestCloseAsync">@AppText.Get("Cancel")</button>
+                <button class="btn-teal" @onclick="BeginPreview" disabled="@Busy">@AppText.Get("SaveChanges")</button>
+            </div>
+            @if (ConfirmDiscard)
+            {
+                <div class="discard-confirmation">
+                    <span>@AppText.Get("UnsavedChanges")</span>
+                    <button class="btn-secondary" @onclick="KeepEditing">@AppText.Get("KeepEditing")</button>
+                    <button class="btn-danger" @onclick="DiscardAsync">@AppText.Get("DiscardChanges")</button>
+                </div>
+            }
+        </div>
+    </div>
+
+@code { protected override bool Quick => false; }
