@@ -127,6 +127,8 @@ button:disabled {
 .language-switcher button.active { background: var(--wt-mist); border-color: var(--wt-turquoise); color: var(--wt-teal); }
 .public-content { flex: 1; margin: 0 auto; max-width: 1080px; padding: 2.5rem 1.25rem 4rem; width: 100%; }
 .public-hero { margin-bottom: 2rem; max-width: 760px; }
+.public-hero-wide { max-width: none; }
+.public-hero-wide .public-intro { max-width: 760px; }
 .internal-heading { margin-bottom: 2rem; max-width: none; }
 .internal-heading { align-items: start; border-bottom: 1px solid var(--wt-line); display: flex; justify-content: space-between; padding-bottom: 1.5rem; }
 .public-hero > div { max-width: 58ch; }
