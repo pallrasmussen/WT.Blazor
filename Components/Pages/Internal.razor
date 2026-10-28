@@ -131,7 +131,7 @@
                     </div>
                     @if (quickEditItem?.Id == item.Id)
                     {
-                        <WaitingTimeQuickEditor @key="item.Id" Item="item" Username="@username" Saved="HandleSaved" Close="CloseQuickEdit" Reload="() => ReloadConflictedItemAsync(true)" />
+                        <WaitingTimeQuickEditor @key="item.Id" Item="item" Session="quickSession" StateChanged="StateHasChanged" Username="@username" Saved="HandleSaved" Close="CloseQuickEdit" Reload="() => ReloadConflictedItemAsync(true)" />
                     }
                 </article>
             }

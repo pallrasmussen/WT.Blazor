@@ -56,6 +56,7 @@ public partial class Internal
     private bool showCreateForm;
     private WaitingTime? editItem;
     private WaitingTime? quickEditItem;
+    private WaitingTimeEditorSession quickSession = new();
     private bool confirmReviewAll;
     private bool isReviewing;
     private WaitingTime? itemPendingDeactivation;
@@ -224,9 +225,9 @@ public partial class Internal
         && (filters.Department is null || item.Department == filters.Department);
 
     private void OpenEdit(WaitingTime item) { CloseQuickEdit(); editItem = item; }
-    private void OpenQuickEdit(WaitingTime item) { CloseEdit(); quickEditItem = item; }
+    private void OpenQuickEdit(WaitingTime item) { CloseEdit(); quickSession = new(); quickEditItem = item; }
     private void CloseEdit() => editItem = null;
-    private void CloseQuickEdit() => quickEditItem = null;
+    private void CloseQuickEdit() { quickEditItem = null; quickSession = new(); }
     protected override void OnParametersSet() => showCreateForm = OpenCreateForm == true && isSuperAdmin;
     private void CloseCreate()
     {

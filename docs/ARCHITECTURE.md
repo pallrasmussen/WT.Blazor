@@ -46,6 +46,8 @@ components in `Components/Administration`:
   layouts. `WaitingTimeEditorBase` owns their common validation, dirty-state,
   confirmation, save, conflict and discard workflow. Drafts reset only when the
   record ID or version changes; unrelated parent renders preserve unsaved work.
+  The page retains `WaitingTimeEditorSession` for a quick edit so filtering its
+  row out and back in preserves the draft and confirmation state too.
 - `WaitingTimeEditPreview` formats the before/after values without making
   persistence decisions.
 

@@ -18,24 +18,26 @@ public abstract class WaitingTimeEditorBase : ComponentBase
     [Parameter] public EventCallback<WaitingTimeEditResult> Saved { get; set; }
     [Parameter] public EventCallback Close { get; set; }
     [Parameter] public EventCallback Reload { get; set; }
+    [Parameter] public WaitingTimeEditorSession Session { get; set; } = new();
+    [Parameter] public EventCallback StateChanged { get; set; }
     [Inject] protected IWaitingTimeManagementService Manager { get; set; } = default!;
     [Inject] private ILogger<WaitingTimeEditorBase> Logger { get; set; } = default!;
 
     protected abstract bool Quick { get; }
-    protected WaitingTimeFormState Form { get; } = new();
-    protected string? Error { get; private set; }
-    protected bool Conflict { get; private set; }
-    protected bool Busy { get; private set; }
-    protected bool ShowPreview { get; private set; }
-    protected bool ConfirmDiscard { get; private set; }
+    protected WaitingTimeFormState Form => Session.Form;
+    protected string? Error { get => Session.Error; private set => Session.Error = value; }
+    protected bool Conflict { get => Session.Conflict; private set => Session.Conflict = value; }
+    protected bool Busy { get => Session.Busy; private set => Session.Busy = value; }
+    protected bool ShowPreview { get => Session.ShowPreview; private set => Session.ShowPreview = value; }
+    protected bool ConfirmDiscard { get => Session.ConfirmDiscard; private set => Session.ConfirmDiscard = value; }
     protected ElementReference DialogElement;
     protected ElementReference ErrorElement;
     protected static Hospital[] EditableHospitals => Enum.GetValues<Hospital>();
     protected static string[] FormDepartments => Enum.GetValues<Department>().Select(DisplayNames.For).ToArray();
     protected static string LandssjukrahusidName => DisplayNames.For(Hospital.Landssjukrahusid);
-    private WaitingTimeInput previous = new();
-    private WaitingTimeInput? acknowledged;
-    private (int Id, int Version)? loaded;
+    private WaitingTimeInput previous { get => Session.Previous; set => Session.Previous = value; }
+    private WaitingTimeInput? acknowledged { get => Session.Acknowledged; set => Session.Acknowledged = value; }
+    private (int Id, int Version)? loaded { get => Session.Loaded; set => Session.Loaded = value; }
     private bool focusError;
 
     protected override void OnParametersSet()
@@ -133,7 +135,11 @@ public abstract class WaitingTimeEditorBase : ComponentBase
             Logger.LogError(exception, "Could not save waiting time {WaitingTimeId}.", Item.Id);
             SetError(AppText.Get("EstimateSaveFailed"));
         }
-        finally { Busy = false; }
+        finally
+        {
+            Busy = false;
+            await StateChanged.InvokeAsync();
+        }
     }
 
     private bool Validate()

@@ -124,6 +124,10 @@ public class InternalPageTests : BunitContext
         cut.Find(input).Change("9");
         cut.Find("#admin-search").Input("Active");
         Assert.Equal("9", cut.Find(input).GetAttribute("value"));
+        cut.Find("#admin-search").Input("No matching row");
+        if (quick) Assert.Empty(cut.FindAll(input));
+        cut.Find("#admin-search").Input("Active");
+        Assert.Equal("9", cut.Find(input).GetAttribute("value"));
         cut.FindAll(".filter-presets button").First().Click();
         cut.WaitForAssertion(() => Assert.Equal("9", cut.Find(input).GetAttribute("value")));
         Assert.Null(manager.UpdateRequest);
