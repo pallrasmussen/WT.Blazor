@@ -39,7 +39,9 @@ public class PublicBrowserSmokeTests : IAsyncLifetime
         await page.WaitForURLAsync("**/gongd/**");
 
         await Assertions.Expect(page.Locator("#trend-period")).ToBeVisibleAsync();
+        await Assertions.Expect(page.Locator("#trend-period")).ToBeEnabledAsync();
         await page.Locator("#trend-period").SelectOptionAsync("90");
+        await Assertions.Expect(page.Locator("#trend-period")).ToHaveValueAsync("90");
         await Assertions.Expect(page.Locator("svg.chart-svg")).ToBeVisibleAsync();
         var chartAccessibleName = await page.Locator("svg.chart-svg[role='img']").GetAttributeAsync("aria-label");
         Assert.False(string.IsNullOrWhiteSpace(chartAccessibleName));
@@ -56,6 +58,41 @@ public class PublicBrowserSmokeTests : IAsyncLifetime
         var download = await page.RunAndWaitForDownloadAsync(async () => await exportLink.ClickAsync());
         Assert.EndsWith(".pdf", download.SuggestedFilename, StringComparison.OrdinalIgnoreCase);
         Assert.EndsWith("_90d.pdf", download.SuggestedFilename, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [BrowserFact]
+    public async Task TrendPeriodCannotBeChangedUntilThePageIsInteractive()
+    {
+        var source = await browser!.NewPageAsync();
+        await source.GotoAsync(baseUrl, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+        var trendPath = await source.Locator("a.graph-link").First.GetAttributeAsync("href");
+        Assert.NotNull(trendPath);
+        var page = await browser.NewPageAsync();
+        var scriptRequested = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseScript = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        await page.RouteAsync("**/_framework/blazor.web*.js*", async route =>
+        {
+            scriptRequested.TrySetResult();
+            await releaseScript.Task;
+            await route.ContinueAsync();
+        });
+        var period = page.Locator("#trend-period");
+        try
+        {
+            await page.GotoAsync(new Uri(new Uri(baseUrl), trendPath).ToString(), new PageGotoOptions { WaitUntil = WaitUntilState.Commit });
+            await period.WaitForAsync();
+            await scriptRequested.Task.WaitAsync(TimeSpan.FromSeconds(10));
+            await Assertions.Expect(period).ToBeDisabledAsync();
+        }
+        finally { releaseScript.TrySetResult(); }
+
+        await Assertions.Expect(period).ToBeEnabledAsync();
+        await period.SelectOptionAsync("90");
+        await Assertions.Expect(period).ToHaveValueAsync("90");
+        await Assertions.Expect(page.Locator(".trend-actions a")).ToHaveAttributeAsync("href",
+            new System.Text.RegularExpressions.Regex(@"/api/trend/\d+/export/pdf\?periodDays=90$"));
+        await page.CloseAsync();
+        await source.CloseAsync();
     }
 
     [BrowserFact]
