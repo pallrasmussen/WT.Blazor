@@ -395,7 +395,8 @@ public class AuditLogTests
                     Hospital = Hospital.Klaksvikar,
                     WaitValue = 2,
                     Unit = WaitUnit.Vikur,
-                    UpdatedAt = now.UtcDateTime
+                    UpdatedAt = now.UtcDateTime,
+                    VerifiedAt = now.UtcDateTime
                 };
                 var inactiveLongWait = new WaitingTime
                 {

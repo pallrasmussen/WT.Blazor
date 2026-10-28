@@ -89,6 +89,14 @@ namespace WT.Blazor.Migrations
                     b.Property<int?>("Department")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("EstimateSeries")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(1);
+
+                    b.Property<int>("EstimateStatus")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Hospital")
                         .HasColumnType("INTEGER");
 
@@ -104,10 +112,20 @@ namespace WT.Blazor.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("ReferralEndpoint")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ResponsibleDepartment")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Unit")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("VerifiedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Version")
@@ -139,6 +157,14 @@ namespace WT.Blazor.Migrations
                     b.Property<string>("Detail")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("EstimateSeries")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(1);
+
+                    b.Property<int>("EstimateStatus")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Hospital")
                         .HasColumnType("INTEGER");
 
@@ -164,8 +190,15 @@ namespace WT.Blazor.Migrations
                     b.Property<int?>("OldWaitValue")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("ReferralEndpoint")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("RequestId")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ResponsibleDepartment")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Timestamp")

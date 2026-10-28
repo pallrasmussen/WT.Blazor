@@ -1,0 +1,35 @@
+@using WT.Blazor.Components.Pages
+
+<div class="edit-form-field">
+    <label for="@($"{Prefix}-estimate-status")">@AppText.Get("EstimateStatus")</label>
+    <select id="@($"{Prefix}-estimate-status")" @bind="State.EstimateStatus" @bind:after="() => Changed.InvokeAsync()">
+        @foreach (var status in Enum.GetValues<EstimateStatus>())
+        {
+            <option value="@status">@ReferralEstimate.StatusLabel(status)</option>
+        }
+    </select>
+</div>
+@if (IncludeDefinition)
+{
+    <div class="edit-form-field">
+        <label for="@($"{Prefix}-referral-endpoint")">@AppText.Get("ReferralEndpoint")</label>
+        <select id="@($"{Prefix}-referral-endpoint")" @bind="State.ReferralEndpoint">
+            @foreach (var endpoint in Enum.GetValues<ReferralEndpoint>())
+            {
+                <option value="@endpoint">@ReferralEstimate.EndpointLabel(endpoint)</option>
+            }
+        </select>
+    </div>
+    <div class="edit-form-field">
+        <label for="@($"{Prefix}-responsible-department")">@AppText.Get("ResponsibleDepartment")</label>
+        <input id="@($"{Prefix}-responsible-department")" maxlength="200" @bind="State.ResponsibleDepartment" aria-describedby="@($"{Prefix}-owner-help")" />
+        <small id="@($"{Prefix}-owner-help")">@AppText.Get("ResponsibleDepartmentHelp")</small>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public WaitingTimeFormState State { get; set; } = default!;
+    [Parameter, EditorRequired] public string Prefix { get; set; } = "";
+    [Parameter] public EventCallback Changed { get; set; }
+    [Parameter] public bool IncludeDefinition { get; set; } = true;
+}

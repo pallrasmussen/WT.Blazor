@@ -22,7 +22,7 @@ public record HistoryExportRow(
         DisplayNames.For(entry.Action),
         entry.Detail ?? string.Empty,
         WaitText(entry.OldWaitValue, entry.OldUnit),
-        WaitText(entry.NewWaitValue, entry.NewUnit),
+        entry.NewWaitValue is null && entry.EstimateStatus != EstimateStatus.Available ? ReferralEstimate.StatusLabel(entry.EstimateStatus) : WaitText(entry.NewWaitValue, entry.NewUnit),
         entry.Username ?? string.Empty,
         entry.RequestId ?? string.Empty);
 

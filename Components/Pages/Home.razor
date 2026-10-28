@@ -17,6 +17,7 @@
 <section class="public-hero">
 	<h1>@AppText.Get("WaitingTime")</h1>
 	<p>@AppText.Get("Intro")</p>
+    <p>@AppText.Get("ReferralEstimateDisclaimer")</p>
 </section>
 
 <section class="public-panel public-large-text" aria-label="@AppText.Get("WaitingTime")" aria-busy="@isLoading">
@@ -101,9 +102,17 @@
 						<span class="chip">@(item.Department is not null ? DisplayNames.For(item.Department.Value) : DisplayNames.For(item.Hospital))</span>
 						<span class="card-hospital">@DisplayNames.For(item.Hospital)</span>
 						<h3>@item.Name</h3>
-						<div class="wait-value">
-							@item.WaitValue <span>@DisplayNames.For(item.Unit, item.WaitValue)</span>
-							@if (trendChanges.TryGetValue(item.Id, out var change))
+                        <p class="referral-definition">@AppText.Get("ReferralEndpoint"): @ReferralEstimate.EndpointLabel(item.ReferralEndpoint)</p>
+						<div class="wait-value @(item.EstimateStatus == EstimateStatus.Available ? "" : "estimate-unavailable")">
+							@if (item.EstimateStatus == EstimateStatus.Available)
+                            {
+                                @item.WaitValue <span>@DisplayNames.For(item.Unit, item.WaitValue)</span>
+                            }
+                            else
+                            {
+                                @ReferralEstimate.StatusLabel(item.EstimateStatus)
+                            }
+							@if (item.EstimateStatus == EstimateStatus.Available && trendChanges.TryGetValue(item.Id, out var change))
 							{
 								<span class="trend-arrow @TrendCssClass(change)" role="img" aria-label="@TrendLabel(change)" title="@TrendLabel(change)"></span>
 							}
@@ -115,10 +124,20 @@
 					}
 					else
 					{
-						<p class="note">@item.Note</p>
+						<p class="note"><strong>@AppText.Get("ReferralConditions"):</strong> @item.Note</p>
 					}
-					<a class="graph-link" href="@TrendUri(item.Id)">@AppText.Get("Trend")</a>
-					<div class="updated-note @UpdatedStatus.CssClass(item.UpdatedAt, portalSettings.GreenMaximumAgeMonths, portalSettings.YellowMaximumAgeMonths, CurrentUtc)">@AppText.Get("LastUpdated"): @item.UpdatedAt.ToLocalTime().ToString("dd. MMMM yyyy")</div>
+                    @if (item.EstimateStatus == EstimateStatus.Available)
+                    {
+                        <a class="graph-link" href="@TrendUri(item.Id)">@AppText.Get("Trend")</a>
+                        @if (item.VerifiedAt is { } verified)
+                        {
+                            <div class="updated-note @UpdatedStatus.CssClass(verified, portalSettings.GreenMaximumAgeMonths, portalSettings.YellowMaximumAgeMonths, CurrentUtc)">@AppText.Get("LastVerified"): @verified.ToLocalTime().ToString("dd. MMMM yyyy")</div>
+                        }
+                        else
+                        {
+                            <div class="updated-note">@AppText.Get("VerificationNotRecorded")</div>
+                        }
+                    }
 				</article>
 			}
 		</div>

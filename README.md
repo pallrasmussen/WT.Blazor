@@ -201,10 +201,45 @@ Existing stored values are not rewritten by this change.
 
 ## Waiting-time freshness
 
-`WaitingTime.UpdatedAt` records creation, a change to the waiting-time value or
-unit, or an explicit **Mark reviewed** action. Editing names, hospital/department
-metadata or notes, and reactivating a record, do not refresh that timestamp.
+`WaitingTime.VerifiedAt` records confirmation of an available estimate on creation,
+a change to its value/unit, resumption, or an explicit **Mark reviewed** action. Editing names, hospital/department
+metadata or notes, and reactivating a record, do not refresh that verification timestamp.
 Their actual edit times remain in the immutable audit history. After reactivation,
-review the estimate explicitly if it has been verified. This change does not
-rewrite historical timestamps; review existing estimates through the normal
-staff workflow if metadata edits previously made them appear current.
+review the estimate explicitly if it has been verified. The migration preserves `UpdatedAt` and reconstructs `VerifiedAt` only where audit
+evidence exists; staff should explicitly review estimates lacking that evidence.
+
+## Estimates for newly referred patients
+
+The portal publishes staff estimates for newly received **routine referrals**,
+not measured waits for individual patients. Each record can specify the endpoint:
+first consultation, investigation, or start of treatment. Public cards, trend
+pages and trend PDFs explain that actual waits depend on clinical priority and
+individual circumstances. The existing public note is labelled as referral
+conditions / the patient groups covered. Do not enter patient-identifiable data.
+
+Staff can assign a responsible department in the full create/edit forms. That
+field stays internal; it is also snapshotted into the staff audit history.
+Unassigned ownership and unspecified endpoints remain visible to staff so legacy
+records can be reviewed without inventing their meaning.
+
+New forms start with **No estimate available**. Choose **Estimate available** to
+enter a numeric value and unit. **Service currently unavailable** is separate
+from an unknown estimate and from deactivation (which removes the public card).
+An available estimate of zero is valid. Placeholder numeric storage for other
+statuses is never presented as a zero estimate or included in trends/long waits.
+
+Changing the referral endpoint or switching availability starts a new trend
+series. Published estimate changes are plotted only for the current comparable
+series; old entries remain in the audit history. A note/owner edit does not start
+a new series or verify an estimate. Endpoint-only edits do not verify it either.
+The review queue includes available estimates lacking a verification date.
+
+The additive `AddReferralEstimateDefinition` migration preserves existing values,
+marks their endpoints as unspecified and owners as unassigned, and backfills
+verification dates only from recorded creation, waiting-time updates and explicit
+reviews with numeric evidence. Ordinary edits, future events and known demo markers do not qualify;
+records without evidence show **Verification date not recorded**. Audit entries
+are not rewritten. Back up the database before deployment, apply the migration
+on staging, then have data owners define legacy endpoints/ownership and explicitly
+review estimates. Older binaries cannot represent the new statuses correctly;
+roll back by restoring the pre-upgrade database and matching application bundle.

@@ -58,7 +58,7 @@
             </div>
             <label class="review-filter" for="needs-review">
                 <input id="needs-review" type="checkbox" @bind="showNeedsReview" @bind:after="FilterChangedAsync" />
-                @string.Format(AppText.Get("NeedsReview"), items.Count(item => UpdatedStatus.RequiresReview(item.UpdatedAt, portalSettings.GreenMaximumAgeMonths, CurrentUtc)))
+                @string.Format(AppText.Get("NeedsReview"), items.Count(item => UpdatedStatus.RequiresReview(ReferralEstimate.ReviewDate(item), portalSettings.GreenMaximumAgeMonths, CurrentUtc)))
             </label>
             @if (isSuperAdmin)
             {
@@ -90,7 +90,9 @@
     @if (isSuperAdmin && showCreateForm)
     {
         <section class="create-box">
+            <p>@AppText.Get("ReferralEstimateStaffHelp")</p>
             <div class="create-grid">
+                <ReferralEstimateFields State="createForm" Prefix="new" Changed="StateHasChanged" />
                 <div>
                     <label for="new-hospital">@AppText.Get("HistoryColumnHospital")</label>
                     <select id="new-hospital" @bind="createForm.HospitalName">
@@ -116,15 +118,15 @@
                 }
                 <div>
                     <label for="new-name">@AppText.Get("SpecialtyTreatment")</label>
-                    <input id="new-name" @bind="createForm.Name" placeholder="@AppText.Get("SearchPlaceholder")" />
+                    <input maxlength="200" id="new-name" @bind="createForm.Name" placeholder="@AppText.Get("SearchPlaceholder")" />
                 </div>
                 <div>
                     <label for="new-wait">@AppText.Get("Wait")</label>
-                    <input id="new-wait" type="number" min="0" max="@WaitDuration.MaximumValue(createForm.Unit)" @bind="createForm.WaitValue" />
+                    <input id="new-wait" type="number" min="0" max="@WaitDuration.MaximumValue(createForm.Unit)" @bind="createForm.WaitValue" disabled="@(createForm.EstimateStatus != EstimateStatus.Available)" />
                 </div>
                 <div>
                     <label for="new-unit">@AppText.Get("Unit")</label>
-                    <select id="new-unit" @bind="createForm.Unit">
+                    <select id="new-unit" @bind="createForm.Unit" disabled="@(createForm.EstimateStatus != EstimateStatus.Available)">
                         <option value="@WaitUnit.Dagar">@AppText.Get("UnitDays")</option>
                         <option value="@WaitUnit.Vikur">@AppText.Get("UnitWeeks")</option>
                         <option value="@WaitUnit.Manadir">@AppText.Get("UnitMonths")</option>
@@ -136,8 +138,8 @@
                 <div class="login-error">@createErrorMessage</div>
             }
             <div style="margin-top:.8rem">
-                <label for="new-note">@AppText.Get("Note")</label>
-                <input id="new-note" @bind="createForm.Note" placeholder="@AppText.Get("Optional")" />
+                <label for="new-note">@AppText.Get("ReferralConditions")</label>
+                <input maxlength="500" id="new-note" @bind="createForm.Note" placeholder="@AppText.Get("Optional")" />
             </div>
             <button class="btn-teal" style="margin-top:.9rem" @onclick="AddNew" disabled="@isSaving">@AppText.Get("SaveNew")</button>
             <button type="button" class="btn-secondary" style="margin-top:.9rem" @onclick="CloseCreate">@AppText.Get("Cancel")</button>
@@ -168,7 +170,14 @@
                         <h3>@item.Name</h3>
                         <div class="meta">
                             @DisplayNames.For(item.Hospital)@(item.Department is not null ? " · " + DisplayNames.For(item.Department.Value) : "")<br />
-                            <span class="status-dot @UpdatedStatus.CssClass(item.UpdatedAt, portalSettings.GreenMaximumAgeMonths, portalSettings.YellowMaximumAgeMonths, CurrentUtc)">@AppText.Get("LastUpdated"): @item.UpdatedAt.ToLocalTime().ToString("dd. MMMM yyyy")</span>
+                            @if (item.EstimateStatus == EstimateStatus.Available && item.VerifiedAt is { } verified)
+                            {
+                                <span class="status-dot @UpdatedStatus.CssClass(verified, portalSettings.GreenMaximumAgeMonths, portalSettings.YellowMaximumAgeMonths, CurrentUtc)">@AppText.Get("LastVerified"): @verified.ToLocalTime().ToString("dd. MMMM yyyy")</span>
+                            }
+                            else
+                            {
+                                <span>@AppText.Get("VerificationNotRecorded")</span>
+                            }
                             @if (!item.IsActive)
                             {
                                 <br /><span class="inactive-meta">@AppText.Get("Inactive")</span>
@@ -181,10 +190,12 @@
                     </div>
                     <div>
                         <label>@AppText.Get("Wait")</label>
-                        <div class="admin-value">@item.WaitValue @DisplayNames.For(item.Unit, item.WaitValue)</div>
+                        <div class="admin-value">@ReferralEstimate.WaitText(item)</div>
+                        <small>@ReferralEstimate.EndpointLabel(item.ReferralEndpoint)</small>
+                        <p>@AppText.Get("ResponsibleDepartment"): @(item.ResponsibleDepartment ?? AppText.Get("OwnerNotAssigned"))</p>
                     </div>
                     <div>
-                        <label>@AppText.Get("Note")</label>
+                        <label>@AppText.Get("ReferralConditions")</label>
                         <div class="admin-value">@(string.IsNullOrWhiteSpace(item.Note) ? "-" : item.Note)</div>
                     </div>
                     <div class="admin-actions">
@@ -208,21 +219,22 @@
                     @if (quickEditItem?.Id == item.Id)
                     {
                         <div class="admin-quick-edit">
+                            <ReferralEstimateFields State="quickEditForm" Changed="StateHasChanged" Prefix="@($"quick-{item.Id}")" IncludeDefinition="false" />
                             <div>
                                 <label for="quick-wait-@item.Id">@AppText.Get("Wait")</label>
-                                <input id="quick-wait-@item.Id" type="number" min="0" max="@WaitDuration.MaximumValue(quickEditForm.Unit)" @bind="quickEditForm.WaitValue" />
+                                <input id="quick-wait-@item.Id" type="number" min="0" max="@WaitDuration.MaximumValue(quickEditForm.Unit)" @bind="quickEditForm.WaitValue" disabled="@(quickEditForm.EstimateStatus != EstimateStatus.Available)" />
                             </div>
                             <div>
                                 <label for="quick-unit-@item.Id">@AppText.Get("Unit")</label>
-                                <select id="quick-unit-@item.Id" @bind="quickEditForm.Unit">
+                                <select id="quick-unit-@item.Id" @bind="quickEditForm.Unit" disabled="@(quickEditForm.EstimateStatus != EstimateStatus.Available)">
                                     <option value="@WaitUnit.Dagar">@AppText.Get("UnitDays")</option>
                                     <option value="@WaitUnit.Vikur">@AppText.Get("UnitWeeks")</option>
                                     <option value="@WaitUnit.Manadir">@AppText.Get("UnitMonths")</option>
                                 </select>
                             </div>
                             <div>
-                                <label for="quick-note-@item.Id">@AppText.Get("Note")</label>
-                                <input id="quick-note-@item.Id" @bind="quickEditForm.Note" placeholder="@AppText.Get("Optional")" />
+                                <label for="quick-note-@item.Id">@AppText.Get("ReferralConditions")</label>
+                                <input maxlength="500" id="quick-note-@item.Id" @bind="quickEditForm.Note" placeholder="@AppText.Get("Optional")" />
                             </div>
                             <div class="admin-quick-edit-actions">
                                 <button class="btn-teal" @onclick="BeginQuickEditPreview" disabled="@isQuickSaving">@AppText.Get("SaveChanges")</button>
@@ -281,7 +293,9 @@
                         <button class="btn-secondary reload-latest" @onclick="() => ReloadConflictedItemAsync(false)">@AppText.Get("ReloadLatest")</button>
                     }
                 }
+                <p>@AppText.Get("ReferralEstimateStaffHelp")</p>
                 <div class="edit-form-grid">
+                    <ReferralEstimateFields State="editForm" Prefix="edit" Changed="StateHasChanged" />
                     @if (isSuperAdmin)
                     {
                     <div class="edit-form-field edit-form-field-wide">
@@ -313,19 +327,19 @@
                     }
                     <div class="edit-form-field">
                         <label for="edit-wait">@AppText.Get("Wait")</label>
-                        <input id="edit-wait" type="number" min="0" max="@WaitDuration.MaximumValue(editForm.Unit)" @bind="editForm.WaitValue" />
+                        <input id="edit-wait" type="number" min="0" max="@WaitDuration.MaximumValue(editForm.Unit)" @bind="editForm.WaitValue" disabled="@(editForm.EstimateStatus != EstimateStatus.Available)" />
                     </div>
                     <div class="edit-form-field">
                         <label for="edit-unit">@AppText.Get("Unit")</label>
-                        <select id="edit-unit" @bind="editForm.Unit">
+                        <select id="edit-unit" @bind="editForm.Unit" disabled="@(editForm.EstimateStatus != EstimateStatus.Available)">
                             <option value="@WaitUnit.Dagar">@AppText.Get("UnitDays")</option>
                             <option value="@WaitUnit.Vikur">@AppText.Get("UnitWeeks")</option>
                             <option value="@WaitUnit.Manadir">@AppText.Get("UnitMonths")</option>
                         </select>
                     </div>
                     <div class="edit-form-field edit-form-field-wide">
-                        <label for="edit-note">@AppText.Get("Note")</label>
-                        <input id="edit-note" @bind="editForm.Note" placeholder="@AppText.Get("Optional")" />
+                        <label for="edit-note">@AppText.Get("ReferralConditions")</label>
+                        <input maxlength="500" id="edit-note" @bind="editForm.Note" placeholder="@AppText.Get("Optional")" />
                     </div>
                 </div>
                 @if (showEditPreview)

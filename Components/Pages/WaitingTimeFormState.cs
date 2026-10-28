@@ -9,6 +9,9 @@ public sealed class WaitingTimeFormState
     public string Name { get; set; } = "";
     public int WaitValue { get; set; }
     public WaitUnit Unit { get; set; } = WaitUnit.Manadir;
+    public EstimateStatus EstimateStatus { get; set; } = EstimateStatus.Unknown;
+    public ReferralEndpoint ReferralEndpoint { get; set; }
+    public string? ResponsibleDepartment { get; set; }
     public string? Note { get; set; }
 
     public void Load(WaitingTime item)
@@ -19,6 +22,9 @@ public sealed class WaitingTimeFormState
         WaitValue = item.WaitValue;
         Unit = item.Unit;
         Note = item.Note;
+        EstimateStatus = item.EstimateStatus;
+        ReferralEndpoint = item.ReferralEndpoint;
+        ResponsibleDepartment = item.ResponsibleDepartment;
     }
 
     public void Clear()
@@ -29,5 +35,8 @@ public sealed class WaitingTimeFormState
         WaitValue = 0;
         Unit = WaitUnit.Manadir;
         Note = null;
+        EstimateStatus = EstimateStatus.Unknown;
+        ReferralEndpoint = ReferralEndpoint.Unspecified;
+        ResponsibleDepartment = null;
     }
 }

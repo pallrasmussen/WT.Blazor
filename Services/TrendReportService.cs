@@ -9,7 +9,10 @@ public record TrendReport(
     string? Department,
     string CurrentWait,
     string UnitLabel,
-    List<TrendPoint> Points);
+    List<TrendPoint> Points,
+    string? ReferralDefinition = null,
+    DateTime? VerifiedAt = null,
+    string? Conditions = null);
 
 public interface ITrendReportService
 {
@@ -29,8 +32,11 @@ public sealed class TrendReportService(ITrendReadService trendReader) : ITrendRe
             item.Name,
             DisplayNames.For(item.Hospital),
             item.Department is null ? null : DisplayNames.For(item.Department.Value),
-            $"{item.WaitValue} {DisplayNames.For(item.Unit, item.WaitValue)}",
+            ReferralEstimate.WaitText(item),
             DisplayNames.For(item.Unit, item.WaitValue),
-            points);
+            points,
+            ReferralEstimate.EndpointLabel(item.ReferralEndpoint),
+            item.EstimateStatus == EstimateStatus.Available ? item.VerifiedAt : null,
+            item.Note);
     }
 }

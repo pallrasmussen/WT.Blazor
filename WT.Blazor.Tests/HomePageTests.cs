@@ -10,6 +10,58 @@ namespace WT.Blazor.Tests;
 
 public class HomePageTests : BunitContext
 {
+    [Theory]
+    [InlineData(EstimateStatus.Available)]
+    [InlineData(EstimateStatus.Unknown)]
+    [InlineData(EstimateStatus.ServiceUnavailable)]
+    public void PublicCardsDistinguishUnavailableEstimatesFromZeroAndHideInternalOwnership(EstimateStatus status)
+    {
+        using var culture = new WT.Blazor.Tests.TestInfrastructure.TestCulture("en");
+        var item = new WaitingTime
+        {
+            Id = 22,
+            Name = "MRI",
+            Hospital = Hospital.Klaksvikar,
+            WaitValue = 0,
+            Unit = WaitUnit.Dagar,
+            EstimateStatus = status,
+            ReferralEndpoint = ReferralEndpoint.Investigation,
+            ResponsibleDepartment = "INTERNAL-OWNER",
+            VerifiedAt = new DateTime(2026, 1, 1),
+            Note = "Adults only"
+        };
+        Services.AddSingleton<IWaitingTimeCatalogService>(new SingleItemCatalog(item));
+        Services.AddSingleton<ITrendReadService>(new EmptyTrendReadService());
+        Services.AddSingleton<IPortalSettingsService>(new DefaultPortalSettingsService());
+        Services.AddSingleton<PortalSettingsChangeNotifier>();
+        Services.AddSingleton<PortalTelemetry>();
+        Services.AddSingleton(TimeProvider.System);
+        var cut = Render<Home>();
+        Assert.DoesNotContain("INTERNAL-OWNER", cut.Markup);
+        Assert.Contains("Investigation", cut.Markup);
+        Assert.Contains("routine referrals", cut.Markup);
+        Assert.Contains("Adults only", cut.Markup);
+        var card = cut.Find("#waiting-time-22");
+        if (status == EstimateStatus.Available)
+        {
+            Assert.Contains("0", card.QuerySelector(".wait-value")!.TextContent);
+            Assert.Contains("Last verified", card.TextContent);
+            Assert.NotNull(card.QuerySelector(".graph-link"));
+        }
+        else
+        {
+            Assert.Equal(ReferralEstimate.StatusLabel(status), card.QuerySelector(".wait-value")!.TextContent.Trim());
+            Assert.Null(card.QuerySelector(".graph-link"));
+            Assert.DoesNotContain("Last verified", card.TextContent);
+        }
+    }
+
+    private sealed class SingleItemCatalog(WaitingTime item) : IWaitingTimeCatalogService
+    {
+        public Task<List<WaitingTime>> GetActiveAsync(Hospital? hospital, Department? department) => Task.FromResult(new List<WaitingTime> { item });
+        public Task<List<WaitingTime>> GetAllAsync(Hospital? hospital, Department? department) => GetActiveAsync(hospital, department);
+    }
+
     [Fact]
     public void PublicPageHidesHospitalFilterAndLoadsAllWaitingTimes()
     {

@@ -16,6 +16,9 @@ public class WaitingTimeFormStateTests
             Department = Department.Medisinskidepilin,
             WaitValue = 12,
             Unit = WaitUnit.Vikur,
+            EstimateStatus = EstimateStatus.ServiceUnavailable,
+            ReferralEndpoint = ReferralEndpoint.Treatment,
+            ResponsibleDepartment = "Surgery",
             Note = "Fastandi tilvísing"
         };
         var state = new WaitingTimeFormState();
@@ -28,6 +31,9 @@ public class WaitingTimeFormStateTests
         Assert.Equal(item.WaitValue, state.WaitValue);
         Assert.Equal(item.Unit, state.Unit);
         Assert.Equal(item.Note, state.Note);
+        Assert.Equal(item.EstimateStatus, state.EstimateStatus);
+        Assert.Equal(item.ReferralEndpoint, state.ReferralEndpoint);
+        Assert.Equal(item.ResponsibleDepartment, state.ResponsibleDepartment);
     }
 
     [Fact]
@@ -51,5 +57,8 @@ public class WaitingTimeFormStateTests
         Assert.Equal(0, state.WaitValue);
         Assert.Equal(WaitUnit.Manadir, state.Unit);
         Assert.Null(state.Note);
+        Assert.Equal(EstimateStatus.Unknown, state.EstimateStatus);
+        Assert.Equal(ReferralEndpoint.Unspecified, state.ReferralEndpoint);
+        Assert.Null(state.ResponsibleDepartment);
     }
 }

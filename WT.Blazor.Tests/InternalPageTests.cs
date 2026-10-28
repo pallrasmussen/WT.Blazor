@@ -34,6 +34,7 @@ public class InternalPageTests : BunitContext
         {
             cut.Find("#new-hospital").Change(DisplayNames.For(Hospital.Klaksvikar));
             cut.Find("#new-name").Change("Too large");
+            cut.Find("#new-estimate-status").Change(EstimateStatus.Available.ToString());
         }
         else if (mode == "edit")
             cut.FindAll("button").Single(button => button.TextContent == AppText.Get("Edit")).Click();
@@ -140,6 +141,11 @@ public class InternalPageTests : BunitContext
 
         cut.Find("#new-hospital").Change(DisplayNames.For(Hospital.Klaksvikar));
         cut.Find("#new-name").Change("  New waiting time  ");
+        Assert.True(cut.Find("#new-wait").HasAttribute("disabled"));
+        cut.Find("#new-estimate-status").Change(EstimateStatus.Available.ToString());
+        Assert.False(cut.Find("#new-wait").HasAttribute("disabled"));
+        cut.Find("#new-referral-endpoint").Change(ReferralEndpoint.Treatment.ToString());
+        cut.Find("#new-responsible-department").Change("Surgery");
         cut.Find("#new-wait").Change("4");
         cut.Find("#new-unit").Change(WaitUnit.Vikur.ToString());
         cut.Find("#new-note").Change("  Note  ");
@@ -154,6 +160,9 @@ public class InternalPageTests : BunitContext
             Assert.Equal(4, request.WaitValue);
             Assert.Equal(WaitUnit.Vikur, request.Unit);
             Assert.Equal("Note", request.Note);
+            Assert.Equal(EstimateStatus.Available, request.EstimateStatus);
+            Assert.Equal(ReferralEndpoint.Treatment, request.ReferralEndpoint);
+            Assert.Equal("Surgery", request.ResponsibleDepartment);
         });
     }
 

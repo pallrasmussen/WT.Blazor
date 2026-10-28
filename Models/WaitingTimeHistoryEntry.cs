@@ -15,6 +15,11 @@ public class WaitingTimeHistoryEntry
     public Department? Department { get; set; }
     public string Name { get; set; } = string.Empty;
 
+    public EstimateStatus EstimateStatus { get; set; }
+    public ReferralEndpoint ReferralEndpoint { get; set; }
+    public string? ResponsibleDepartment { get; set; }
+    public int EstimateSeries { get; set; } = 1;
+
     public HistoryAction Action { get; set; }
     public string? Detail { get; set; }
 
