@@ -55,15 +55,38 @@ public class ImprovementRulesTests
         await using var db = new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connection).Options);
         await db.Database.EnsureCreatedAsync();
         var manager = new WaitingTimeManagementService(db, NullLogger<WaitingTimeManagementService>.Instance, new HttpContextAccessor(), TimeProvider.System);
-        var item = await manager.CreateAsync(new WaitingTimeCreate("MRI", Hospital.Klaksvikar, null, 4, WaitUnit.Vikur, "Routine adults", "staff", ReferralEndpoint: ReferralEndpoint.Investigation, ComparisonCode: " mri-1 "));
+        var item = await manager.CreateAsync(new WaitingTimeCreate
+        {
+            Name = "MRI",
+            Hospital = Hospital.Klaksvikar,
+            Department = null,
+            WaitValue = 4,
+            Unit = WaitUnit.Vikur,
+            Note = "Routine adults",
+            Username = "staff",
+            ReferralEndpoint = ReferralEndpoint.Investigation,
+            ComparisonCode = " mri-1 "
+        });
         Assert.Equal("MRI-1", item.ComparisonCode);
-        var update = new WaitingTimeUpdate(item.Id, item.Version, item.Name, item.Hospital, null, 40, item.Unit, item.Note, "staff",
-            ReferralEndpoint: item.ReferralEndpoint, ComparisonCode: item.ComparisonCode);
+        var update = new WaitingTimeUpdate
+        {
+            Id = item.Id,
+            ExpectedVersion = item.Version,
+            Name = item.Name,
+            Hospital = item.Hospital,
+            Department = null,
+            WaitValue = 40,
+            Unit = item.Unit,
+            Note = item.Note,
+            Username = "staff",
+            ReferralEndpoint = item.ReferralEndpoint,
+            ComparisonCode = item.ComparisonCode
+        };
         await Assert.ThrowsAsync<LargeEstimateChangeException>(() => manager.UpdateAsync(update));
         Assert.Equal(4, item.WaitValue);
         Assert.Equal(1, item.Version);
         Assert.Single(await db.WaitingTimeHistoryEntries.ToListAsync());
-        await manager.UpdateAsync(update with { ConfirmLargeChange = true });
+        item = await manager.UpdateAsync(update with { ConfirmLargeChange = true });
         Assert.Equal(40, item.WaitValue);
         Assert.Equal(2, await db.WaitingTimeHistoryEntries.CountAsync());
     }

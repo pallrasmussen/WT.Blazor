@@ -1,3 +1,4 @@
+using WT.Blazor.Localization;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,7 +51,7 @@ public class HomePageTests : BunitContext
         }
         else
         {
-            Assert.Equal(ReferralEstimate.StatusLabel(status), card.QuerySelector(".wait-value")!.TextContent.Trim());
+            Assert.Equal(ReferralEstimateText.StatusLabel(status), card.QuerySelector(".wait-value")!.TextContent.Trim());
             Assert.Null(card.QuerySelector(".graph-link"));
             Assert.DoesNotContain("Last verified", card.TextContent);
         }

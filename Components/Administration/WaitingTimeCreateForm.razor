@@ -1,0 +1,96 @@
+@using WT.Blazor.Components.Shared
+@using WT.Blazor.Components.Pages
+@inject IWaitingTimeManagementService Manager
+@inject ILogger<WaitingTimeCreateForm> Logger
+
+<section class="create-box">
+    <p>@AppText.Get("ReferralEstimateStaffHelp")</p>
+    <div class="create-grid">
+        <ReferralEstimateFields State="Form" Prefix="new" Changed="StateHasChanged" />
+        <div>
+            <label for="new-hospital">@AppText.Get("HistoryColumnHospital")</label>
+            <select id="new-hospital" @bind="Form.HospitalName">
+                <option value="">@AppText.Get("ChooseHospital")</option>
+                @foreach (var h in EditableHospitals)
+                {
+                    <option value="@DisplayNames.For(h)">@(h == Hospital.Sjukrahusverkid ? AppText.Get("SharedWaitingLists") : DisplayNames.For(h))</option>
+                }
+            </select>
+        </div>
+        @if (Form.HospitalName == LandssjukrahusidName)
+        {
+            <div>
+                <label for="new-department">@AppText.Get("Department")</label>
+                <select id="new-department" @bind="Form.DepartmentName">
+                    <option value="">@AppText.Get("ChooseDepartment")</option>
+                    @foreach (var d in FormDepartments)
+                    {
+                        <option value="@d">@d</option>
+                    }
+                </select>
+            </div>
+        }
+        <div>
+            <label for="new-name">@AppText.Get("SpecialtyTreatment")</label>
+            <input maxlength="200" id="new-name" @bind="Form.Name" placeholder="@AppText.Get("SearchPlaceholder")" />
+        </div>
+        <div>
+            <label for="new-wait">@AppText.Get("Wait")</label>
+            <input id="new-wait" type="number" min="0" max="@WaitDuration.MaximumValue(Form.Unit)" @bind="Form.WaitValue" disabled="@(Form.EstimateStatus != EstimateStatus.Available)" />
+        </div>
+        <div>
+            <label for="new-unit">@AppText.Get("Unit")</label>
+            <select id="new-unit" @bind="Form.Unit" disabled="@(Form.EstimateStatus != EstimateStatus.Available)">
+                <option value="@WaitUnit.Dagar">@AppText.Get("UnitDays")</option>
+                <option value="@WaitUnit.Vikur">@AppText.Get("UnitWeeks")</option>
+                <option value="@WaitUnit.Manadir">@AppText.Get("UnitMonths")</option>
+            </select>
+        </div>
+    </div>
+    @if (Error is not null)
+    {
+        <div class="login-error">@Error</div>
+    }
+    <div style="margin-top:.8rem">
+        <label for="new-note">@AppText.Get("ReferralConditions")</label>
+        <input maxlength="500" id="new-note" @bind="Form.Note" placeholder="@AppText.Get("Optional")" />
+    </div>
+    <button class="btn-teal" style="margin-top:.9rem" @onclick="SaveAsync" disabled="@Busy">@AppText.Get("SaveNew")</button>
+    <button type="button" class="btn-secondary" style="margin-top:.9rem" @onclick="Close">@AppText.Get("Cancel")</button>
+</section>
+
+@code {
+    [Parameter] public string Username { get; set; } = "";
+    [Parameter] public EventCallback<WaitingTime> Created { get; set; }
+    [Parameter] public EventCallback Close { get; set; }
+    private WaitingTimeFormState Form { get; } = new();
+    private string? Error;
+    private bool Busy;
+    private static Hospital[] EditableHospitals => Enum.GetValues<Hospital>();
+    private static string[] FormDepartments => Enum.GetValues<Department>().Select(DisplayNames.For).ToArray();
+    private static string LandssjukrahusidName => DisplayNames.For(Hospital.Landssjukrahusid);
+
+    private async Task SaveAsync()
+    {
+        if (Busy) return;
+        var input = Form.ToInput();
+        if (WaitingTimeValidation.Validate(input) is { } issue)
+        {
+            Error = WaitingTimeValidationText.Message(issue);
+            return;
+        }
+        Busy = true;
+        Error = null;
+        try
+        {
+            var created = await Manager.CreateAsync(new WaitingTimeCreate(WaitingTimeValidation.Normalize(input)) { Username = Username });
+            await Created.InvokeAsync(created);
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Could not create a waiting-time estimate.");
+            Error = AppText.Get("EstimateSaveFailed");
+        }
+        finally { Busy = false; }
+    }
+}

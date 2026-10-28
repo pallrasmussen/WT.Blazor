@@ -5,7 +5,7 @@
     <select id="@($"{Prefix}-estimate-status")" @bind="State.EstimateStatus" @bind:after="() => Changed.InvokeAsync()">
         @foreach (var status in Enum.GetValues<EstimateStatus>())
         {
-            <option value="@status">@ReferralEstimate.StatusLabel(status)</option>
+            <option value="@status">@ReferralEstimateText.StatusLabel(status)</option>
         }
     </select>
 </div>
@@ -21,7 +21,7 @@
         <select id="@($"{Prefix}-referral-endpoint")" @bind="State.ReferralEndpoint">
             @foreach (var endpoint in Enum.GetValues<ReferralEndpoint>())
             {
-                <option value="@endpoint">@ReferralEstimate.EndpointLabel(endpoint)</option>
+                <option value="@endpoint">@ReferralEstimateText.EndpointLabel(endpoint)</option>
             }
         </select>
     </div>

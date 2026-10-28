@@ -361,3 +361,10 @@ retain its result as deployment evidence; the existing scheduled recovery-drill
 installer and monitor support periodic checks. CI verifies synthetic recovery,
 not the contents of a hospital's real backups. Real IIS permission acceptance is
 documented in [STAGING-BROWSER-CHECKS.md](docs/STAGING-BROWSER-CHECKS.md).
+
+### Maintaining estimate workflows
+
+See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for administration component ownership,
+shared input and validation rules, saved-record handling, and undo/concurrency
+contracts. New create/update commands use named properties rather than long
+positional argument lists.

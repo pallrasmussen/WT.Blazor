@@ -103,7 +103,7 @@
 						<span class="chip">@(item.Department is not null ? DisplayNames.For(item.Department.Value) : DisplayNames.For(item.Hospital))</span>
 						<span class="card-hospital">@DisplayNames.For(item.Hospital)</span>
 						<h3>@item.Name</h3>
-                        <p class="referral-definition">@AppText.Get("ReferralEndpoint"): @ReferralEstimate.EndpointLabel(item.ReferralEndpoint)</p>
+                        <p class="referral-definition">@AppText.Get("ReferralEndpoint"): @ReferralEstimateText.EndpointLabel(item.ReferralEndpoint)</p>
 						<div class="wait-value @(item.EstimateStatus == EstimateStatus.Available && !ReferralEstimate.IsExpired(item, portalSettings, CurrentUtc) ? "" : "estimate-unavailable")">
                             @if (item.EstimateStatus == EstimateStatus.Available && !ReferralEstimate.IsExpired(item, portalSettings, CurrentUtc))
                             {
@@ -112,7 +112,7 @@
                             }
                             else
                             {
-                                @ReferralEstimate.PublicWaitText(item, portalSettings, CurrentUtc)
+                                @ReferralEstimateText.PublicWaitText(item, portalSettings, CurrentUtc)
                             }
 							@if (item.EstimateStatus == EstimateStatus.Available && !ReferralEstimate.IsExpired(item, portalSettings, CurrentUtc) && item.WaitUpperValue is null && trendChanges.TryGetValue(item.Id, out var change))
 							{

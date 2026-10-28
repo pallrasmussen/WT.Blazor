@@ -1,0 +1,64 @@
+@using WT.Blazor.Components.Shared
+@inherits WaitingTimeEditorBase
+
+<div class="admin-quick-edit">
+    <ReferralEstimateFields State="Form" Changed="StateHasChanged" Prefix="@($"quick-{Item.Id}")" IncludeDefinition="false" />
+    <div>
+        <label for="quick-wait-@Item.Id">@AppText.Get("Wait")</label>
+        <input id="quick-wait-@Item.Id" type="number" min="0" max="@WaitDuration.MaximumValue(Form.Unit)" @bind="Form.WaitValue" disabled="@(Form.EstimateStatus != EstimateStatus.Available)" />
+    </div>
+    <div>
+        <label for="quick-unit-@Item.Id">@AppText.Get("Unit")</label>
+        <select id="quick-unit-@Item.Id" @bind="Form.Unit" disabled="@(Form.EstimateStatus != EstimateStatus.Available)">
+            <option value="@WaitUnit.Dagar">@AppText.Get("UnitDays")</option>
+            <option value="@WaitUnit.Vikur">@AppText.Get("UnitWeeks")</option>
+            <option value="@WaitUnit.Manadir">@AppText.Get("UnitMonths")</option>
+        </select>
+    </div>
+    <div>
+        <label for="quick-note-@Item.Id">@AppText.Get("ReferralConditions")</label>
+        <input maxlength="500" id="quick-note-@Item.Id" @bind="Form.Note" placeholder="@AppText.Get("Optional")" />
+    </div>
+    <div class="admin-quick-edit-actions">
+        <button class="btn-teal" @onclick="BeginPreview" disabled="@Busy">@AppText.Get("SaveChanges")</button>
+        <button class="btn-secondary" @onclick="RequestCloseAsync" disabled="@Busy">@AppText.Get("Cancel")</button>
+    </div>
+    @if (ShowPreview)
+    {
+        <div class="change-preview" role="status">
+            <strong>@AppText.Get("ChangePreview")</strong>
+            <ul>
+                @foreach (var change in PreviewChanges)
+                {
+                    <li>@change</li>
+                }
+            </ul>
+            @if (RequiresConfirmation)
+            {
+                <p class="large-change-warning" role="alert">@AppText.Get("LargeChangeWarning")</p>
+                <label for="confirm-large-quick"><input id="confirm-large-quick" type="checkbox" @bind="Acknowledged" /> @AppText.Get("ConfirmLargeChange")</label>
+            }
+            <button class="btn-teal" @onclick="SaveAsync" disabled="@(Busy || RequiresConfirmation && !Acknowledged)">@AppText.Get("ConfirmSave")</button>
+            <button class="btn-secondary" @onclick="CancelPreview" disabled="@Busy">@AppText.Get("Cancel")</button>
+        </div>
+    }
+    @if (Error is not null)
+    {
+        <p class="login-error" role="alert">@Error</p>
+        @if (Conflict)
+        {
+            <p>@AppText.Get("ReloadLatestHint")</p>
+            <button class="btn-secondary reload-latest" @onclick="Reload">@AppText.Get("ReloadLatest")</button>
+        }
+    }
+    @if (ConfirmDiscard)
+    {
+        <div class="discard-confirmation">
+            <span>@AppText.Get("UnsavedChanges")</span>
+            <button class="btn-secondary" @onclick="KeepEditing">@AppText.Get("KeepEditing")</button>
+            <button class="btn-danger" @onclick="DiscardAsync">@AppText.Get("DiscardChanges")</button>
+        </div>
+    }
+</div>
+
+@code { protected override bool Quick => true; }

@@ -23,11 +23,8 @@ public sealed class PortalSettingsService(ApplicationDbContext db, PortalSetting
     public async Task SaveAsync(PortalSettings settings, string username, CancellationToken cancellationToken = default)
     {
         using var operation = await DatabaseOperation.EnterAsync(db, cancellationToken);
-        settings.ReferralInstructionsFo = string.IsNullOrWhiteSpace(settings.ReferralInstructionsFo) ? null : settings.ReferralInstructionsFo.Trim();
-        settings.ReferralInstructionsEn = string.IsNullOrWhiteSpace(settings.ReferralInstructionsEn) ? null : settings.ReferralInstructionsEn.Trim();
-        settings.ContactGuidanceFo = string.IsNullOrWhiteSpace(settings.ContactGuidanceFo) ? null : settings.ContactGuidanceFo.Trim();
-        settings.ContactGuidanceEn = string.IsNullOrWhiteSpace(settings.ContactGuidanceEn) ? null : settings.ContactGuidanceEn.Trim();
-        Validate(settings);
+        PortalSettingsValidation.Normalize(settings);
+        PortalSettingsValidation.ThrowIfInvalid(settings);
 
         // A Blazor circuit can outlive changes saved by other administrators.
         // Load a fresh tracked row for each operation, preserving unrelated entities.
@@ -117,19 +114,4 @@ public sealed class PortalSettingsService(ApplicationDbContext db, PortalSetting
             .ToListAsync(cancellationToken);
     }
 
-    private static void Validate(PortalSettings settings)
-    {
-        var guidance = new[] { settings.ReferralInstructionsFo, settings.ReferralInstructionsEn, settings.ContactGuidanceFo, settings.ContactGuidanceEn };
-        if (guidance.Any(text => text?.Length > 2000)) throw new ArgumentException("Guidance cannot exceed 2000 characters per field.");
-        if (settings.PublishPatientGuidance && guidance.Any(string.IsNullOrWhiteSpace))
-            throw new ArgumentException("Both language versions of referral and contact guidance are required before publication.");
-        if (settings.EstimateExpiryMonths is < 1 or > 60)
-            throw new ArgumentOutOfRangeException(nameof(settings.EstimateExpiryMonths));
-        if (settings.GreenMaximumAgeMonths is < 1 or > 24)
-            throw new ArgumentOutOfRangeException(nameof(settings.GreenMaximumAgeMonths));
-        if (settings.YellowMaximumAgeMonths is < 2 or > 36 || settings.YellowMaximumAgeMonths <= settings.GreenMaximumAgeMonths)
-            throw new ArgumentOutOfRangeException(nameof(settings.YellowMaximumAgeMonths));
-        if (settings.LongWaitMonths is < 1 or > 60)
-            throw new ArgumentOutOfRangeException(nameof(settings.LongWaitMonths));
-    }
 }

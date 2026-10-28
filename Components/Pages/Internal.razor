@@ -4,6 +4,7 @@
 @attribute [Authorize(Policy = Policies.AdminAccess)]
 @implements IDisposable
 @using WT.Blazor.Components.Shared
+@using WT.Blazor.Components.Administration
 @inject IWaitingTimeCatalogService WaitingTimeCatalog
 @inject IWaitingTimeManagementService WaitingTimeManager
 @inject IHistoryReadService HistoryReader
@@ -27,62 +28,10 @@
 @if (!(isSuperAdmin && showCreateForm))
 {
 <section class="public-panel">
-        <div class="admin-toolbar">
-            <AdminFilterPresets SelectedPreset="@selectedPreset" PresetSelected="ApplyPresetAsync" />
-            <div>
-                <label for="admin-hospital">@AppText.Get("Hospital")</label>
-                <select id="admin-hospital" @bind="filterHospital" @bind:after="FilterChangedAsync">
-                    <option value="">@AppText.Get("AllWaitingLists")</option>
-                    @foreach (var h in FilterHospitals)
-                    {
-                        <option value="@h">@(h == Hospital.Sjukrahusverkid ? AppText.Get("SharedWaitingLists") : DisplayNames.For(h))</option>
-                    }
-                </select>
-            </div>
-            @if (filterHospital == Hospital.Landssjukrahusid)
-            {
-                <div>
-                    <label for="admin-dept">@AppText.Get("Department")</label>
-                    <select id="admin-dept" @bind="filterDepartment" @bind:after="FilterChangedAsync">
-                        <option value="">@AppText.Get("AllDepartments")</option>
-                        @foreach (var d in AllDepartments)
-                        {
-                            <option value="@d">@DisplayNames.For(d)</option>
-                        }
-                    </select>
-                </div>
-            }
-            <div>
-                <label for="admin-search">@AppText.Get("SearchByName")</label>
-                <input id="admin-search" @bind="searchText" @bind:event="oninput" placeholder="@AppText.Get("SearchPlaceholder")" />
-            </div>
-            <label class="review-filter" for="needs-review">
-                <input id="needs-review" type="checkbox" @bind="showNeedsReview" @bind:after="FilterChangedAsync" />
-                @string.Format(AppText.Get("NeedsReview"), items.Count(item => item.IsActive && ReviewReasons(item) != EstimateReviewReason.None))
-            </label>
-            @if (isSuperAdmin)
-            {
-                <label class="review-filter" for="show-inactive">
-                    <input id="show-inactive" type="checkbox" disabled="@showNeedsReview" @bind="showInactive" @bind:after="FilterChangedAsync" />
-                    @string.Format(AppText.Get("ShowInactive"), items.Count(item => !item.IsActive))
-                </label>
-            }
-        </div>
+        <AdministrationFilters State="filters" IsSuperAdmin="isSuperAdmin" SelectedPreset="@selectedPreset" PresetSelected="ApplyPresetAsync" Changed="FilterChangedAsync" LocalChanged="StateHasChanged"
+                               NeedsReviewCount="items.Count(item => item.IsActive && ReviewReasons(item) != EstimateReviewReason.None)" InactiveCount="items.Count(item => !item.IsActive)" />
 
-        @if (showNeedsReview)
-        {
-            <div class="review-queue-filters">
-                <div><label for="review-reason">@AppText.Get("ReviewReason")</label>
-                <select id="review-reason" @bind="reviewReason">
-                    <option value="@EstimateReviewReason.None">@AppText.Get("AllReviewReasons")</option>
-                    @foreach (var reason in Enum.GetValues<EstimateReviewReason>().Where(reason => reason != EstimateReviewReason.None))
-                    { <option value="@reason">@AppText.Get($"ReviewReason{reason}")</option> }
-                </select></div>
-                <div><label for="review-owner">@AppText.Get("ReviewOwnerFilter")</label><input id="review-owner" type="search" @bind="reviewOwner" @bind:event="oninput" /></div>
-            </div>
-            <p>@AppText.Get("ReviewQueueExplanation")</p>
-        }
-        @if (showNeedsReview && visibleItems.Count > 0)
+        @if (filters.NeedsReview && visibleItems.Count > 0)
         {
             <ReviewQueueActions Count="visibleItems.Count" Confirming="confirmReviewAll" Busy="isReviewing" Confirm="ConfirmReviewAllAsync" Cancel="CancelReviewAll" Begin="BeginReviewAll" />
         }
@@ -102,61 +51,7 @@
 
     @if (isSuperAdmin && showCreateForm)
     {
-        <section class="create-box">
-            <p>@AppText.Get("ReferralEstimateStaffHelp")</p>
-            <div class="create-grid">
-                <ReferralEstimateFields State="createForm" Prefix="new" Changed="StateHasChanged" />
-                <div>
-                    <label for="new-hospital">@AppText.Get("HistoryColumnHospital")</label>
-                    <select id="new-hospital" @bind="createForm.HospitalName">
-                        <option value="">@AppText.Get("ChooseHospital")</option>
-                        @foreach (var h in EditableHospitals)
-                        {
-                            <option value="@DisplayNames.For(h)">@(h == Hospital.Sjukrahusverkid ? AppText.Get("SharedWaitingLists") : DisplayNames.For(h))</option>
-                        }
-                    </select>
-                </div>
-                @if (createForm.HospitalName == LandssjukrahusidName)
-                {
-                    <div>
-                        <label for="new-department">@AppText.Get("Department")</label>
-                        <select id="new-department" @bind="createForm.DepartmentName">
-                            <option value="">@AppText.Get("ChooseDepartment")</option>
-                            @foreach (var d in FormDepartments)
-                            {
-                                <option value="@d">@d</option>
-                            }
-                        </select>
-                    </div>
-                }
-                <div>
-                    <label for="new-name">@AppText.Get("SpecialtyTreatment")</label>
-                    <input maxlength="200" id="new-name" @bind="createForm.Name" placeholder="@AppText.Get("SearchPlaceholder")" />
-                </div>
-                <div>
-                    <label for="new-wait">@AppText.Get("Wait")</label>
-                    <input id="new-wait" type="number" min="0" max="@WaitDuration.MaximumValue(createForm.Unit)" @bind="createForm.WaitValue" disabled="@(createForm.EstimateStatus != EstimateStatus.Available)" />
-                </div>
-                <div>
-                    <label for="new-unit">@AppText.Get("Unit")</label>
-                    <select id="new-unit" @bind="createForm.Unit" disabled="@(createForm.EstimateStatus != EstimateStatus.Available)">
-                        <option value="@WaitUnit.Dagar">@AppText.Get("UnitDays")</option>
-                        <option value="@WaitUnit.Vikur">@AppText.Get("UnitWeeks")</option>
-                        <option value="@WaitUnit.Manadir">@AppText.Get("UnitMonths")</option>
-                    </select>
-                </div>
-            </div>
-            @if (createErrorMessage is not null)
-            {
-                <div class="login-error">@createErrorMessage</div>
-            }
-            <div style="margin-top:.8rem">
-                <label for="new-note">@AppText.Get("ReferralConditions")</label>
-                <input maxlength="500" id="new-note" @bind="createForm.Note" placeholder="@AppText.Get("Optional")" />
-            </div>
-            <button class="btn-teal" style="margin-top:.9rem" @onclick="AddNew" disabled="@isSaving">@AppText.Get("SaveNew")</button>
-            <button type="button" class="btn-secondary" style="margin-top:.9rem" @onclick="CloseCreate">@AppText.Get("Cancel")</button>
-        </section>
+        <WaitingTimeCreateForm Username="@username" Created="HandleCreated" Close="CloseCreate" />
     }
 
     @if (!(isSuperAdmin && showCreateForm))
@@ -208,8 +103,8 @@
                     </div>
                     <div>
                         <label>@AppText.Get("Wait")</label>
-                        <div class="admin-value">@ReferralEstimate.WaitText(item)</div>
-                        <small>@ReferralEstimate.EndpointLabel(item.ReferralEndpoint)</small>
+                        <div class="admin-value">@ReferralEstimateText.WaitText(item)</div>
+                        <small>@ReferralEstimateText.EndpointLabel(item.ReferralEndpoint)</small>
                         <p>@AppText.Get("ResponsibleDepartment"): @(item.ResponsibleDepartment ?? AppText.Get("OwnerNotAssigned"))</p>
                     </div>
                     <div>
@@ -217,7 +112,7 @@
                         <div class="admin-value">@(string.IsNullOrWhiteSpace(item.Note) ? "-" : item.Note)</div>
                     </div>
                     <div class="admin-actions">
-                        @if (showNeedsReview)
+                        @if (filters.NeedsReview)
                         {
                             <button class="btn-secondary" @onclick="() => MarkReviewedAsync(item)" disabled="@isReviewing">@AppText.Get("MarkReviewed")</button>
                         }
@@ -236,65 +131,7 @@
                     </div>
                     @if (quickEditItem?.Id == item.Id)
                     {
-                        <div class="admin-quick-edit">
-                            <ReferralEstimateFields State="quickEditForm" Changed="StateHasChanged" Prefix="@($"quick-{item.Id}")" IncludeDefinition="false" />
-                            <div>
-                                <label for="quick-wait-@item.Id">@AppText.Get("Wait")</label>
-                                <input id="quick-wait-@item.Id" type="number" min="0" max="@WaitDuration.MaximumValue(quickEditForm.Unit)" @bind="quickEditForm.WaitValue" disabled="@(quickEditForm.EstimateStatus != EstimateStatus.Available)" />
-                            </div>
-                            <div>
-                                <label for="quick-unit-@item.Id">@AppText.Get("Unit")</label>
-                                <select id="quick-unit-@item.Id" @bind="quickEditForm.Unit" disabled="@(quickEditForm.EstimateStatus != EstimateStatus.Available)">
-                                    <option value="@WaitUnit.Dagar">@AppText.Get("UnitDays")</option>
-                                    <option value="@WaitUnit.Vikur">@AppText.Get("UnitWeeks")</option>
-                                    <option value="@WaitUnit.Manadir">@AppText.Get("UnitMonths")</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="quick-note-@item.Id">@AppText.Get("ReferralConditions")</label>
-                                <input maxlength="500" id="quick-note-@item.Id" @bind="quickEditForm.Note" placeholder="@AppText.Get("Optional")" />
-                            </div>
-                            <div class="admin-quick-edit-actions">
-                                <button class="btn-teal" @onclick="BeginQuickEditPreview" disabled="@isQuickSaving">@AppText.Get("SaveChanges")</button>
-                                <button class="btn-secondary" @onclick="RequestCloseQuickEdit" disabled="@isQuickSaving">@AppText.Get("Cancel")</button>
-                            </div>
-                            @if (showQuickEditPreview)
-                            {
-                                <div class="change-preview" role="status">
-                                    <strong>@AppText.Get("ChangePreview")</strong>
-                                    <ul>
-                                        @foreach (var change in QuickEditPreviewChanges())
-                                        {
-                                            <li>@change</li>
-                                        }
-                                    </ul>
-                                    @if (QuickRequiresConfirmation)
-                                    {
-                                        <p class="large-change-warning" role="alert">@AppText.Get("LargeChangeWarning")</p>
-                                        <label for="confirm-large-quick"><input id="confirm-large-quick" type="checkbox" @bind="LargeQuickAcknowledged" /> @AppText.Get("ConfirmLargeChange")</label>
-                                    }
-                                    <button class="btn-teal" @onclick="SaveQuickEdit" disabled="@(isQuickSaving || QuickRequiresConfirmation && !LargeQuickAcknowledged)">@AppText.Get("ConfirmSave")</button>
-                                    <button class="btn-secondary" @onclick="CancelQuickEditPreview" disabled="@isQuickSaving">@AppText.Get("Cancel")</button>
-                                </div>
-                            }
-                            @if (quickEditErrorMessage is not null)
-                            {
-                                <p class="login-error" role="alert">@quickEditErrorMessage</p>
-                                @if (quickEditConflict)
-                                {
-                                    <p>@AppText.Get("ReloadLatestHint")</p>
-                                    <button class="btn-secondary reload-latest" @onclick="() => ReloadConflictedItemAsync(true)">@AppText.Get("ReloadLatest")</button>
-                                }
-                            }
-                            @if (confirmDiscardQuickEdit)
-                            {
-                                <div class="discard-confirmation">
-                                    <span>@AppText.Get("UnsavedChanges")</span>
-                                    <button class="btn-secondary" @onclick="CancelDiscardQuickEdit">@AppText.Get("KeepEditing")</button>
-                                    <button class="btn-danger" @onclick="ConfirmDiscardQuickEdit">@AppText.Get("DiscardChanges")</button>
-                                </div>
-                            }
-                        </div>
+                        <WaitingTimeQuickEditor @key="item.Id" Item="item" Username="@username" Saved="HandleSaved" Close="CloseQuickEdit" Reload="() => ReloadConflictedItemAsync(true)" />
                     }
                 </article>
             }
@@ -304,100 +141,7 @@
 
     @if (editItem is not null)
     {
-        <div class="modal-backdrop" @ref="editModalRef" @onkeydown="@(e => { if (e.Key == "Escape") RequestCloseEdit(); })" tabindex="-1">
-            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="edit-dialog-title" tabindex="-1" @onclick:stopPropagation="true">
-                <h2 id="edit-dialog-title">@AppText.Get("EditWaitingTime")</h2>
-                @if (editErrorMessage is not null)
-                {
-                    <div class="login-error" @ref="editErrorRef" role="alert" tabindex="-1">@editErrorMessage</div>
-                    @if (editConflict)
-                    {
-                        <p>@AppText.Get("ReloadLatestHint")</p>
-                        <button class="btn-secondary reload-latest" @onclick="() => ReloadConflictedItemAsync(false)">@AppText.Get("ReloadLatest")</button>
-                    }
-                }
-                <p>@AppText.Get("ReferralEstimateStaffHelp")</p>
-                <div class="edit-form-grid">
-                    <ReferralEstimateFields State="editForm" Prefix="edit" Changed="StateHasChanged" />
-                    @if (isSuperAdmin)
-                    {
-                    <div class="edit-form-field edit-form-field-wide">
-                        <label for="edit-name">@AppText.Get("SpecialtyTreatment")</label>
-                        <input id="edit-name" @bind="editForm.Name" />
-                    </div>
-                    <div class="edit-form-field">
-                        <label for="edit-hospital">@AppText.Get("HistoryColumnHospital")</label>
-                        <select id="edit-hospital" @bind="editForm.HospitalName">
-                            @foreach (var h in EditableHospitals)
-                            {
-                                <option value="@DisplayNames.For(h)">@(h == Hospital.Sjukrahusverkid ? AppText.Get("SharedWaitingLists") : DisplayNames.For(h))</option>
-                            }
-                        </select>
-                    </div>
-                    @if (editForm.HospitalName == LandssjukrahusidName)
-                    {
-                        <div class="edit-form-field">
-                            <label for="edit-department">@AppText.Get("Department")</label>
-                            <select id="edit-department" @bind="editForm.DepartmentName">
-                                <option value="">@AppText.Get("ChooseDepartment")</option>
-                                @foreach (var d in FormDepartments)
-                                {
-                                    <option value="@d">@d</option>
-                                }
-                            </select>
-                        </div>
-                    }
-                    }
-                    <div class="edit-form-field">
-                        <label for="edit-wait">@AppText.Get("Wait")</label>
-                        <input id="edit-wait" type="number" min="0" max="@WaitDuration.MaximumValue(editForm.Unit)" @bind="editForm.WaitValue" disabled="@(editForm.EstimateStatus != EstimateStatus.Available)" />
-                    </div>
-                    <div class="edit-form-field">
-                        <label for="edit-unit">@AppText.Get("Unit")</label>
-                        <select id="edit-unit" @bind="editForm.Unit" disabled="@(editForm.EstimateStatus != EstimateStatus.Available)">
-                            <option value="@WaitUnit.Dagar">@AppText.Get("UnitDays")</option>
-                            <option value="@WaitUnit.Vikur">@AppText.Get("UnitWeeks")</option>
-                            <option value="@WaitUnit.Manadir">@AppText.Get("UnitMonths")</option>
-                        </select>
-                    </div>
-                    <div class="edit-form-field edit-form-field-wide">
-                        <label for="edit-note">@AppText.Get("ReferralConditions")</label>
-                        <input maxlength="500" id="edit-note" @bind="editForm.Note" placeholder="@AppText.Get("Optional")" />
-                    </div>
-                </div>
-                @if (showEditPreview)
-                {
-                    <div class="change-preview" role="status">
-                        <strong>@AppText.Get("ChangePreview")</strong>
-                        <ul>
-                            @foreach (var change in EditPreviewChanges())
-                            {
-                                <li>@change</li>
-                            }
-                        </ul>
-                        @if (EditRequiresConfirmation)
-                        {
-                            <p class="large-change-warning" role="alert">@AppText.Get("LargeChangeWarning")</p>
-                            <label for="confirm-large-edit"><input id="confirm-large-edit" type="checkbox" @bind="LargeEditAcknowledged" /> @AppText.Get("ConfirmLargeChange")</label>
-                        }
-                        <button class="btn-teal" @onclick="SaveEdit" disabled="@(EditRequiresConfirmation && !LargeEditAcknowledged)">@AppText.Get("ConfirmSave")</button>
-                        <button class="btn-secondary" @onclick="CancelEditPreview">@AppText.Get("Cancel")</button>
-                    </div>
-                }
-                <div class="modal-actions">
-                    <button class="btn-secondary" @onclick="RequestCloseEdit">@AppText.Get("Cancel")</button>
-                    <button class="btn-teal" @onclick="BeginEditPreview">@AppText.Get("SaveChanges")</button>
-                </div>
-                @if (confirmDiscardEdit)
-                {
-                    <div class="discard-confirmation">
-                        <span>@AppText.Get("UnsavedChanges")</span>
-                        <button class="btn-secondary" @onclick="CancelDiscardEdit">@AppText.Get("KeepEditing")</button>
-                        <button class="btn-danger" @onclick="ConfirmDiscardEdit">@AppText.Get("DiscardChanges")</button>
-                    </div>
-                }
-            </div>
-        </div>
+        <WaitingTimeEditDialog @key="editItem.Id" Item="editItem" IsSuperAdmin="isSuperAdmin" Username="@username" Saved="HandleSaved" Close="CloseEdit" Reload="() => ReloadConflictedItemAsync(false)" />
     }
 
     @if (itemPendingDeactivation is not null)

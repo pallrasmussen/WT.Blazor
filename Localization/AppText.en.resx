@@ -255,4 +255,7 @@
   <data name="WaitRangeHelp" xml:space="preserve"><value>The waiting time becomes the lower bound. Use the same unit for both bounds. Leave blank for a single value. Enter only a range supported by the department.</value></data>
   <data name="WaitRangeValidation" xml:space="preserve"><value>The upper bound must be at least the lower bound and within the supported waiting time.</value></data>
   <data name="RangeTrendExplanation" xml:space="preserve"><value>This estimate is a range. Ranges are not plotted as single values; changes remain available in the internal audit history.</value></data>
+  <data name="FieldLengthValidation" xml:space="preserve"><value>{0} cannot exceed {1} characters.</value></data>
+  <data name="InvalidEstimateValidation" xml:space="preserve"><value>Select valid estimate options.</value></data>
+  <data name="EstimateSaveFailed" xml:space="preserve"><value>The estimate could not be saved. Please try again.</value></data>
 </root>

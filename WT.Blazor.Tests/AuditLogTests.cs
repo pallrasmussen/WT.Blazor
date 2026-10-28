@@ -26,14 +26,33 @@ public class AuditLogTests
             var now = old.AddYears(1);
             var manager = new WaitingTimeManagementService(db, NullLogger<WaitingTimeManagementService>.Instance,
                 new HttpContextAccessor(), new FixedTimeProvider(old));
-            var item = await manager.CreateAsync(new WaitingTimeCreate("Original", Hospital.Klaksvikar, null, 3, WaitUnit.Vikur, null, "creator"));
-            if (action == "reactivate") await manager.DeactivateAsync(item.Id, item.Version, "tester");
+            var item = await manager.CreateAsync(new WaitingTimeCreate
+            {
+                Name = "Original",
+                Hospital = Hospital.Klaksvikar,
+                Department = null,
+                WaitValue = 3,
+                Unit = WaitUnit.Vikur,
+                Note = null,
+                Username = "creator"
+            });
+            if (action == "reactivate") item = await manager.DeactivateAsync(item.Id, item.Version, "tester");
             manager = new WaitingTimeManagementService(db, NullLogger<WaitingTimeManagementService>.Instance,
                 new HttpContextAccessor(), new FixedTimeProvider(now));
             if (action == "reactivate") await manager.ReactivateAsync(item.Id, item.Version, "tester");
             else if (action == "review") await manager.MarkReviewedAsync(item.Id, item.Version, "tester");
-            else await manager.UpdateAsync(new WaitingTimeUpdate(item.Id, item.Version, "Renamed", item.Hospital, null,
-                action == "wait" ? 4 : 3, item.Unit, "New note", "tester"));
+            else await manager.UpdateAsync(new WaitingTimeUpdate
+            {
+                Id = item.Id,
+                ExpectedVersion = item.Version,
+                Name = "Renamed",
+                Hospital = item.Hospital,
+                Department = null,
+                WaitValue = action == "wait" ? 4 : 3,
+                Unit = item.Unit,
+                Note = "New note",
+                Username = "tester"
+            });
 
             db.ChangeTracker.Clear();
             var saved = await db.WaitingTimes.SingleAsync();
@@ -59,10 +78,18 @@ public class AuditLogTests
                 NullLogger<WaitingTimeManagementService>.Instance,
                 new HttpContextAccessor(),
                 new FixedTimeProvider(timestamp));
-            var waitingTime = await managementService.CreateAsync(new WaitingTimeCreate(
-                "Testviðgerð", Hospital.Klaksvikar, null, 3, WaitUnit.Vikur, null, "heilsunet\\test-user"));
+            var waitingTime = await managementService.CreateAsync(new WaitingTimeCreate
+            {
+                Name = "Testviðgerð",
+                Hospital = Hospital.Klaksvikar,
+                Department = null,
+                WaitValue = 3,
+                Unit = WaitUnit.Vikur,
+                Note = null,
+                Username = "heilsunet\\test-user"
+            });
 
-            await managementService.MarkReviewedAsync(waitingTime.Id, waitingTime.Version, "heilsunet\\reviewer");
+            waitingTime = await managementService.MarkReviewedAsync(waitingTime.Id, waitingTime.Version, "heilsunet\\reviewer");
 
             var entry = Assert.Single(db.WaitingTimeHistoryEntries.Where(item => item.Action == HistoryAction.Reviewed));
             Assert.Equal("heilsunet\\reviewer", entry.Username);
@@ -93,8 +120,16 @@ public class AuditLogTests
                     new FixedTimeProvider(timestamp));
                 var readService = new WaitingTimeReadService(db, new FixedTimeProvider(timestamp));
 
-                var waitingTime = await managementService.CreateAsync(new WaitingTimeCreate(
-                    "Testviðgerð", Hospital.Klaksvikar, null, 3, WaitUnit.Vikur, null, "heilsunet\\test-user"));
+                var waitingTime = await managementService.CreateAsync(new WaitingTimeCreate
+                {
+                    Name = "Testviðgerð",
+                    Hospital = Hospital.Klaksvikar,
+                    Department = null,
+                    WaitValue = 3,
+                    Unit = WaitUnit.Vikur,
+                    Note = null,
+                    Username = "heilsunet\\test-user"
+                });
 
                 var query = new HistoryQuery(
                     Hospital: Hospital.Klaksvikar,
@@ -140,8 +175,16 @@ public class AuditLogTests
                     new HttpContextAccessor(),
                     TimeProvider.System);
 
-                await Assert.ThrowsAsync<DbUpdateException>(() => managementService.CreateAsync(new WaitingTimeCreate(
-                    "Óskrásett viðgerð", Hospital.Klaksvikar, null, 3, WaitUnit.Vikur, null, "heilsunet\\test-user")));
+                await Assert.ThrowsAsync<DbUpdateException>(() => managementService.CreateAsync(new WaitingTimeCreate
+                {
+                    Name = "Óskrásett viðgerð",
+                    Hospital = Hospital.Klaksvikar,
+                    Department = null,
+                    WaitValue = 3,
+                    Unit = WaitUnit.Vikur,
+                    Note = null,
+                    Username = "heilsunet\\test-user"
+                }));
 
                 db.ChangeTracker.Clear();
                 Assert.Empty(await db.WaitingTimes.ToListAsync());
@@ -221,10 +264,26 @@ public class AuditLogTests
                     new HttpContextAccessor(),
                     TimeProvider.System);
                 var readService = new WaitingTimeReadService(db, TimeProvider.System);
-                var active = await managementService.CreateAsync(new WaitingTimeCreate(
-                    "Virkin viðgerð", Hospital.Klaksvikar, null, 3, WaitUnit.Vikur, null, "heilsunet\\test-user"));
-                var inactive = await managementService.CreateAsync(new WaitingTimeCreate(
-                    "Óvirkin viðgerð", Hospital.Klaksvikar, null, 2, WaitUnit.Vikur, null, "heilsunet\\test-user"));
+                var active = await managementService.CreateAsync(new WaitingTimeCreate
+                {
+                    Name = "Virkin viðgerð",
+                    Hospital = Hospital.Klaksvikar,
+                    Department = null,
+                    WaitValue = 3,
+                    Unit = WaitUnit.Vikur,
+                    Note = null,
+                    Username = "heilsunet\\test-user"
+                });
+                var inactive = await managementService.CreateAsync(new WaitingTimeCreate
+                {
+                    Name = "Óvirkin viðgerð",
+                    Hospital = Hospital.Klaksvikar,
+                    Department = null,
+                    WaitValue = 2,
+                    Unit = WaitUnit.Vikur,
+                    Note = null,
+                    Username = "heilsunet\\test-user"
+                });
                 await managementService.DeactivateAsync(inactive.Id, inactive.Version, "heilsunet\\test-user");
 
                 var results = await readService.GetActiveAsync(Hospital.Klaksvikar, null);
@@ -259,10 +318,18 @@ public class AuditLogTests
                 NullLogger<WaitingTimeManagementService>.Instance,
                 new HttpContextAccessor(),
                 TimeProvider.System);
-            var waitingTime = await managementService.CreateAsync(new WaitingTimeCreate(
-                "Endurstovna bíðitíð", Hospital.Klaksvikar, null, 3, WaitUnit.Vikur, null, "heilsunet\\test-user"));
+            var waitingTime = await managementService.CreateAsync(new WaitingTimeCreate
+            {
+                Name = "Endurstovna bíðitíð",
+                Hospital = Hospital.Klaksvikar,
+                Department = null,
+                WaitValue = 3,
+                Unit = WaitUnit.Vikur,
+                Note = null,
+                Username = "heilsunet\\test-user"
+            });
 
-            await managementService.DeactivateAsync(waitingTime.Id, waitingTime.Version, "heilsunet\\test-user");
+            waitingTime = await managementService.DeactivateAsync(waitingTime.Id, waitingTime.Version, "heilsunet\\test-user");
             var restored = await managementService.ReactivateAsync(waitingTime.Id, waitingTime.Version, "heilsunet\\restorer");
 
             Assert.True(restored.IsActive);
@@ -296,8 +363,16 @@ public class AuditLogTests
                     new HttpContextAccessor(),
                     TimeProvider.System);
                 var readService = new WaitingTimeReadService(db, TimeProvider.System);
-                await managementService.CreateAsync(new WaitingTimeCreate(
-                    "Frákoplað viðgerð", Hospital.Klaksvikar, null, 3, WaitUnit.Vikur, null, "heilsunet\\test-user"));
+                await managementService.CreateAsync(new WaitingTimeCreate
+                {
+                    Name = "Frákoplað viðgerð",
+                    Hospital = Hospital.Klaksvikar,
+                    Department = null,
+                    WaitValue = 3,
+                    Unit = WaitUnit.Vikur,
+                    Note = null,
+                    Username = "heilsunet\\test-user"
+                });
                 db.ChangeTracker.Clear();
 
                 var waitingTime = Assert.Single(await readService.GetActiveAsync(Hospital.Klaksvikar, null));
@@ -325,10 +400,26 @@ public class AuditLogTests
                     new HttpContextAccessor(),
                     TimeProvider.System);
 
-                await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => managementService.CreateAsync(new WaitingTimeCreate(
-                    "Ógild viðgerð", Hospital.Klaksvikar, null, -1, WaitUnit.Vikur, null, "heilsunet\\test-user")));
-                await Assert.ThrowsAsync<ArgumentException>(() => managementService.CreateAsync(new WaitingTimeCreate(
-                    "Viðgerð uttan depil", Hospital.Landssjukrahusid, null, 3, WaitUnit.Vikur, null, "heilsunet\\test-user")));
+                await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => managementService.CreateAsync(new WaitingTimeCreate
+                {
+                    Name = "Ógild viðgerð",
+                    Hospital = Hospital.Klaksvikar,
+                    Department = null,
+                    WaitValue = -1,
+                    Unit = WaitUnit.Vikur,
+                    Note = null,
+                    Username = "heilsunet\\test-user"
+                }));
+                await Assert.ThrowsAsync<ArgumentException>(() => managementService.CreateAsync(new WaitingTimeCreate
+                {
+                    Name = "Viðgerð uttan depil",
+                    Hospital = Hospital.Landssjukrahusid,
+                    Department = null,
+                    WaitValue = 3,
+                    Unit = WaitUnit.Vikur,
+                    Note = null,
+                    Username = "heilsunet\\test-user"
+                }));
                 Assert.Empty(await db.WaitingTimes.ToListAsync());
             }
         }
@@ -352,15 +443,31 @@ public class AuditLogTests
                     new HttpContextAccessor(),
                     TimeProvider.System);
 
-                var waitingTime = await managementService.CreateAsync(new WaitingTimeCreate(
-                    "  Viðgerð  ", Hospital.Klaksvikar, Department.Medisinskidepilin, 3, WaitUnit.Vikur, "  Viðmerking  ", "heilsunet\\test-user"));
+                var waitingTime = await managementService.CreateAsync(new WaitingTimeCreate
+                {
+                    Name = "  Viðgerð  ",
+                    Hospital = Hospital.Klaksvikar,
+                    Department = Department.Medisinskidepilin,
+                    WaitValue = 3,
+                    Unit = WaitUnit.Vikur,
+                    Note = "  Viðmerking  ",
+                    Username = "heilsunet\\test-user"
+                });
 
                 Assert.Equal("Viðgerð", waitingTime.Name);
                 Assert.Equal("Viðmerking", waitingTime.Note);
                 Assert.Null(waitingTime.Department);
 
-                var sharedWaitingTime = await managementService.CreateAsync(new WaitingTimeCreate(
-                    "Felags viðgerð", Hospital.Sjukrahusverkid, Department.Medisinskidepilin, 3, WaitUnit.Vikur, null, "heilsunet\\test-user"));
+                var sharedWaitingTime = await managementService.CreateAsync(new WaitingTimeCreate
+                {
+                    Name = "Felags viðgerð",
+                    Hospital = Hospital.Sjukrahusverkid,
+                    Department = Department.Medisinskidepilin,
+                    WaitValue = 3,
+                    Unit = WaitUnit.Vikur,
+                    Note = null,
+                    Username = "heilsunet\\test-user"
+                });
 
                 Assert.Equal(Hospital.Sjukrahusverkid, sharedWaitingTime.Hospital);
                 Assert.Null(sharedWaitingTime.Department);
@@ -441,19 +548,30 @@ public class AuditLogTests
                     NullLogger<WaitingTimeManagementService>.Instance,
                     new HttpContextAccessor(),
                     TimeProvider.System);
-                var waitingTime = await managementService.CreateAsync(new WaitingTimeCreate(
-                    "Upprunaligt navn", Hospital.Klaksvikar, null, 3, WaitUnit.Vikur, null, "heilsunet\\test-user"));
+                var waitingTime = await managementService.CreateAsync(new WaitingTimeCreate
+                {
+                    Name = "Upprunaligt navn",
+                    Hospital = Hospital.Klaksvikar,
+                    Department = null,
+                    WaitValue = 3,
+                    Unit = WaitUnit.Vikur,
+                    Note = null,
+                    Username = "heilsunet\\test-user"
+                });
 
-                await managementService.UpdateAsync(new WaitingTimeUpdate(
-                    waitingTime.Id,
-                    waitingTime.Version,
-                    "Nýtt navn",
-                    Hospital.Landssjukrahusid,
-                    Department.Medisinskidepilin,
-                    2,
-                    WaitUnit.Manadir,
-                    "Nýggj viðmerking",
-                    "heilsunet\\test-user", ConfirmLargeChange: true));
+                await managementService.UpdateAsync(new WaitingTimeUpdate
+                {
+                    Id = waitingTime.Id,
+                    ExpectedVersion = waitingTime.Version,
+                    Name = "Nýtt navn",
+                    Hospital = Hospital.Landssjukrahusid,
+                    Department = Department.Medisinskidepilin,
+                    WaitValue = 2,
+                    Unit = WaitUnit.Manadir,
+                    Note = "Nýggj viðmerking",
+                    Username = "heilsunet\\test-user",
+                    ConfirmLargeChange = true
+                });
 
                 var entries = await db.WaitingTimeHistoryEntries
                     .Where(entry => entry.WaitingTimeId == waitingTime.Id)
@@ -490,15 +608,43 @@ public class AuditLogTests
                     NullLogger<WaitingTimeManagementService>.Instance,
                     new HttpContextAccessor(),
                     TimeProvider.System);
-                var waitingTime = await managementService.CreateAsync(new WaitingTimeCreate(
-                    "Bíðitíð", Hospital.Klaksvikar, null, 3, WaitUnit.Vikur, null, "heilsunet\\test-user"));
+                var waitingTime = await managementService.CreateAsync(new WaitingTimeCreate
+                {
+                    Name = "Bíðitíð",
+                    Hospital = Hospital.Klaksvikar,
+                    Department = null,
+                    WaitValue = 3,
+                    Unit = WaitUnit.Vikur,
+                    Note = null,
+                    Username = "heilsunet\\test-user"
+                });
                 var staleVersion = waitingTime.Version;
 
-                await managementService.UpdateAsync(new WaitingTimeUpdate(
-                    waitingTime.Id, staleVersion, waitingTime.Name, waitingTime.Hospital, null, 4, WaitUnit.Vikur, null, "heilsunet\\test-user"));
+                await managementService.UpdateAsync(new WaitingTimeUpdate
+                {
+                    Id = waitingTime.Id,
+                    ExpectedVersion = staleVersion,
+                    Name = waitingTime.Name,
+                    Hospital = waitingTime.Hospital,
+                    Department = null,
+                    WaitValue = 4,
+                    Unit = WaitUnit.Vikur,
+                    Note = null,
+                    Username = "heilsunet\\test-user"
+                });
 
-                await Assert.ThrowsAsync<WaitingTimeConcurrencyException>(() => managementService.UpdateAsync(new WaitingTimeUpdate(
-                    waitingTime.Id, staleVersion, waitingTime.Name, waitingTime.Hospital, null, 5, WaitUnit.Vikur, null, "heilsunet\\test-user")));
+                await Assert.ThrowsAsync<WaitingTimeConcurrencyException>(() => managementService.UpdateAsync(new WaitingTimeUpdate
+                {
+                    Id = waitingTime.Id,
+                    ExpectedVersion = staleVersion,
+                    Name = waitingTime.Name,
+                    Hospital = waitingTime.Hospital,
+                    Department = null,
+                    WaitValue = 5,
+                    Unit = WaitUnit.Vikur,
+                    Note = null,
+                    Username = "heilsunet\\test-user"
+                }));
             }
         }
         finally
@@ -520,8 +666,18 @@ public class AuditLogTests
                 new HttpContextAccessor(),
                 TimeProvider.System);
 
-            await Assert.ThrowsAsync<WaitingTimeNotFoundException>(() => managementService.UpdateAsync(new WaitingTimeUpdate(
-                999, 1, "Missing", Hospital.Klaksvikar, null, 1, WaitUnit.Dagar, null, "test-user")));
+            await Assert.ThrowsAsync<WaitingTimeNotFoundException>(() => managementService.UpdateAsync(new WaitingTimeUpdate
+            {
+                Id = 999,
+                ExpectedVersion = 1,
+                Name = "Missing",
+                Hospital = Hospital.Klaksvikar,
+                Department = null,
+                WaitValue = 1,
+                Unit = WaitUnit.Dagar,
+                Note = null,
+                Username = "test-user"
+            }));
             await Assert.ThrowsAsync<WaitingTimeNotFoundException>(() => managementService.MarkReviewedAsync(999, 1, "test-user"));
             await Assert.ThrowsAsync<WaitingTimeNotFoundException>(() => managementService.DeactivateAsync(999, 1, "test-user"));
             await Assert.ThrowsAsync<WaitingTimeNotFoundException>(() => managementService.ReactivateAsync(999, 1, "test-user"));

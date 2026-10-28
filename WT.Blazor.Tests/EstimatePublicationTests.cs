@@ -1,3 +1,4 @@
+using WT.Blazor.Localization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +23,7 @@ public class EstimatePublicationTests
         Assert.False(ReferralEstimate.IsExpired(item, settings, now));
         item.VerifiedAt = now.AddMonths(-12);
         Assert.True(ReferralEstimate.IsExpired(item, settings, now));
-        Assert.DoesNotContain("6 ", ReferralEstimate.PublicWaitText(item, settings, now));
+        Assert.DoesNotContain("6 ", ReferralEstimateText.PublicWaitText(item, settings, now));
         item.UpdatedAt = now; // Editing metadata cannot make this current.
         Assert.True(ReferralEstimate.IsExpired(item, settings, now));
         item.VerifiedAt = null;
@@ -41,26 +42,49 @@ public class EstimatePublicationTests
         await using var db = new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connection).Options);
         await db.Database.MigrateAsync();
         var manager = new WaitingTimeManagementService(db, NullLogger<WaitingTimeManagementService>.Instance, new HttpContextAccessor(), TimeProvider.System);
-        var create = new WaitingTimeCreate("Range", Hospital.Klaksvikar, null, 6, WaitUnit.Vikur, "Adults", "staff",
-            ReferralEndpoint: ReferralEndpoint.Treatment, WaitUpperValue: 10);
+        var create = new WaitingTimeCreate
+        {
+            Name = "Range",
+            Hospital = Hospital.Klaksvikar,
+            Department = null,
+            WaitValue = 6,
+            Unit = WaitUnit.Vikur,
+            Note = "Adults",
+            Username = "staff",
+            ReferralEndpoint = ReferralEndpoint.Treatment,
+            WaitUpperValue = 10
+        };
         var item = await manager.CreateAsync(create);
-        Assert.Contains("6–10", ReferralEstimate.WaitText(item));
-        Assert.Contains("42–70", ReferralEstimate.NumericText(item, canonicalDays: true));
+        Assert.Contains("6–10", ReferralEstimateText.WaitText(item));
+        Assert.Contains("42–70", ReferralEstimateText.NumericText(item, canonicalDays: true));
         var reader = new WaitingTimeReadService(db, TimeProvider.System);
         Assert.Empty(await reader.GetTrendPointsAsync(item.Id));
         Assert.Empty(await reader.GetTrendChangesAsync([item.Id]));
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => manager.CreateAsync(create with { WaitUpperValue = 5 }));
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => manager.CreateAsync(create with { WaitUpperValue = int.MaxValue }));
-        var update = new WaitingTimeUpdate(item.Id, item.Version, item.Name, item.Hospital, null, 6, item.Unit, item.Note, "staff", ReferralEndpoint: item.ReferralEndpoint, WaitUpperValue: 20);
+        var update = new WaitingTimeUpdate
+        {
+            Id = item.Id,
+            ExpectedVersion = item.Version,
+            Name = item.Name,
+            Hospital = item.Hospital,
+            Department = null,
+            WaitValue = 6,
+            Unit = item.Unit,
+            Note = item.Note,
+            Username = "staff",
+            ReferralEndpoint = item.ReferralEndpoint,
+            WaitUpperValue = 20
+        };
         await Assert.ThrowsAsync<LargeEstimateChangeException>(() => manager.UpdateAsync(update));
         Assert.Equal(10, item.WaitUpperValue);
-        await manager.UpdateAsync(update with { ConfirmLargeChange = true });
+        item = await manager.UpdateAsync(update with { ConfirmLargeChange = true });
         var audit = await db.WaitingTimeHistoryEntries.OrderByDescending(entry => entry.Id).FirstAsync();
         Assert.Equal(10, audit.OldWaitUpperValue);
         Assert.Equal(20, audit.NewWaitUpperValue);
         Assert.Contains("6–20", HistoryExportRow.From(audit).NewWait);
         var previousSeries = item.EstimateSeries;
-        await manager.UpdateAsync(update with { ExpectedVersion = item.Version, WaitUpperValue = null, ConfirmLargeChange = true });
+        item = await manager.UpdateAsync(update with { ExpectedVersion = item.Version, WaitUpperValue = null, ConfirmLargeChange = true });
         Assert.True(item.EstimateSeries > previousSeries);
         Assert.Single(await reader.GetTrendPointsAsync(item.Id));
         Assert.Empty(await reader.GetTrendChangesAsync([item.Id]));

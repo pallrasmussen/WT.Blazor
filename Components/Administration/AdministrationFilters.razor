@@ -1,0 +1,72 @@
+@using WT.Blazor.Components.Shared
+
+<div class="admin-toolbar">
+    <AdminFilterPresets SelectedPreset="@SelectedPreset" PresetSelected="PresetSelected" />
+    <div>
+        <label for="admin-hospital">@AppText.Get("Hospital")</label>
+        <select id="admin-hospital" @bind="State.Hospital" @bind:after="NotifyChangedAsync">
+            <option value="">@AppText.Get("AllWaitingLists")</option>
+            @foreach (var h in FilterHospitals)
+            {
+                <option value="@h">@(h == Hospital.Sjukrahusverkid ? AppText.Get("SharedWaitingLists") : DisplayNames.For(h))</option>
+            }
+        </select>
+    </div>
+    @if (State.Hospital == Hospital.Landssjukrahusid)
+    {
+        <div>
+            <label for="admin-dept">@AppText.Get("Department")</label>
+            <select id="admin-dept" @bind="State.Department" @bind:after="NotifyChangedAsync">
+                <option value="">@AppText.Get("AllDepartments")</option>
+                @foreach (var d in AllDepartments)
+                {
+                    <option value="@d">@DisplayNames.For(d)</option>
+                }
+            </select>
+        </div>
+    }
+    <div>
+        <label for="admin-search">@AppText.Get("SearchByName")</label>
+        <input id="admin-search" @bind="State.Search" @bind:event="oninput" @bind:after="NotifyLocalChangedAsync" placeholder="@AppText.Get("SearchPlaceholder")" />
+    </div>
+    <label class="review-filter" for="needs-review">
+        <input id="needs-review" type="checkbox" @bind="State.NeedsReview" @bind:after="NotifyChangedAsync" />
+        @string.Format(AppText.Get("NeedsReview"), NeedsReviewCount)
+    </label>
+    @if (IsSuperAdmin)
+    {
+        <label class="review-filter" for="show-inactive">
+            <input id="show-inactive" type="checkbox" disabled="@State.NeedsReview" @bind="State.Inactive" @bind:after="NotifyChangedAsync" />
+            @string.Format(AppText.Get("ShowInactive"), InactiveCount)
+        </label>
+    }
+</div>
+
+@if (State.NeedsReview)
+{
+    <div class="review-queue-filters">
+        <div><label for="review-reason">@AppText.Get("ReviewReason")</label>
+        <select id="review-reason" @bind="State.Reason" @bind:after="NotifyLocalChangedAsync">
+            <option value="@EstimateReviewReason.None">@AppText.Get("AllReviewReasons")</option>
+            @foreach (var reason in Enum.GetValues<EstimateReviewReason>().Where(reason => reason != EstimateReviewReason.None))
+            { <option value="@reason">@AppText.Get($"ReviewReason{reason}")</option> }
+        </select></div>
+        <div><label for="review-owner">@AppText.Get("ReviewOwnerFilter")</label><input id="review-owner" type="search" @bind="State.Owner" @bind:event="oninput" @bind:after="NotifyLocalChangedAsync" /></div>
+    </div>
+    <p>@AppText.Get("ReviewQueueExplanation")</p>
+}
+
+@code {
+    [Parameter, EditorRequired] public AdministrationFilterState State { get; set; } = default!;
+    [Parameter] public bool IsSuperAdmin { get; set; }
+    [Parameter] public int NeedsReviewCount { get; set; }
+    [Parameter] public int InactiveCount { get; set; }
+    [Parameter] public string? SelectedPreset { get; set; }
+    [Parameter] public EventCallback<string> PresetSelected { get; set; }
+    [Parameter] public EventCallback Changed { get; set; }
+    [Parameter] public EventCallback LocalChanged { get; set; }
+    private static Hospital[] FilterHospitals => Enum.GetValues<Hospital>();
+    private static Department[] AllDepartments => Enum.GetValues<Department>();
+    private Task NotifyChangedAsync() => Changed.InvokeAsync();
+    private Task NotifyLocalChangedAsync() => LocalChanged.InvokeAsync();
+}
