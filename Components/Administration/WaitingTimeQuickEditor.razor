@@ -2,7 +2,7 @@
 @inherits WaitingTimeEditorBase
 
 <div class="admin-quick-edit">
-    <ReferralEstimateFields State="Form" Changed="StateHasChanged" Prefix="@($"quick-{Item.Id}")" IncludeDefinition="false" IncludeUpperBound="false" IncludeReferralEndpoint="false" IncludeComparisonCode="false" />
+    <ReferralEstimateFields State="Form" Changed="StateHasChanged" Prefix="@($"quick-{Item.Id}")" IncludeDefinition="false" IncludeReferralEndpoint="false" IncludeComparisonCode="false" />
     <div>
         <label for="quick-wait-@Item.Id">@AppText.Get("Wait")</label>
         <input id="quick-wait-@Item.Id" type="number" min="0" max="@WaitDuration.MaximumValue(Form.Unit)" @bind="Form.WaitValue" disabled="@(Form.EstimateStatus != EstimateStatus.Available)" />
