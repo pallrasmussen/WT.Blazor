@@ -302,7 +302,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible
 .modal-backdrop { align-items: center; background: rgba(18, 53, 91, .45); display: flex; inset: 0; justify-content: center; padding: 1.25rem; position: fixed; z-index: 1000; }
 .modal { background: white; border-radius: 1rem; box-shadow: 0 24px 60px rgba(0,0,0,.25); display: block; max-height: 90vh; overflow: auto; padding: 1.5rem; position: relative; width: min(720px, 100%); }
 .modal h2 { margin-top: 0; }
-.edit-form-grid { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.edit-form-grid { align-items: start; display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .edit-form-field { display: grid; gap: .35rem; }
 .edit-form-field-wide { grid-column: 1 / -1; }
 .edit-form-field input, .edit-form-field select { min-width: 0; width: 100%; }
@@ -352,9 +352,13 @@ input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible
 .change-preview { background: #f0f7f6; border: 1px solid #b9dcd7; border-radius: .5rem; display: grid; gap: .6rem; margin-top: 1rem; padding: .8rem; }
 .change-preview ul { margin: 0; padding-left: 1.25rem; }
 .create-box { background: white; border: 1px solid var(--wt-line); border-radius: .75rem; margin-top: 1.5rem; padding: 1.25rem; }
-.create-grid { display: grid; gap: .8rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-top: .8rem; }
+.create-grid { align-items: start; display: grid; gap: .8rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-top: .8rem; }
 .create-grid > div { min-width: 0; }
-.create-grid label { display: block; margin-bottom: .4rem; }
+.create-grid .edit-form-field, .edit-form-grid .edit-form-field { align-content: start; row-gap: 0; }
+.create-grid .edit-form-field small, .edit-form-grid .edit-form-field small { margin-top: .35rem; }
+.create-grid label, .edit-form-grid label { display: block; margin-bottom: .4rem; }
+.create-grid label { min-height: 3em; }
+.edit-form-grid label { min-height: 1.25em; }
 .create-grid input, .create-grid select { width: 100%; }
 .admin-list { display: grid; gap: .9rem; margin-top: 1.5rem; }
 .admin-row { align-items: end; background: white; border: 1px solid var(--wt-line); border-radius: .75rem; display: grid; gap: .8rem; grid-template-columns: 1.4fr .8fr 1.2fr auto; padding: 1.1rem; }

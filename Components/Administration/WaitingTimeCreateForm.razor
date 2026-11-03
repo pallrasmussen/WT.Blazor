@@ -6,7 +6,7 @@
 <section class="create-box">
     <p>@AppText.Get("ReferralEstimateStaffHelp")</p>
     <div class="create-grid">
-        <ReferralEstimateFields State="Form" Prefix="new" Changed="StateHasChanged" />
+        <ReferralEstimateFields State="Form" Prefix="new" Changed="StateHasChanged" IncludeUpperBound="false" IncludeReferralEndpoint="false" IncludeComparisonCode="false" />
         <div>
             <label for="new-hospital">@AppText.Get("HistoryColumnHospital")</label>
             <select id="new-hospital" @bind="Form.HospitalName">
@@ -32,7 +32,7 @@
         }
         <div>
             <label for="new-name">@AppText.Get("SpecialtyTreatment")</label>
-            <input maxlength="@FieldLimits.WaitingTimeName" id="new-name" @bind="Form.Name" placeholder="@AppText.Get("SearchPlaceholder")" />
+            <input maxlength="@FieldLimits.WaitingTimeName" id="new-name" @bind="Form.Name" />
         </div>
         <div>
             <label for="new-wait">@AppText.Get("Wait")</label>
@@ -51,10 +51,6 @@
     {
         <div class="login-error">@Error</div>
     }
-    <div style="margin-top:.8rem">
-        <label for="new-note">@AppText.Get("ReferralConditions")</label>
-        <input maxlength="@FieldLimits.Note" id="new-note" @bind="Form.Note" placeholder="@AppText.Get("Optional")" />
-    </div>
     <button class="btn-teal" style="margin-top:.9rem" @onclick="SaveAsync" disabled="@Busy">@AppText.Get("SaveNew")</button>
     <button type="button" class="btn-secondary" style="margin-top:.9rem" @onclick="Close">@AppText.Get("Cancel")</button>
 </section>

@@ -15,7 +15,7 @@
             }
             <p>@AppText.Get("ReferralEstimateStaffHelp")</p>
             <div class="edit-form-grid">
-                <ReferralEstimateFields State="Form" Prefix="edit" Changed="StateHasChanged" />
+                <ReferralEstimateFields State="Form" Prefix="edit" Changed="StateHasChanged" IncludeUpperBound="false" IncludeReferralEndpoint="false" IncludeComparisonCode="false" />
                 @if (IsSuperAdmin)
                 {
                 <div class="edit-form-field edit-form-field-wide">
@@ -56,10 +56,6 @@
                         <option value="@WaitUnit.Vikur">@AppText.Get("UnitWeeks")</option>
                         <option value="@WaitUnit.Manadir">@AppText.Get("UnitMonths")</option>
                     </select>
-                </div>
-                <div class="edit-form-field edit-form-field-wide">
-                    <label for="edit-note">@AppText.Get("ReferralConditions")</label>
-                    <input maxlength="@FieldLimits.Note" id="edit-note" @bind="Form.Note" placeholder="@AppText.Get("Optional")" />
                 </div>
             </div>
             @if (ShowPreview)

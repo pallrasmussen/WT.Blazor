@@ -9,27 +9,36 @@
         }
     </select>
 </div>
-<div class="edit-form-field">
-    <label for="@($"{Prefix}-wait-upper")">@AppText.Get("WaitUpperValue")</label>
-    <input id="@($"{Prefix}-wait-upper")" type="number" min="@State.WaitValue" max="@WaitDuration.MaximumValue(State.Unit)" @bind="State.WaitUpperValue" @bind:after="() => Changed.InvokeAsync()" disabled="@(State.EstimateStatus != EstimateStatus.Available)" aria-describedby="@($"{Prefix}-range-help")" />
-    <small id="@($"{Prefix}-range-help")">@AppText.Get("WaitRangeHelp")</small>
-</div>
-@if (IncludeDefinition)
+@if (IncludeUpperBound)
 {
     <div class="edit-form-field">
-        <label for="@($"{Prefix}-referral-endpoint")">@AppText.Get("ReferralEndpoint")</label>
-        <select id="@($"{Prefix}-referral-endpoint")" @bind="State.ReferralEndpoint">
-            @foreach (var endpoint in Enum.GetValues<ReferralEndpoint>())
-            {
-                <option value="@endpoint">@ReferralEstimateText.EndpointLabel(endpoint)</option>
-            }
-        </select>
+        <label for="@($"{Prefix}-wait-upper")">@AppText.Get("WaitUpperValue")</label>
+        <input id="@($"{Prefix}-wait-upper")" type="number" min="@State.WaitValue" max="@WaitDuration.MaximumValue(State.Unit)" @bind="State.WaitUpperValue" @bind:after="() => Changed.InvokeAsync()" disabled="@(State.EstimateStatus != EstimateStatus.Available)" aria-describedby="@($"{Prefix}-range-help")" />
+        <small id="@($"{Prefix}-range-help")">@AppText.Get("WaitRangeHelp")</small>
     </div>
-    <div class="edit-form-field">
-        <label for="@($"{Prefix}-comparison-code")">@AppText.Get("ComparisonCode")</label>
-        <input id="@($"{Prefix}-comparison-code")" maxlength="@FieldLimits.ComparisonCode" @bind="State.ComparisonCode" aria-describedby="@($"{Prefix}-comparison-help")" />
-        <small id="@($"{Prefix}-comparison-help")">@AppText.Get("ComparisonCodeHelp")</small>
-    </div>
+}
+@if (IncludeDefinition)
+{
+    @if (IncludeReferralEndpoint)
+    {
+        <div class="edit-form-field">
+            <label for="@($"{Prefix}-referral-endpoint")">@AppText.Get("ReferralEndpoint")</label>
+            <select id="@($"{Prefix}-referral-endpoint")" @bind="State.ReferralEndpoint">
+                @foreach (var endpoint in Enum.GetValues<ReferralEndpoint>())
+                {
+                    <option value="@endpoint">@ReferralEstimateText.EndpointLabel(endpoint)</option>
+                }
+            </select>
+        </div>
+    }
+    @if (IncludeComparisonCode)
+    {
+        <div class="edit-form-field">
+            <label for="@($"{Prefix}-comparison-code")">@AppText.Get("ComparisonCode")</label>
+            <input id="@($"{Prefix}-comparison-code")" maxlength="@FieldLimits.ComparisonCode" @bind="State.ComparisonCode" aria-describedby="@($"{Prefix}-comparison-help")" />
+            <small id="@($"{Prefix}-comparison-help")">@AppText.Get("ComparisonCodeHelp")</small>
+        </div>
+    }
     <div class="edit-form-field">
         <label for="@($"{Prefix}-responsible-department")">@AppText.Get("ResponsibleDepartment")</label>
         <input id="@($"{Prefix}-responsible-department")" maxlength="@FieldLimits.ResponsibleDepartment" @bind="State.ResponsibleDepartment" aria-describedby="@($"{Prefix}-owner-help")" />
@@ -42,4 +51,7 @@
     [Parameter, EditorRequired] public string Prefix { get; set; } = "";
     [Parameter] public EventCallback Changed { get; set; }
     [Parameter] public bool IncludeDefinition { get; set; } = true;
+    [Parameter] public bool IncludeUpperBound { get; set; } = true;
+    [Parameter] public bool IncludeReferralEndpoint { get; set; } = true;
+    [Parameter] public bool IncludeComparisonCode { get; set; } = true;
 }

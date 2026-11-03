@@ -2,7 +2,7 @@
 @inherits WaitingTimeEditorBase
 
 <div class="admin-quick-edit">
-    <ReferralEstimateFields State="Form" Changed="StateHasChanged" Prefix="@($"quick-{Item.Id}")" IncludeDefinition="false" />
+    <ReferralEstimateFields State="Form" Changed="StateHasChanged" Prefix="@($"quick-{Item.Id}")" IncludeDefinition="false" IncludeUpperBound="false" IncludeReferralEndpoint="false" IncludeComparisonCode="false" />
     <div>
         <label for="quick-wait-@Item.Id">@AppText.Get("Wait")</label>
         <input id="quick-wait-@Item.Id" type="number" min="0" max="@WaitDuration.MaximumValue(Form.Unit)" @bind="Form.WaitValue" disabled="@(Form.EstimateStatus != EstimateStatus.Available)" />
@@ -14,10 +14,6 @@
             <option value="@WaitUnit.Vikur">@AppText.Get("UnitWeeks")</option>
             <option value="@WaitUnit.Manadir">@AppText.Get("UnitMonths")</option>
         </select>
-    </div>
-    <div>
-        <label for="quick-note-@Item.Id">@AppText.Get("ReferralConditions")</label>
-        <input maxlength="@FieldLimits.Note" id="quick-note-@Item.Id" @bind="Form.Note" placeholder="@AppText.Get("Optional")" />
     </div>
     <div class="admin-quick-edit-actions">
         <button class="btn-teal" @onclick="BeginPreview" disabled="@Busy">@AppText.Get("SaveChanges")</button>
