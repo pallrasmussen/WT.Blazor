@@ -6,7 +6,7 @@
 <section class="create-box">
     <p>@AppText.Get("ReferralEstimateStaffHelp")</p>
     <div class="create-grid">
-        <ReferralEstimateFields State="Form" Prefix="new" Changed="StateHasChanged" IncludeUpperBound="false" IncludeReferralEndpoint="false" IncludeComparisonCode="false" />
+        <ReferralEstimateFields State="Form" Prefix="new" Changed="StateHasChanged" IncludeUpperBound="false" IncludeComparisonCode="false" />
         <div>
             <label for="new-hospital">@AppText.Get("HistoryColumnHospital")</label>
             <select id="new-hospital" @bind="Form.HospitalName">
