@@ -46,7 +46,7 @@
     </div>
     <div class="edit-form-field">
         <label for="@($"{Prefix}-note")">@AppText.Get("ReferralConditions")</label>
-        <textarea id="@($"{Prefix}-note")" maxlength="@FieldLimits.Note" @bind="State.Note"></textarea>
+        <textarea id="@($"{Prefix}-note")" maxlength="@FieldLimits.Note" @bind="State.Note" @bind:after="() => Changed.InvokeAsync()"></textarea>
     </div>
 }
 
